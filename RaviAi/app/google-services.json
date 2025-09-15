@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "150254318822",
+    "project_id": "ravi-ai-d1e8a",
+    "storage_bucket": "ravi-ai-d1e8a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:150254318822:android:70ced449573f1a3ea53727",
+        "android_client_info": {
+          "package_name": "com.example.raviai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "150254318822-b7gi5a3to5ago6so3irjtrb9i4frfkgh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.raviai",
+            "certificate_hash": "d86b8634d0105d9ad2df6103e31e2d608535dfa3"
+          }
+        },
+        {
+          "client_id": "150254318822-choe9epkdvb8d6h1fhnun0q76d3krpfh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhZBenMKQxQpwlBQEEo4Q2o87M340eVmE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "150254318822-choe9epkdvb8d6h1fhnun0q76d3krpfh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
