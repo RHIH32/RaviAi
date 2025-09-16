@@ -369,7 +369,14 @@ Your subscription payments are handled by our secure third-party payment partner
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
 // Jab user Google se login karke vaapas aata hai, to yeh code result check karega
-auth.getRedirectResult()
+
+// Sabse pehle Firebase ko batayein ki localStorage ka istemal karna hai
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => {
+        console.log("Firebase persistence set to LOCAL.");
+        // Persistence set hone ke baad hi redirect result ko handle karein
+        return auth.getRedirectResult();
+    })
     .then((result) => {
         if (result && result.user) {
             // Login safal hua!
@@ -377,13 +384,11 @@ auth.getRedirectResult()
             console.log("Redirect login successful for:", user.displayName);
             handleLogin(user.displayName, user.email);
         }
-        // Agar result.user null hai to kuch nahi karna hai
     }).catch((error) => {
-        // Error handle karein
-        console.error("Google Redirect Login Error:", error.code, error.message);
-        alert("Google login failed: " + error.message);
+        // Yahan persistence ya redirect ka error handle hoga
+        console.error("Auth persistence or redirect error:", error.code, error.message);
     });
-
+// ------------------------------------------------------------------
         // --- DOM Elements ---
         const loginScreen = document.getElementById('login-screen');
         const paymentModal = document.getElementById('payment-modal');
@@ -1162,6 +1167,7 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
+
 
 
 
