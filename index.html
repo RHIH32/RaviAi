@@ -651,24 +651,60 @@ auth.getRedirectResult()
 
         // --- Speech Synthesis (TTS) ---
 
-// YEH FINAL AUR SABSE SAFE CODE HAI. APNE PURANE CODE KO ISSE REPLACE KAREIN.
+// YEH FINAL, ULTIMATE CODE HAI. ISSE POORE TTS SECTION KO REPLACE KAREIN.
 
-const synth = window.speechSynthesis;
+// Pehle hi check kar lein ki API maujood hai ya nahi
+const isSpeechSupported = 'speechSynthesis' in window && window.speechSynthesis !== null;
+
+let synth;
+let hindiVoice = null;
+
 const speakerOnIcon = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
 const speakerOffIcon = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l-4-4m0 4l4-4" /></svg>`;
 
 function loadVoices() {
-    // Yeh function ab sirf tabhi chalega jab voices 100% taiyaar hongi.
+    // Agar API support hi nahi karti to kuch na karein
+    if (!isSpeechSupported) return;
+    
     const voices = synth.getVoices();
+    if (!voices || voices.length === 0) return; // Extra safety check
+    
     hindiVoice = voices.find(v => v.lang === 'hi-IN' && v.name.includes('Google')) || voices.find(v => v.lang === 'hi-IN');
-    // Debugging ke liye yeh line add ki hai, taaki console mein pata chale ki voices load ho gayi hain.
     console.log("Voices successfully loaded. Found Hindi voice:", hindiVoice ? hindiVoice.name : "None");
 }
 
-// Puraani 'if' condition ko hata dein aur sirf is line ko rakhein.
-// Yeh browser ko batata hai: "Jab bhi voices taiyaar ho jaayein, tab loadVoices() chalaana."
-// Yahi sabse safe tarika hai.
-speechSynthesis.onvoiceschanged = loadVoices;
+function speak(text) {
+    // Agar API support nahi karti, ya Mute hai, ya text nahi hai, to kuch na karein
+    if (!isSpeechSupported || isMuted || !text) return;
+
+    synth.cancel();
+    const emojiRegex = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
+    const cleanText = text.replace(emojiRegex, '').replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/_ /g, ' ');
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    if (hindiVoice) utterance.voice = hindiVoice;
+    utterance.lang = 'hi-IN';
+    synth.speak(utterance);
+}
+
+function updateMuteButtonIcon() {
+    muteButton.innerHTML = isMuted ? speakerOffIcon : speakerOnIcon;
+}
+
+// Ab saara setup is condition ke andar karein
+if (isSpeechSupported) {
+    console.log("Speech Synthesis is supported.");
+    synth = window.speechSynthesis;
+    
+    // Event listener lagayein
+    synth.onvoiceschanged = loadVoices;
+    
+    // Initial load attempt, in case voices are already there
+    loadVoices();
+} else {
+    console.error("Speech Synthesis API is NOT supported in this WebView/Browser.");
+    // Voice-related UI (Mute Button) ko disable ya hide kar dein
+    if (muteButton) muteButton.style.display = 'none';
+}
 
 
 // ... baaki speak() aur updateMuteButtonIcon() functions vaise hi rahenge ...
@@ -1155,6 +1191,7 @@ speechSynthesis.onvoiceschanged = loadVoices;
     </script>
 </body>
 </html>
+
 
 
 
