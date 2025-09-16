@@ -366,52 +366,26 @@ Your subscription payments are handled by our secure third-party payment partner
 
         // Initialize Firebase
 
-// Yeh listener tabhi chalega jab Firebase ko user ki login state ka 100% pata hoga.
-auth.onAuthStateChanged(user => {
-    if (user) {
-        // User LOGGED IN hai (chahe Email se ya Google se)
-        console.log("onAuthStateChanged: User is logged in:", user.displayName || user.email);
-        
-        currentUser = user.displayName || user.email.split('@')[0]; // Username set karein
-        currentUserEmail = user.email;
+ firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
 
-        // User ki details ko localStorage mein save karein
-        localStorage.setItem('ravi-ai-user', currentUser);
-        localStorage.setItem('ravi-ai-email', currentUserEmail);
 
-        // Ab check karein ki user subscribed hai ya nahi
-        const isSubscribed = localStorage.getItem('ravi-ai-subscribed');
-
-        if (isSubscribed === 'true') {
-            // User logged in hai aur subscribed bhi hai -> Chat dikhayein
-            showChatInterface();
-        } else {
-            // User logged in hai, lekin subscribed nahi -> Payment page dikhayein
-            showPaymentInterface();
+auth.getRedirectResult()
+    .then((result) => {
+        if (result && result.user) {
+            // Login safal hua!
+            const user = result.user;
+            console.log("Redirect login successful for:", user.displayName);
+            handleLogin(user.displayName, user.email);
         }
+        // Agar result.user null hai to kuch nahi karna hai
+    }).catch((error) => {
+        // Error handle karein
+        console.error("Google Redirect Login Error:", error.code, error.message);
+        alert("Google login failed: " + error.message);
+    });
 
-    } else {
-        // User LOGGED OUT hai
-        console.log("onAuthStateChanged: User is logged out.");
-        showLoginInterface();
-
-        // Sirf zaroori cheezein hatayein, poora clear na karein (theme bachane ke liye)
-        localStorage.removeItem('ravi-ai-user');
-        localStorage.removeItem('ravi-ai-email');
-        localStorage.removeItem('ravi-ai-subscribed');
-    }
-});
-
-// Redirect se vaapas aane ko ab bhi handle karna hai, lekin iska kaam sirf error dikhana hai.
-// Asli state management upar onAuthStateChanged karega.
-auth.getRedirectResult().catch(error => {
-    console.error("Redirect Result Error:", error.code, error.message);
-    alert("Login mein samasya aayi: " + error.message);
-});
-
-// Aapke baaki event listeners setup karne wala function
-setupEventListeners();
-setupIcons(); // Ye functions yahan call karna theek hai
 // ------------------------------------------------------------------
         // --- DOM Elements ---
         const loginScreen = document.getElementById('login-screen');
@@ -1191,6 +1165,7 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
+
 
 
 
