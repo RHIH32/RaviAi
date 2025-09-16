@@ -369,6 +369,21 @@ Your subscription payments are handled by our secure third-party payment partner
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
+// Jab user Google se login karke vaapas aata hai, to yeh code result check karega
+auth.getRedirectResult()
+    .then((result) => {
+        if (result && result.user) {
+            // Login safal hua!
+            const user = result.user;
+            console.log("Redirect login successful for:", user.displayName);
+            handleLogin(user.displayName, user.email);
+        }
+        // Agar result.user null hai to kuch nahi karna hai
+    }).catch((error) => {
+        // Error handle karein
+        console.error("Google Redirect Login Error:", error.code, error.message);
+        alert("Google login failed: " + error.message);
+    });
 
         // --- DOM Elements ---
         const loginScreen = document.getElementById('login-screen');
@@ -959,16 +974,10 @@ Your subscription payments are handled by our secure third-party payment partner
             
             guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
             
+            // (REPLACE WITH THIS CORRECT CODE)
             googleLoginBtn.addEventListener('click', () => {
-               auth.signInWithRedirect(provider);
-                    .then((result) => {
-                        const user = result.user;
-                        handleLogin(user.displayName, user.email);
-                    }).catch((error) => {
-                        console.error("Google Login Error:", error.message);
-                        alert("Google login failed. Please check your Firebase configuration and make sure the domain is authorized.");
-                    });
-            });
+                auth.signInWithRedirect(provider);
+              });
 
             paymentButton.addEventListener('click', handlePayment);
 
@@ -1135,6 +1144,7 @@ Your subscription payments are handled by our secure third-party payment partner
     </script>
 </body>
 </html>
+
 
 
 
