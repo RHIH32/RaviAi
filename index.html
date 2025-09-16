@@ -635,17 +635,24 @@ Your subscription payments are handled by our secure third-party payment partner
             renderChatHistory();
         }
 
-        // --- Speech Synthesis (TTS) ---
-        const synth = window.speechSynthesis;
-        const speakerOnIcon = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
-        const speakerOffIcon = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l-4-4m0 4l4-4" /></svg>`;
-        
-        function loadVoices() {
-            const voices = synth.getVoices();
-            hindiVoice = voices.find(v => v.lang === 'hi-IN' && v.name.includes('Google')) || voices.find(v => v.lang === 'hi-IN');
-        }
-        loadVoices();
-        if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+       // --- Speech Synthesis (TTS) --- (SUDHARA HUA / CORRECTED)
+const synth = window.speechSynthesis;
+const speakerOnIcon = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
+const speakerOffIcon = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l-4-4m0 4l4-4" /></svg>`;
+
+function loadVoices() {
+    const voices = synth.getVoices();
+    hindiVoice = voices.find(v => v.lang === 'hi-IN' && v.name.includes('Google')) || voices.find(v => v.lang === 'hi-IN');
+}
+
+// Yeh sahi tarika hai
+if (synth.getVoices().length) {
+    loadVoices();
+} else if (synth.onvoiceschanged !== undefined) {
+    synth.onvoiceschanged = loadVoices;
+}
+
+// speak() function aur baaki code vaise hi rahega...
 
         function speak(text) {
             if (isMuted || !text) return;
@@ -950,13 +957,51 @@ Your subscription payments are handled by our secure third-party payment partner
             menuButton.addEventListener('click', toggleSidebar);
             collapseSidebarButton.addEventListener('click', toggleSidebar);
             
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const username = usernameInput.value.trim();
-                const email = emailInput.value.trim();
-                if (username && email) handleLogin(username, email);
-            });
-            
+           // --- setupEventListeners() function ke andar ---
+
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password || !username) {
+        alert("Please fill all fields.");
+        return;
+    }
+
+    // Pehle User ko Login karne ki koshish karein
+    auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            // Login successful
+            const user = userCredential.user;
+            handleLogin(user.displayName || username, user.email);
+        })
+        .catch((error) => {
+            // Agar login fail hota hai, to ho sakta hai user naya ho
+            if (error.code === 'auth/user-not-found') {
+                // User naya hai, to account create karein
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Signup successful
+                        const user = userCredential.user;
+                        // User ka naam set karein
+                        return user.updateProfile({
+                            displayName: username
+                        }).then(() => {
+                            handleLogin(username, user.email);
+                        });
+                    })
+                    .catch((createError) => {
+                        console.error("Signup Error:", createError.message);
+                        alert("Signup failed: " + createError.message);
+                    });
+            } else {
+                console.error("Login Error:", error.message);
+                alert("Login failed: " + error.message);
+            }
+        });
+});
             guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
             
             googleLoginBtn.addEventListener('click', () => {
