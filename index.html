@@ -960,7 +960,7 @@ Your subscription payments are handled by our secure third-party payment partner
             guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
             
             googleLoginBtn.addEventListener('click', () => {
-                auth.signInWithPopup(provider)
+               auth.signInWithRedirect(provider);
                     .then((result) => {
                         const user = result.user;
                         handleLogin(user.displayName, user.email);
@@ -1135,5 +1135,6 @@ Your subscription payments are handled by our secure third-party payment partner
     </script>
 </body>
 </html>
+
 
 
