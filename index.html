@@ -366,26 +366,66 @@ Your subscription payments are handled by our secure third-party payment partner
 
         // Initialize Firebase
 
- firebase.initializeApp(firebaseConfig);
+   firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
 
+         // --- STEP 2: LOGIN FUNCTION (signInWithRedirect) ---
+        // Login button par click hone par user Google sign-in page par redirect ho jayega
+        loginBtn.addEventListener('click', () => {
+            auth.signInWithRedirect(provider);
+        });
+        
+        // --- STEP 3: LOGOUT FUNCTION ---
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                console.log("User signed out.");
+                // Logout ke baad onAuthStateChanged isko handle kar lega
+            });
+        });
 
-auth.getRedirectResult()
-    .then((result) => {
-        if (result && result.user) {
-            // Login safal hua!
-            const user = result.user;
-            console.log("Redirect login successful for:", user.displayName);
-            handleLogin(user.displayName, user.email);
-        }
-        // Agar result.user null hai to kuch nahi karna hai
-    }).catch((error) => {
-        // Error handle karein
-        console.error("Google Redirect Login Error:", error.code, error.message);
-        alert("Google login failed: " + error.message);
-    });
+        // --- STEP 4: REDIRECT RESULT KO HANDLE KARNA ---
+        // Page load hone ke baad, yeh check karta hai ki kya user login karke redirect hua hai
+        auth.getRedirectResult()
+            .then((result) => {
+                if (result.user) {
+                    // Yahan user ki nayi login ki jaankari milti hai
+                    console.log("Redirect login successful for:", result.user.displayName);
+                }
+                // Agar result.user null hai to iska matlab ya to user pehle se logged in tha ya abhi tak login nahi kiya.
+                // onAuthStateChanged isko aage handle karega.
+            }).catch((error) => {
+                console.error("Google Redirect Login Error:", error.code, error.message);
+                alert("Google login failed: " + error.message);
+            });
 
+        // --- STEP 5: AUTH STATE LISTENER (SABSE ZAROORI) ---
+        // Yeh function hamesha user ke login status ko check karta hai, khaaskar page reload hone ke baad
+        auth.onAuthStateChanged((user) => {
+            loadingDiv.style.display = 'none'; // Loading state hatayein
+            if (user) {
+                // Agar user logged in hai:
+                console.log("Auth state changed: User is IN", user.displayName);
+                
+                // Logged in wala section dikhayein aur logged out wala chupayein
+                loggedInDiv.style.display = 'block';
+                loggedOutDiv.style.display = 'none';
+                
+                // User ki jaankari dikhayein
+                userInfoDiv.innerHTML = `
+                    <p>Email: ${user.email}</p>
+                    <p>Name: ${user.displayName}</p>
+                    <img src="${user.photoURL}" alt="Profile Picture" style="border-radius: 50%;">
+                `;
+            } else {
+                // Agar user logged out hai:
+                console.log("Auth state changed: User is OUT");
+                
+                // Logged out wala section dikhayein aur logged in wala chupayein
+                loggedInDiv.style.display = 'none';
+                loggedOutDiv.style.display = 'block';
+            }
+        });
 // ------------------------------------------------------------------
         // --- DOM Elements ---
         const loginScreen = document.getElementById('login-screen');
@@ -1165,6 +1205,7 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
+
 
 
 
