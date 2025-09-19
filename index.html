@@ -366,12 +366,12 @@ Your subscription payments are handled by our secure third-party payment partner
 
         // Initialize Firebase
 
+ firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const provider = new firebase.auth.GoogleAuthProvider()
 
- auth.getRedirectResult()
+auth.getRedirectResult()
     .then((result) => {
         if (result && result.user) {
             // Login safal hua!
@@ -1164,6 +1164,7 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
+
 
 
 
