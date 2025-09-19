@@ -366,66 +366,40 @@ Your subscription payments are handled by our secure third-party payment partner
 
         // Initialize Firebase
 
-   firebase.initializeApp(firebaseConfig);
+ firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
 
-         // --- STEP 2: LOGIN FUNCTION (signInWithRedirect) ---
-        // Login button par click hone par user Google sign-in page par redirect ho jayega
-        loginBtn.addEventListener('click', () => {
-            auth.signInWithRedirect(provider);
-        });
+
+// --- AUTHENTICATION STATE MANAGEMENT (FINAL & CORRECT CODE) ---
+
+// Yeh listener Firebase ka "source of truth" hai.
+// Yeh apne aap chalta hai jab user login karta hai, logout karta hai, ya page refresh karta hai.
+auth.onAuthStateChanged(user => {
+    if (user) {
+        // User is signed in.
+        // Yeh block tab chalega jab Firebase confirm kar dega ki user logged in hai.
+        console.log("Auth state changed: User is SIGNED IN", user);
         
-        // --- STEP 3: LOGOUT FUNCTION ---
-        logoutBtn.addEventListener('click', () => {
-            auth.signOut().then(() => {
-                console.log("User signed out.");
-                // Logout ke baad onAuthStateChanged isko handle kar lega
-            });
-        });
+        // Ab hum aapke handleLogin function ko call karenge taaki user ko payment ya chat screen dikhe.
+        // Yahan hum yeh maan rahe hain ki handleLogin function user ko payment screen par le jaata hai.
+        handleLogin(user.displayName, user.email); 
+        
+    } else {
+        // User is signed out.
+        console.log("Auth state changed: User is SIGNED OUT");
+        showLoginInterface();
+    }
+});
 
-        // --- STEP 4: REDIRECT RESULT KO HANDLE KARNA ---
-        // Page load hone ke baad, yeh check karta hai ki kya user login karke redirect hua hai
-        auth.getRedirectResult()
-            .then((result) => {
-                if (result.user) {
-                    // Yahan user ki nayi login ki jaankari milti hai
-                    console.log("Redirect login successful for:", result.user.displayName);
-                }
-                // Agar result.user null hai to iska matlab ya to user pehle se logged in tha ya abhi tak login nahi kiya.
-                // onAuthStateChanged isko aage handle karega.
-            }).catch((error) => {
-                console.error("Google Redirect Login Error:", error.code, error.message);
-                alert("Google login failed: " + error.message);
-            });
+// Redirect result ko handle karna ab bhi zaroori hai, taaki agar redirect ke dauraan koi error aaye to pata chale.
+// Asli state management upar wala listener karega.
+auth.getRedirectResult().catch(error => {
+    console.error("Redirect Result Error:", error.code, error.message);
+    alert("Login process mein samasya aayi: " + error.message);
+});
 
-        // --- STEP 5: AUTH STATE LISTENER (SABSE ZAROORI) ---
-        // Yeh function hamesha user ke login status ko check karta hai, khaaskar page reload hone ke baad
-        auth.onAuthStateChanged((user) => {
-            loadingDiv.style.display = 'none'; // Loading state hatayein
-            if (user) {
-                // Agar user logged in hai:
-                console.log("Auth state changed: User is IN", user.displayName);
-                
-                // Logged in wala section dikhayein aur logged out wala chupayein
-                loggedInDiv.style.display = 'block';
-                loggedOutDiv.style.display = 'none';
-                
-                // User ki jaankari dikhayein
-                userInfoDiv.innerHTML = `
-                    <p>Email: ${user.email}</p>
-                    <p>Name: ${user.displayName}</p>
-                    <img src="${user.photoURL}" alt="Profile Picture" style="border-radius: 50%;">
-                `;
-            } else {
-                // Agar user logged out hai:
-                console.log("Auth state changed: User is OUT");
-                
-                // Logged out wala section dikhayein aur logged in wala chupayein
-                loggedInDiv.style.display = 'none';
-                loggedOutDiv.style.display = 'block';
-            }
-        });
+  
 // ------------------------------------------------------------------
         // --- DOM Elements ---
         const loginScreen = document.getElementById('login-screen');
@@ -1205,6 +1179,7 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
+
 
 
 
