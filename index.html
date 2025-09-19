@@ -375,19 +375,13 @@ Your subscription payments are handled by our secure third-party payment partner
 auth.getRedirectResult()
     .then((result) => {
         if (result && result.user) {
-            // Login safal hua!
             const user = result.user;
-            console.log("Redirect login successful for:", user.displayName);
             handleLogin(user.displayName, user.email);
         }
-        // Agar result.user null hai to kuch nahi karna hai
     }).catch((error) => {
-        // Error handle karein
         console.error("Google Redirect Login Error:", error.code, error.message);
         alert("Google login failed: " + error.message);
     });
-
-  
 // ------------------------------------------------------------------
         // --- DOM Elements ---
         const loginScreen = document.getElementById('login-screen');
@@ -1167,6 +1161,7 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
+
 
 
 
