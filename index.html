@@ -367,21 +367,24 @@ Your subscription payments are handled by our secure third-party payment partner
         // Initialize Firebase
 
 
- firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const provider = new firebase.auth.GoogleAuthProvider();
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider()
 
-    // <<<<<<<<<<<<<< YAHAN PAR NAYA CODE AAYEGA >>>>>>>>>>>>>>
-    auth.getRedirectResult()
-        .then((result) => {
-            if (result && result.user) {
-                const user = result.user;
-                handleLogin(user.displayName, user.email);
-            }
-        }).catch((error) => {
-            console.error("Google Redirect Login Error:", error.code, error.message);
-            alert("Google login failed: " + error.message);
-        });
+ auth.getRedirectResult()
+    .then((result) => {
+        if (result && result.user) {
+            // Login safal hua!
+            const user = result.user;
+            console.log("Redirect login successful for:", user.displayName);
+            handleLogin(user.displayName, user.email);
+        }
+        // Agar result.user null hai to kuch nahi karna hai
+    }).catch((error) => {
+        // Error handle karein
+        console.error("Google Redirect Login Error:", error.code, error.message);
+        alert("Google login failed: " + error.message);
+    });
 // ------------------------------------------------------------------
         // --- DOM Elements ---
         const loginScreen = document.getElementById('login-screen');
@@ -1161,6 +1164,7 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
+
 
 
 
