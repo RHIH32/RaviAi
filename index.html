@@ -366,38 +366,26 @@ Your subscription payments are handled by our secure third-party payment partner
 
         // Initialize Firebase
 
+
  firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
 
 
-// --- AUTHENTICATION STATE MANAGEMENT (FINAL & CORRECT CODE) ---
-
-// Yeh listener Firebase ka "source of truth" hai.
-// Yeh apne aap chalta hai jab user login karta hai, logout karta hai, ya page refresh karta hai.
-auth.onAuthStateChanged(user => {
-    if (user) {
-        // User is signed in.
-        // Yeh block tab chalega jab Firebase confirm kar dega ki user logged in hai.
-        console.log("Auth state changed: User is SIGNED IN", user);
-        
-        // Ab hum aapke handleLogin function ko call karenge taaki user ko payment ya chat screen dikhe.
-        // Yahan hum yeh maan rahe hain ki handleLogin function user ko payment screen par le jaata hai.
-        handleLogin(user.displayName, user.email); 
-        
-    } else {
-        // User is signed out.
-        console.log("Auth state changed: User is SIGNED OUT");
-        showLoginInterface();
-    }
-});
-
-// Redirect result ko handle karna ab bhi zaroori hai, taaki agar redirect ke dauraan koi error aaye to pata chale.
-// Asli state management upar wala listener karega.
-auth.getRedirectResult().catch(error => {
-    console.error("Redirect Result Error:", error.code, error.message);
-    alert("Login process mein samasya aayi: " + error.message);
-});
+auth.getRedirectResult()
+    .then((result) => {
+        if (result && result.user) {
+            // Login safal hua!
+            const user = result.user;
+            console.log("Redirect login successful for:", user.displayName);
+            handleLogin(user.displayName, user.email);
+        }
+        // Agar result.user null hai to kuch nahi karna hai
+    }).catch((error) => {
+        // Error handle karein
+        console.error("Google Redirect Login Error:", error.code, error.message);
+        alert("Google login failed: " + error.message);
+    });
 
   
 // ------------------------------------------------------------------
@@ -1179,6 +1167,7 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
+
 
 
 
