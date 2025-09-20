@@ -1057,8 +1057,6 @@ if (isSpeechSupported) {
                     optionsPopover.classList.add('hidden');
                 }
 
-                 setupIcons();
-                 setupEventListeners();
             });
 
             removeFileButton.addEventListener('click', () => { selectedFile = null; filePreviewContainer.classList.add('hidden'); });
@@ -1156,10 +1154,13 @@ if (isSpeechSupported) {
         }
         
         initialize();
+           setupIcons();
+                 setupEventListeners();
     });
     </script>
 </body>
 </html>
+
 
 
 
