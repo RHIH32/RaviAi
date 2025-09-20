@@ -353,7 +353,7 @@ Your subscription payments are handled by our secure third-party payment partner
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- Firebase Configuration ---
-        // ZAROORI: Apne Firebase project ki details yahan daalein
+        // ZAROORI: Apne Firebase project ki details yahan 
         const firebaseConfig = {
          apiKey: "AIzaSyCTvZ63pkD4C9FnfOwmlKQX1QwDDOW3680",
          authDomain: "ravi-ai-d1e8a.firebaseapp.com",
@@ -371,20 +371,33 @@ Your subscription payments are handled by our secure third-party payment partner
         const provider = new firebase.auth.GoogleAuthProvider();
 
 
-auth.getRedirectResult()
-    .then((result) => {
-        if (result && result.user) {
-            // Login safal hua!
-            const user = result.user;
-            console.log("Redirect login successful for:", user.displayName);
-            handleLogin(user.displayName, user.email);
+// ===================================================================
+// YEH NAYA AUTH CODE YAHAN DAALEIN
+// ===================================================================
+auth.onAuthStateChanged(user => {
+    if (user) {
+        // User LOGGED IN hai
+        currentUser = user.displayName || user.email.split('@')[0];
+        currentUserEmail = user.email;
+        localStorage.setItem('ravi-ai-user', currentUser);
+        localStorage.setItem('ravi-ai-email', currentUserEmail);
+        const isSubscribed = localStorage.getItem('ravi-ai-subscribed');
+        
+        if (isSubscribed === 'true') {
+            showChatInterface();
+        } else {
+            showPaymentInterface();
         }
-        // Agar result.user null hai to kuch nahi karna hai
-    }).catch((error) => {
-        // Error handle karein
-        console.error("Google Redirect Login Error:", error.code, error.message);
-        alert("Google login failed: " + error.message);
-    });
+    } else {
+        // User LOGGED OUT hai
+        showLoginInterface();
+    }
+});
+
+auth.getRedirectResult().catch(error => {
+    console.error("Redirect Result Error:", error.code, error.message);
+});
+// ===================================================================
 // ------------------------------------------------------------------
         // --- DOM Elements ---
         const loginScreen = document.getElementById('login-screen');
@@ -443,27 +456,7 @@ auth.getRedirectResult()
         let selectedFile = null; 
 
         // --- Initialization ---
-        function initialize() {
-            const savedUser = localStorage.getItem('ravi-ai-user');
-            const savedEmail = localStorage.getItem('ravi-ai-email');
-            const savedTheme = localStorage.getItem('ravi-ai-theme');
-            const isSubscribed = localStorage.getItem('ravi-ai-subscribed');
-
-            if (savedTheme) {
-                document.body.classList.add(savedTheme);
-            }
-
-            if (savedUser && isSubscribed === 'true') {
-                currentUser = savedUser;
-                currentUserEmail = savedEmail;
-                showChatInterface();
-            } else {
-                showLoginInterface();
-                localStorage.clear(); // Clear all app-related storage on new session
-            }
-            setupIcons();
-            setupEventListeners();
-        }
+     
 
         // --- setupIcons ---
         function setupIcons() {
@@ -1063,6 +1056,9 @@ if (isSpeechSupported) {
                 if (!optionsPopover.classList.contains('hidden') && !optionsPopover.contains(e.target) && !optionsMenuButton.contains(e.target)) {
                     optionsPopover.classList.add('hidden');
                 }
+
+                 setupIcons();
+                 setupEventListeners();
             });
 
             removeFileButton.addEventListener('click', () => { selectedFile = null; filePreviewContainer.classList.add('hidden'); });
@@ -1164,6 +1160,7 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
+
 
 
 
