@@ -942,6 +942,61 @@ if (isSpeechSupported) {
             });
         }
 
+        / YEH NAYA FUNCTION ADD KAREIN
+// ==========================================================
+async function sendMessage() {
+    const userMessage = userInput.value.trim();
+    if (!userMessage && !selectedFile) return;
+
+    if (isSpeechSupported) synth.cancel();
+    addMessageToUI('user', userMessage || `Analyzing file: ${selectedFile.name}`);
+    userInput.value = '';
+    typingIndicator.classList.remove('hidden');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    if (createImageToggle.checked) {
+        createImageToggle.checked = false;
+        userInput.placeholder = "Yahan type karein ya bolein...";
+        addMessageToUI('model', "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨");
+        const imageBubble = addAILoadingBubble();
+        try {
+            const base64Image = await generateImage(userMessage);
+            renderGeneratedImage(imageBubble, `data:image/png;base64,${base64Image}`);
+        } catch (error) {
+            imageBubble.innerHTML = `<p class="text-red-400">Maaf kijiye, photo banane mein kuch samasya aa gayi.</p>`;
+        } finally {
+            typingIndicator.classList.add('hidden');
+        }
+        return;
+    }
+
+    let fileData = null;
+    if (selectedFile) {
+        try {
+            fileData = await readFileAsBase64(selectedFile);
+        } catch (error) {
+            addMessageToUI('model', "Maaf kijiye, file padhne mein samasya aa gayi.");
+            typingIndicator.classList.add('hidden');
+            return;
+        }
+    }
+
+    addMessageToHistory('user', userMessage, selectedFile ? {name: selectedFile.name, type: selectedFile.type} : null);
+    selectedFile = null;
+    filePreviewContainer.classList.add('hidden');
+
+    try {
+        const aiResponse = await getAIResponse(userMessage, fileData);
+        addMessageToHistory('model', aiResponse);
+        handleAIResponse(aiResponse);
+    } catch (error) {
+        console.error("Error getting AI response:", error);
+        addMessageToUI('model', "Maaf kijiye, kuch takneeki samasya aa gayi hai.");
+    } finally {
+        typingIndicator.classList.add('hidden');
+    }
+}
+
         function setupEventListeners() {
             menuButton.addEventListener('click', toggleSidebar);
             collapseSidebarButton.addEventListener('click', toggleSidebar);
@@ -1031,6 +1086,7 @@ if (isSpeechSupported) {
 
             chatForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                 sendMessage();
                 const userMessage = userInput.value.trim();
                 if (!userMessage && !selectedFile) return;
                 synth.cancel();
@@ -1075,6 +1131,12 @@ if (isSpeechSupported) {
                 } finally {
                     typingIndicator.classList.add('hidden');
                 }
+            });
+
+             // Yeh mobile par send button dabane par kaam karega
+                sendButton.addEventListener('click', (e) => {
+                  e.preventDefault();
+                   sendMessage();
             });
             
             chatContainer.addEventListener('click', (e) => {
@@ -1126,6 +1188,7 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
+
 
 
 
