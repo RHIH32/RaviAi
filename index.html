@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
     <!-- Razorpay Checkout Script for payments -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <!-- Prism.js for syntax highlighting -->
@@ -516,6 +518,37 @@ auth.getRedirectResult()
             }
         }
 
+        // ==========================================================
+// YEH DO NAYE FUNCTIONS YAHAN ADD KAREIN
+// ==========================================================
+
+function updateMuteButtonIcon() {
+    if (muteButton) { // Ensure muteButton exists
+        if (isMuted) {
+            muteButton.innerHTML = `<svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.293 12.293a1 1 0 011.414 0l.707.707a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-.707-.707a1 1 0 010-1.414l4-4zM9 12a1 1 0 01-1-1V5a1 1 0 012 0v6a1 1 0 01-1 1zM7 21a1 1 0 01-1-1V4a1 1 0 012 0v16a1 1 0 01-1 1zM15 21a1 1 0 01-1-1V8a1 1 0 012 0v12a1 1 0 01-1 1z" /></svg>`; // Muted icon
+        } else {
+            muteButton.innerHTML = `<svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h.01M12 12h.01M15 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`; // Unmuted icon (placeholder, you can find a speaker icon)
+        }
+    }
+}
+
+function setupIcons() {
+    // Mic Button setup
+    if (micButton) {
+        micButton.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7v0a7 7 0 01-7-7v0M12 18V21M17 21H7" /></svg>`;
+    }
+
+    // Mute Button setup
+    updateMuteButtonIcon(); // Call to set initial state
+
+    // Send Button setup
+    if (sendButton) {
+        sendButton.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>`;
+    }
+}
+
+// ==========================================================
+
         // --- Sidebar Logic ---
         function toggleSidebar() {
             sidebar.classList.toggle('collapsed');
@@ -983,6 +1016,11 @@ async function sendMessage() {
                 const email = emailInput.value.trim();
                 if (username && email) handleLogin(username, email);
         });
+        // ===================================================================
+// 4. Initial Calls (At the very end)
+// ===================================================================
+setupIcons(); // YAHAN PAR CALL KAREIN
+setupEventListeners();
 
             guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
             
