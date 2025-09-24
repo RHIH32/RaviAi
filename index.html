@@ -615,59 +615,9 @@ async function handlePayment() {
         // --- Speech Synthesis (TTS) ---
 // YEH FINAL AUR SAHI CODE HAI
 
-const isSpeechSupported = 'speechSynthesis' in window && window.speechSynthesis !== null;
-let synth;
 
-const speakerOnIcon = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
-const speakerOffIcon = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l-4-4m0 4l4-4" /></svg>`;
-
-function loadVoices() {
-    if (!isSpeechSupported) return;
-    const voices = synth.getVoices();
-    if (!voices || voices.length === 0) return;
-    hindiVoice = voices.find(v => v.lang === 'hi-IN' && v.name.includes('Google')) || voices.find(v => v.lang === 'hi-IN');
-    console.log("Voices loaded. Hindi voice:", hindiVoice ? hindiVoice.name : "None");
-}
-
-function speak(text) {
-    if (!isSpeechSupported || isMuted || !text) return;
-    synth.cancel();
-    const emojiRegex = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
-    const cleanText = text.replace(emojiRegex, '').replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/_ /g, ' ');
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    if (hindiVoice) utterance.voice = hindiVoice;
-    utterance.lang = 'hi-IN';
-    synth.speak(utterance);
-}
-
-function updateMuteButtonIcon() {
-    if (muteButton) {
-        muteButton.innerHTML = isMuted ? speakerOffIcon : speakerOnIcon;
-    }
-}
-
-if (isSpeechSupported) {
-    console.log("Speech Synthesis is supported.");
-    synth = window.speechSynthesis;
-    synth.onvoiceschanged = loadVoices;
-    loadVoices();
-} else {
-    console.error("Speech Synthesis API is NOT supported.");
-    if (muteButton) muteButton.style.display = 'none';
-    if (micButton) micButton.style.display = 'none';
-}
         // --- Speech Recognition (STT) ---
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'hi-IN';
-            recognition.interimResults = false;
-            micButton.addEventListener('click', () => micButton.classList.contains('mic-listening') ? recognition.stop() : recognition.start());
-            recognition.onstart = () => { micButton.classList.add('mic-listening'); };
-            recognition.onresult = (event) => { userInput.value = event.results[0][0].transcript; chatForm.dispatchEvent(new Event('submit', { cancelable: true })); };
-            recognition.onerror = (event) => { console.error("Speech recognition error:", event.error); };
-            recognition.onend = () => { micButton.classList.remove('mic-listening'); };
-        } else { micButton.disabled = true; }
+     
 
         // --- Main Chat Logic ---
         function addMessageToHistory(role, text, fileInfo = null) {
@@ -683,61 +633,86 @@ if (isSpeechSupported) {
             saveConversations();
         }
 
-        async function handleAIResponse(response, shouldSpeak = true) {
-             try {
-                // Use a regex to find a JSON object within the response string. This is more robust.
-                const jsonMatch = response.match(/\{[\s\S]*\}/);
-                if (!jsonMatch) {
-                    throw new Error("No JSON object found in the response.");
-                }
-
-                const command = JSON.parse(jsonMatch[0]);
-                let url = '', buttonText = '', buttonIcon = '';
-                
-                if (command.action === 'generate_image') {
-                    addMessageToUI('model', command.response);
-                    const loadingBubble = addAILoadingBubble();
-                    try {
-                        const base64Image = await generateImage(command.prompt);
-                        renderGeneratedImage(loadingBubble, `data:image/png;base64,${base64Image}`);
-                    } catch (e) {
-                        loadingBubble.innerHTML = `<p class="text-red-400">Photo banane mein samasya aa gayi. 😔</p>`;
-                    }
-                    return;
-                }
-
-                switch (command.action) {
-                    case 'google':
-                        url = `https://www.google.com/search?q=${encodeURIComponent(command.query)}`;
-                        buttonText = 'Google par dekhein';
-                        buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>`;
-                        break;
-                    case 'youtube':
-                        url = `https://www.youtube.com/results?search_query=${encodeURIComponent(command.query)}`;
-                        buttonText = 'YouTube par kholein';
-                        buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-                        break;
-                    case 'whatsapp':
-                        url = `https://wa.me/${command.number}?text=${encodeURIComponent(command.message)}`;
-                        buttonText = 'WhatsApp par bhejein';
-                        buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>`;
-                        break;
-                    case 'call':
-                        url = `tel:${command.number}`;
-                        buttonText = 'Abhi call karein';
-                        buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>`;
-                        break;
-                    default: throw new Error("Unknown command in JSON.");
-                }
-                addMessageWithAction(command.response, buttonText, buttonIcon, url);
-                if (shouldSpeak) speak(command.response);
-
-            } catch (error) {
-                // If no JSON is found or parsing fails, treat it as a regular message.
-                addMessageToUI('model', response);
-                if (shouldSpeak) speak(response.replace(/```[\s\S]*?```/g, '').replace(/\$\$(.*?)\$\$|\$(.*?)\$/g, ''));
-            }
+       async function handleAIResponse(response, shouldSpeak = true) {
+    try {
+        // Use a regex to find a JSON object within the response string. This is more robust.
+        const jsonMatch = response.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error("No JSON object found in the response.");
         }
+
+        const command = JSON.parse(jsonMatch[0]);
+        let url = '', buttonText = '', buttonIcon = '';
+        
+        if (command.action === 'generate_image') {
+            addMessageToUI('model', command.response);
+            const loadingBubble = addAILoadingBubble();
+            try {
+                const base64Image = await generateImage(command.prompt);
+                renderGeneratedImage(loadingBubble, `data:image/png;base64,${base64Image}`);
+            } catch (e) {
+                loadingBubble.innerHTML = `<p class="text-red-400">Photo banane mein samasya aa gayi. 😔</p>`;
+            }
+            return;
+        }
+
+        switch (command.action) {
+            case 'google':
+                url = `https://www.google.com/search?q=${encodeURIComponent(command.query)}`;
+                buttonText = 'Google par dekhein';
+                buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>`;
+                break;
+            case 'youtube':
+                url = `https://www.youtube.com/results?search_query=${encodeURIComponent(command.query)}`;
+                buttonText = 'YouTube par kholein';
+                buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                break;
+            case 'whatsapp':
+                url = `https://wa.me/${command.number}?text=${encodeURIComponent(command.message)}`;
+                buttonText = 'WhatsApp par bhejein';
+                buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>`;
+                break;
+            case 'call':
+                url = `tel:${command.number}`;
+                buttonText = 'Abhi call karein';
+                buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>`;
+                break;
+            case 'play_music':
+                url = `https://www.youtube.com/results?search_query=${encodeURIComponent(command.query + " song")}`;
+                buttonText = 'Gaana Sunien';
+                buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M3 19V6l12-3v13M12 19V6l12-3v13" /></svg>`;
+                break;
+            default: throw new Error("Unknown command in JSON.");
+        }
+        addMessageWithAction(command.response, buttonText, buttonIcon, url);
+
+        // === YAHAN BADLAV KIYA GAYA HAI ===
+        if (shouldSpeak && window.Android) {
+            // Android ke native TTS ko call karein
+            window.Android.speak(command.response);
+        }
+
+    } catch (error) {
+        // Agar JSON nahi milta ya parsing fails, to regular message ki tarah treat karein.
+        addMessageToUI('model', response);
+        
+        // === YAHAN BHI BADLAV KIYA GAYA HAI ===
+        if (shouldSpeak && window.Android) {
+            // Bolne se pehle text ko saaf karein (HTML tags aur code blocks hatayein)
+            const cleanText = response.replace(/<[^>]*>?/gm, '').replace(/```[\s\S]*?```/g, '').replace(/\$\$(.*?)\$\$|\$(.*?)\$/g, '');
+            // Android ke native TTS ko call karein
+            window.Android.speak(cleanText);
+        }
+    }
+}
+
+
+// Yeh function Android se voice result receive karega
+function onVoiceResult(text) {
+    userInput.value = text;
+    // Message bhejne ke liye form ko submit karein
+    chatForm.dispatchEvent(new Event('submit', { cancelable: true }));
+}
 
         function addAILoadingBubble() {
             const wrapper = document.createElement('div');
@@ -997,20 +972,18 @@ async function sendMessage() {
     } finally {
         typingIndicator.classList.add('hidden');
     }
-}
+ }
 
-
-        function setupEventListeners() {
+         function setupEventListeners() {
             menuButton.addEventListener('click', toggleSidebar);
-            collapseSidebarButton.addEventListener('click', toggleSidebar);
-            
+            collapseSidebarButton.addEventListener('click', toggleSidebar);  
             loginForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const username = usernameInput.value.trim();
                 const email = emailInput.value.trim();
                 if (username && email) handleLogin(username, email);
-            });
-            
+        });
+
             guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
             
             // (REPLACE WITH THIS CORRECT CODE)
@@ -1035,6 +1008,20 @@ async function sendMessage() {
                     showLoginInterface();
                 });
             });
+
+            micButton.addEventListener('click', () => {
+        if (window.Android) {
+            window.Android.startListening();
+        }
+       });
+
+      muteButton.addEventListener('click', () => {
+        isMuted = !isMuted;
+        updateMuteButtonIcon();
+        if (isMuted && window.Android) {
+            window.Android.speak(""); // Khaali text bhejkar speech rok dein
+        }
+       });
 
             newChatButton.addEventListener('click', startNewChat);
             muteButton.addEventListener('click', () => { isMuted = !isMuted; updateMuteButtonIcon(); if (isMuted) synth.cancel(); });
