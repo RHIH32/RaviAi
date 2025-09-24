@@ -944,6 +944,8 @@ if (isSpeechSupported) {
 
         / YEH NAYA FUNCTION ADD KAREIN
 // ==========================================================
+// YEH NAYA FUNCTION ADD KAREIN
+// ==========================================================
 async function sendMessage() {
     const userMessage = userInput.value.trim();
     if (!userMessage && !selectedFile) return;
@@ -954,39 +956,12 @@ async function sendMessage() {
     typingIndicator.classList.remove('hidden');
     chatContainer.scrollTop = chatContainer.scrollHeight;
 
-    if (createImageToggle.checked) {
-        createImageToggle.checked = false;
-        userInput.placeholder = "Yahan type karein ya bolein...";
-        addMessageToUI('model', "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨");
-        const imageBubble = addAILoadingBubble();
-        try {
-            const base64Image = await generateImage(userMessage);
-            renderGeneratedImage(imageBubble, `data:image/png;base64,${base64Image}`);
-        } catch (error) {
-            imageBubble.innerHTML = `<p class="text-red-400">Maaf kijiye, photo banane mein kuch samasya aa gayi.</p>`;
-        } finally {
-            typingIndicator.classList.add('hidden');
-        }
-        return;
-    }
-
-    let fileData = null;
-    if (selectedFile) {
-        try {
-            fileData = await readFileAsBase64(selectedFile);
-        } catch (error) {
-            addMessageToUI('model', "Maaf kijiye, file padhne mein samasya aa gayi.");
-            typingIndicator.classList.add('hidden');
-            return;
-        }
-    }
-
-    addMessageToHistory('user', userMessage, selectedFile ? {name: selectedFile.name, type: selectedFile.type} : null);
-    selectedFile = null;
-    filePreviewContainer.classList.add('hidden');
-
+    // ... Yahan par aapka image generation, file reading, aur AI response wala poora logic aayega ...
+    // Basically, your old chatForm listener's entire content goes here.
+    
+    // For simplicity, let's assume the rest of the logic is here.
     try {
-        const aiResponse = await getAIResponse(userMessage, fileData);
+        const aiResponse = await getAIResponse(userMessage, null); // Simplified for example
         addMessageToHistory('model', aiResponse);
         handleAIResponse(aiResponse);
     } catch (error) {
@@ -1084,61 +1059,31 @@ async function sendMessage() {
 
             removeFileButton.addEventListener('click', () => { selectedFile = null; filePreviewContainer.classList.add('hidden'); });
 
-            chatForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                 sendMessage();
-                const userMessage = userInput.value.trim();
-                if (!userMessage && !selectedFile) return;
-                synth.cancel();
-                addMessageToUI('user', userMessage || `Analyzing file: ${selectedFile.name}`);
-                userInput.value = '';
-                typingIndicator.classList.remove('hidden');
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-                if (createImageToggle.checked) {
-                    createImageToggle.checked = false;
-                    userInput.placeholder = "Yahan type karein ya bolein...";
-                    addMessageToUI('model', "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨");
-                    const imageBubble = addAILoadingBubble();
-                    try {
-                        const base64Image = await generateImage(userMessage);
-                        renderGeneratedImage(imageBubble, `data:image/png;base64,${base64Image}`);
-                    } catch (error) {
-                        imageBubble.innerHTML = `<p class="text-red-400">Maaf kijiye, photo banane mein kuch samasya aa gayi.</p>`;
-                    } finally {
-                        typingIndicator.classList.add('hidden');
-                    }
-                    return;
-                }
-                let fileData = null;
-                if (selectedFile) {
-                    try { fileData = await readFileAsBase64(selectedFile); } 
-                    catch (error) {
-                        addMessageToUI('model', "Maaf kijiye, file padhne mein samasya aa gayi.");
-                        typingIndicator.classList.add('hidden');
-                        return;
-                    }
-                }
-                addMessageToHistory('user', userMessage, selectedFile ? {name: selectedFile.name, type: selectedFile.type} : null);
-                selectedFile = null;
-                filePreviewContainer.classList.add('hidden');
-                try {
-                    const aiResponse = await getAIResponse(userMessage, fileData);
-                    addMessageToHistory('model', aiResponse);
-                    handleAIResponse(aiResponse);
-                } catch (error) {
-                    console.error("Error getting AI response:", error);
-                    addMessageToUI('model', "Maaf kijiye, kuch takneeki samasya aa gayi hai.");
-                } finally {
-                    typingIndicator.classList.add('hidden');
-                }
-            });
+           function setupEventListeners() {
+    // ... aapke baaki saare event listeners (jaise menuButton, loginForm, etc.)
 
-             // Yeh mobile par send button dabane par kaam karega
-                sendButton.addEventListener('click', (e) => {
-                  e.preventDefault();
-                   sendMessage();
-            });
-            
+    // ==========================================================
+    // PURANE CHATFORM LISTENER KO IN DONO SE REPLACE KAREIN
+    // ==========================================================
+    
+    // Yeh keyboard se "Enter" dabane par kaam karega
+    chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        sendMessage(); 
+    });
+
+    // Yeh mobile par send button dabane par kaam karega
+    sendButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        sendMessage();
+    });
+
+    // ==========================================================
+    
+    // ... aapke baaki saare event listeners (jaise chatContainer, logoutButton, etc.)
+}
+
+           
             chatContainer.addEventListener('click', (e) => {
                 const copyBtn = e.target.closest('.copy-btn');
                 if (copyBtn) {
@@ -1188,6 +1133,7 @@ async function sendMessage() {
     </script>
 </body>
 </html>
+
 
 
 
