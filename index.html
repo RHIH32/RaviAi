@@ -523,10 +523,19 @@ auth.getRedirectResult()
         }
         
         // --- Payment Logic ---
-        async function handlePayment() {
-            paymentButton.disabled = true;
-            paymentButton.textContent = 'Processing...';
-            paymentError.classList.add('hidden');
+        // --- Payment Logic (TESTING MODE) ---
+async function handlePayment() {
+    // Button ko disable karein taaki user dobara click na kar sake
+    paymentButton.disabled = true;
+    paymentButton.textContent = 'Processing...';
+    
+    console.log("Simulating successful payment for testing...");
+
+    // 1. Payment ko safal maan lein aur local storage mein save karein
+    localStorage.setItem('ravi-ai-subscribed', 'true');
+    
+    // 2. User ko seedhe chat interface par bhej dein
+    showChatInterface();
 
             try {
                 // 1. Create subscription on the server
