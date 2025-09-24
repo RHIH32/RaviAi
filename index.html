@@ -523,72 +523,20 @@ auth.getRedirectResult()
         }
         
         // --- Payment Logic ---
-        async function handlePayment() {
-            paymentButton.disabled = true;
-            paymentButton.textContent = 'Processing...';
-            paymentError.classList.add('hidden');
+     // --- Payment Logic (TESTING MODE) ---
+async function handlePayment() {
+    // Button ko disable karein taaki user dobara click na kar sake
+    paymentButton.disabled = true;
+    paymentButton.textContent = 'Processing...';
+    
+    console.log("Simulating successful payment for testing...");
 
-            try {
-                // 1. Create subscription on the server
-                const subRes = await fetch('https://raviai-1h96.onrender.com/api/create-subscription', { method: 'POST' });
-                if (!subRes.ok) throw new Error('Could not create subscription on the server.');
-                const subData = await subRes.json();
-                
-                const options = {
-                    key: subData.keyId,
-                    subscription_id: subData.subscriptionId,
-                    name: "Ravi AI",
-                    description: "Monthly Subscription",
-                    image: "https://raviai-1h96.onrender.com/RaviRंजन/Ravi-AI/main/logooo-removebg-preview.png",
-                    handler: async function (response) {
-                        // 2. Verify payment signature on the server
-                        const verificationRes = await fetch('https://raviai-1h96.onrender.com/api/verify-payment', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_subscription_id: response.razorpay_subscription_id, 
-                                razorpay_signature: response.razorpay_signature,
-                            }),
-                        });
-
-                        const verificationData = await verificationRes.json();
-                        if (verificationData.status === 'success') {
-                            localStorage.setItem('ravi-ai-subscribed', 'true');
-                            showChatInterface();
-                        } else {
-                            throw new Error('Payment verification failed.');
-                        }
-                    },
-                    prefill: {
-                        name: currentUser,
-                        email: currentUserEmail,
-                    },
-                    theme: {
-                        color: "#4f46e5"
-                    }
-                };
-                
-                const rzp = new Razorpay(options);
-                rzp.on('payment.failed', function (response) {
-                    console.error(response.error);
-                    paymentError.textContent = `Payment failed: ${response.error.description}. Please try again.`;
-                    paymentError.classList.remove('hidden');
-                    paymentButton.disabled = false;
-                    paymentButton.textContent = 'Subscribe Now';
-                });
-                
-                rzp.open();
-
-            } catch (error) {
-                console.error("Payment Error:", error);
-                paymentError.textContent = "An error occurred connecting to the payment gateway. Please try again later.";
-                paymentError.classList.remove('hidden');
-                paymentButton.disabled = false;
-                paymentButton.textContent = 'Subscribe Now';
-            }
-        }
-
+    // 1. Payment ko safal maan lein aur local storage mein save karein
+    localStorage.setItem('ravi-ai-subscribed', 'true');
+    
+    // 2. User ko seedhe chat interface par bhej dein
+    showChatInterface();
+}
 
         // --- Login/Logout & Chat History ---
         function handleLogin(username, email = 'guest@example.com') {
@@ -1178,6 +1126,7 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
+
 
 
 
