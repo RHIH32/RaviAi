@@ -638,15 +638,23 @@ function loadVoices() {
     console.log("Voices loaded. Hindi voice:", hindiVoice ? hindiVoice.name : "None");
 }
 
+// Puraane speak function ko isse replace karein
 function speak(text) {
-    if (!isSpeechSupported || isMuted || !text) return;
-    synth.cancel();
-    const emojiRegex = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
-    const cleanText = text.replace(emojiRegex, '').replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/_ /g, ' ');
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    if (hindiVoice) utterance.voice = hindiVoice;
-    utterance.lang = 'hi-IN';
-    synth.speak(utterance);
+    if (!text) return;
+
+    // Pehle check karo ki yeh Android App hai ya normal browser
+    if (window.Android && typeof window.Android.speak === 'function') {
+        // Agar Android App hai, to native function call karo
+        window.Android.speak(text);
+    } else {
+        // Agar normal browser hai, to web wala speech synthesis chalao
+        if ('speechSynthesis' in window) {
+            speechSynthesis.cancel(); // Puraani speech roko
+            const utterance = new SpeechSynthesisUtterance(text);
+            // ... (aap yahan voice etc. set kar sakte hain) ...
+            speechSynthesis.speak(utterance);
+        }
+    }
 }
 
 function updateMuteButtonIcon() {
@@ -663,7 +671,11 @@ if (isSpeechSupported) {
 } else {
     console.error("Speech Synthesis API is NOT supported.");
     if (muteButton) muteButton.style.display = 'none';
-    if (micButton) micButton.style.display = 'none';
+    
+    // Yahan check karo ki yeh Android App to nahi hai
+    if (!window.Android) {
+        if (micButton) micButton.style.display = 'none'; // Sirf browser mein hide karo
+    }
 }
         // --- Speech Recognition (STT) ---
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -693,7 +705,12 @@ micButton.addEventListener('click', () => {
             recognition.onresult = (event) => { userInput.value = event.results[0][0].transcript; chatForm.dispatchEvent(new Event('submit', { cancelable: true })); };
             recognition.onerror = (event) => { console.error("Speech recognition error:", event.error); };
             recognition.onend = () => { micButton.classList.remove('mic-listening'); };
-        } else { micButton.disabled = true; }
+      } else {
+    // Yahan check karo ki yeh Android App to nahi hai
+    if (!window.Android) {
+        micButton.disabled = true; // Sirf browser mein disable karo
+    }
+}
 
         // --- Main Chat Logic ---
         function addMessageToHistory(role, text, fileInfo = null) {
