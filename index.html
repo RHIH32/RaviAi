@@ -1028,7 +1028,7 @@ if (isSpeechSupported) {
                 e.preventDefault();
                 const userMessage = userInput.value.trim();
                 if (!userMessage && !selectedFile) return;
-                synth.cancel();
+                synth?.cancel();
                 addMessageToUI('user', userMessage || `Analyzing file: ${selectedFile.name}`);
                 userInput.value = '';
                 typingIndicator.classList.remove('hidden');
@@ -1121,6 +1121,7 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
+
 
 
 
