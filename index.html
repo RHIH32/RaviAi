@@ -600,14 +600,7 @@ async function handlePayment() {
 
 
         // --- Login/Logout & Chat History ---
-        function handleLogin(username, email = 'guest@example.com') {
-            currentUser = username;
-            currentUserEmail = email;
-            localStorage.setItem('ravi-ai-user', username);
-            localStorage.setItem('ravi-ai-email', email);
-            showPaymentInterface();
-        }
-
+      
         function getStorageKey() { return `ravi-ai-chats-${currentUser}`; }
 
         function loadConversations() {
@@ -1007,14 +1000,32 @@ if (isSpeechSupported) {
             menuButton.addEventListener('click', toggleSidebar);
             collapseSidebarButton.addEventListener('click', toggleSidebar);
             
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const username = usernameInput.value.trim();
-                const email = emailInput.value.trim();
-                if (username && email) handleLogin(username, email);
-            });
-            
-            guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
+            // loginForm ke listener ko isse badal dein
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    if (!email || !password || !username) {
+        return alert("Please fill all fields.");
+    }
+    auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => userCredential.user.updateProfile({ displayName: username }))
+        .catch(error => {
+            if (error.code === 'auth/email-already-in-use') {
+                return auth.signInWithEmailAndPassword(email, password);
+            }
+            throw error;
+        })
+        .catch(error => alert(error.message));
+});
+
+// guestLoginBtn ke listener ko isse badal dein
+guestLoginBtn.addEventListener('click', () => {
+    auth.signInAnonymously().catch(error => {
+        alert("Guest login failed: " + error.message);
+    });
+});
             
             // (REPLACE WITH THIS CORRECT CODE)
             googleLoginBtn.addEventListener('click', () => {
