@@ -523,19 +523,10 @@ auth.getRedirectResult()
         }
         
         // --- Payment Logic ---
-        // --- Payment Logic (TESTING MODE) ---
-async function handlePayment() {
-    // Button ko disable karein taaki user dobara click na kar sake
-    paymentButton.disabled = true;
-    paymentButton.textContent = 'Processing...';
-    
-    console.log("Simulating successful payment for testing...");
-
-    // 1. Payment ko safal maan lein aur local storage mein save karein
-    localStorage.setItem('ravi-ai-subscribed', 'true');
-    
-    // 2. User ko seedhe chat interface par bhej dein
-    showChatInterface();
+        async function handlePayment() {
+            paymentButton.disabled = true;
+            paymentButton.textContent = 'Processing...';
+            paymentError.classList.add('hidden');
 
             try {
                 // 1. Create subscription on the server
@@ -600,7 +591,14 @@ async function handlePayment() {
 
 
         // --- Login/Logout & Chat History ---
-      
+        function handleLogin(username, email = 'guest@example.com') {
+            currentUser = username;
+            currentUserEmail = email;
+            localStorage.setItem('ravi-ai-user', username);
+            localStorage.setItem('ravi-ai-email', email);
+            showPaymentInterface();
+        }
+
         function getStorageKey() { return `ravi-ai-chats-${currentUser}`; }
 
         function loadConversations() {
@@ -1000,32 +998,14 @@ if (isSpeechSupported) {
             menuButton.addEventListener('click', toggleSidebar);
             collapseSidebarButton.addEventListener('click', toggleSidebar);
             
-            // loginForm ke listener ko isse badal dein
-loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const username = usernameInput.value.trim();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-    if (!email || !password || !username) {
-        return alert("Please fill all fields.");
-    }
-    auth.createUserWithEmailAndPassword(email, password)
-        .then(userCredential => userCredential.user.updateProfile({ displayName: username }))
-        .catch(error => {
-            if (error.code === 'auth/email-already-in-use') {
-                return auth.signInWithEmailAndPassword(email, password);
-            }
-            throw error;
-        })
-        .catch(error => alert(error.message));
-});
-
-// guestLoginBtn ke listener ko isse badal dein
-guestLoginBtn.addEventListener('click', () => {
-    auth.signInAnonymously().catch(error => {
-        alert("Guest login failed: " + error.message);
-    });
-});
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = usernameInput.value.trim();
+                const email = emailInput.value.trim();
+                if (username && email) handleLogin(username, email);
+            });
+            
+            guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
             
             // (REPLACE WITH THIS CORRECT CODE)
             googleLoginBtn.addEventListener('click', () => {
