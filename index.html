@@ -397,6 +397,7 @@ auth.getRedirectResult()
         console.error("Google Redirect Login Error:", error.code, error.message);
         alert("Google login failed: " + error.message);
     });
+    
 
 // ------------------------------------------------------------------
         // --- DOM Elements ---
@@ -445,7 +446,6 @@ auth.getRedirectResult()
         const closePrivacyModal = document.getElementById('close-privacy-modal');
         const closeTermsModal = document.getElementById('close-terms-modal');
 
-
         // --- State ---
         let conversations = {};
         let activeChatId = null;
@@ -454,6 +454,20 @@ auth.getRedirectResult()
         let currentUserEmail = null;
         let hindiVoice = null;
         let selectedFile = null; 
+
+
+
+         // 1. Yeh function Android se voice text receive karega
+    function onVoiceResult(text) {
+        const userInput = document.getElementById('user-input');
+        const chatForm = document.getElementById('chat-form');
+        
+        if (userInput && chatForm) {
+            userInput.value = text; // Input field mein text daalo
+            // Form ko submit karo
+            chatForm.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+    }
 
         // --- Initialization ---
      function initialize() {
@@ -657,7 +671,24 @@ if (isSpeechSupported) {
             const recognition = new SpeechRecognition();
             recognition.lang = 'hi-IN';
             recognition.interimResults = false;
-            micButton.addEventListener('click', () => micButton.classList.contains('mic-listening') ? recognition.stop() : recognition.start());
+            
+            // Iski Jagah Yeh Naya Code Daalein 🔽
+micButton.addEventListener('click', () => {
+    // Pehle check karo ki yeh Android App hai ya normal browser
+    if (window.Android && typeof window.Android.startListening === 'function') {
+        // Agar Android App hai, to native function call karo
+        window.Android.startListening();
+    } else {
+        // Agar normal browser hai, to web wala speech recognition chalao
+        // Yeh aapka original code hai
+        if (SpeechRecognition) { // Dobara check karlo ki browser support karta hai ya nahi
+             micButton.classList.contains('mic-listening') ? recognition.stop() : recognition.start();
+        } else {
+             alert("Voice recognition is browser mein support nahi karta.");
+        }
+    }
+});
+
             recognition.onstart = () => { micButton.classList.add('mic-listening'); };
             recognition.onresult = (event) => { userInput.value = event.results[0][0].transcript; chatForm.dispatchEvent(new Event('submit', { cancelable: true })); };
             recognition.onerror = (event) => { console.error("Speech recognition error:", event.error); };
@@ -1121,7 +1152,6 @@ if (isSpeechSupported) {
     </script>
 </body>
 </html>
-
 
 
 
