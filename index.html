@@ -469,6 +469,25 @@ auth.getRedirectResult()
         }
     }
 
+
+
+
+    // Yeh functions apne script tag mein `onVoiceResult` ke paas add karein
+
+function onListeningStarted() {
+    const micButton = document.getElementById('mic-button');
+    if (micButton) {
+        micButton.classList.add('mic-listening'); // Animation on karo
+    }
+}
+
+function onListeningEnded() {
+    const micButton = document.getElementById('mic-button');
+    if (micButton) {
+        micButton.classList.remove('mic-listening'); // Animation off karo
+    }
+}
+
         // --- Initialization ---
      function initialize() {
             const savedUser = localStorage.getItem('ravi-ai-user');
