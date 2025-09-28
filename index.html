@@ -457,37 +457,46 @@ auth.getRedirectResult()
 
 
 
-         // 1. Yeh function Android se voice text receive karega
-    function onVoiceResult(text) {
-        const userInput = document.getElementById('user-input');
-        const chatForm = document.getElementById('chat-form');
+        // ==========================================================
+// YEH FINAL AUR SAHI CODE HAI. PURAANE FUNCTIONS KI JAGAH
+// IS POORE BLOCK KO PASTE KAREIN.
+// ==========================================================
+
+// Android se voice result receive karne ke liye
+window.onVoiceResult = function(text) {
+    console.log("Android se voice result mila:", text);
+    const userInput = document.getElementById('user-input');
+    const sendButton = document.getElementById('send-button');
+    if (userInput && sendButton && text && text.trim().length > 0) {
+        userInput.value = text;
+        sendButton.click(); // Form submit karne ke liye button ko click karo
+    }
+};
+
+// Jab Android mic sunna shuru kare
+window.onListeningStarted = function() {
+    console.log("Android ne sunna shuru kiya...");
+    const micButton = document.getElementById('mic-button');
+    if (micButton) {
+        micButton.classList.add('mic-listening'); // Animation on
+    }
+};
+
+// Jab Android mic sunna band kare
+window.onListeningEnded = function() {
+    console.log("Android ne sunna band kiya.");
+    const micButton = document.getElementById('mic-button');
+    if (micButton) {
+        micButton.classList.remove('mic-listening'); // Animation off
+    }
+};
+
+// Jab language pack ki samasya ho
+window.showLanguagePackGuide = function() {
+    alert("Hindi bhasha sunne mein samasya aa rahi hai.\n\nPhone ki settings mein jaakar 'Offline speech recognition' se Hindi (भारत) pack install karein.");
+};
+
         
-        if (userInput && chatForm) {
-            userInput.value = text; // Input field mein text daalo
-            // Form ko submit karo
-            chatForm.dispatchEvent(new Event('submit', { cancelable: true }));
-        }
-    }
-
-
-
-
-    // Yeh functions apne script tag mein `onVoiceResult` ke paas add karein
-
-function onListeningStarted() {
-    const micButton = document.getElementById('mic-button');
-    if (micButton) {
-        micButton.classList.add('mic-listening'); // Animation on karo
-    }
-}
-
-function onListeningEnded() {
-    const micButton = document.getElementById('mic-button');
-    if (micButton) {
-        micButton.classList.remove('mic-listening'); // Animation off karo
-    }
-}
-
         // --- Initialization ---
      function initialize() {
             const savedUser = localStorage.getItem('ravi-ai-user');
@@ -1188,6 +1197,7 @@ micButton.addEventListener('click', () => {
     </script>
 </body>
 </html>
+
 
 
 
