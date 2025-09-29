@@ -667,20 +667,27 @@ function loadVoices() {
 }
 
 function speak(text) {
-    if (isMuted || !text) return; 
+    if (!text || isMuted) {
+        return; // Agar mute hai ya text nahi hai to kuchh na bolo
+    }
 
-    // Pehle check karo ki yeh Android App hai ya normal browser
+    // --- NAYA CODE: Text ko bolne se pehle saaf karein ---
+    const emojiRegex = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
+    
+    let cleanText = text
+        .replace(emojiRegex, '')      // Sabhi emojis ko hatao
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Bold ke liye **text** se ** hatao
+        .replace(/\*(.*?)\*/g, '$1')   // Italic ke liye *text* se * hatao
+        .replace(/[#*_`]/g, '');     // Baaki ke symbols jaise #, *, _, ` ko bhi hatao
+    // --- YAHAN TAK ---
+
+    // Ab saaf kiye hue text ko bolne ke liye bhejein
     if (window.Android && typeof window.Android.speak === 'function') {
-        // Agar Android App hai, to native function call karo
-        window.Android.speak(text);
-    } else {
-        // Agar normal browser hai, to web wala speech synthesis chalao
-        if ('speechSynthesis' in window) {
-            speechSynthesis.cancel(); // Puraani speech roko
-            const utterance = new SpeechSynthesisUtterance(text);
-            // ... (aap yahan voice etc. set kar sakte hain) ...
-            speechSynthesis.speak(utterance);
-        }
+        window.Android.speak(cleanText); // <-- `cleanText` ka istemaal karein
+    } else if (synth) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(cleanText); // <-- `cleanText` ka istemaal karein
+        speechSynthesis.speak(utterance);
     }
 }
 
@@ -1198,6 +1205,7 @@ micButton.addEventListener('click', () => {
     </script>
 </body>
 </html>
+
 
 
 
