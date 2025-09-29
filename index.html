@@ -1076,7 +1076,26 @@ micButton.addEventListener('click', () => {
             });
 
             newChatButton.addEventListener('click', startNewChat);
-            muteButton.addEventListener('click', () => { isMuted = !isMuted; updateMuteButtonIcon(); if (isMuted) synth.cancel(); });
+            muteButton.addEventListener('click', () => {
+    isMuted = !isMuted;
+    updateMuteButtonIcon();
+
+    // Browser ki speech ko control karein
+    if (isSpeechSupported) {
+        if (isMuted) {
+            synth.cancel(); // Chal rahi speech ko turant roko
+        }
+    }
+
+    // Agar yeh Android App hai, to uske native TTS ko bhi control karein
+    if (window.Android) {
+        if (isMuted && typeof window.Android.muteSpeech === 'function') {
+            window.Android.muteSpeech(); // Android mein mute karne ke liye function
+        } else if (!isMuted && typeof window.Android.unmuteSpeech === 'function') {
+            window.Android.unmuteSpeech(); // Android mein unmute karne ke liye function
+        }
+    }
+});
             themeToggleButton.addEventListener('click', () => { document.body.classList.toggle('light-theme'); localStorage.setItem('ravi-ai-theme', document.body.classList.contains('light-theme') ? 'light-theme' : ''); });
             
             chatSearchInput.addEventListener('input', renderChatHistory);
@@ -1223,6 +1242,7 @@ micButton.addEventListener('click', () => {
     </script>
 </body>
 </html>
+
 
 
 
