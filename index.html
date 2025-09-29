@@ -666,9 +666,11 @@ function loadVoices() {
     console.log("Voices loaded. Hindi voice:", hindiVoice ? hindiVoice.name : "None");
 }
 
-// Puraane speak function ko isse replace karein
 function speak(text) {
-    if (!text) return;
+    // NAYA CHECK: Agar text nahi hai YA app MUTE hai, to function se baahar nikal jao
+    if (!text || isMuted) {
+        return;
+    }
 
     // Pehle check karo ki yeh Android App hai ya normal browser
     if (window.Android && typeof window.Android.speak === 'function') {
@@ -679,7 +681,6 @@ function speak(text) {
         if ('speechSynthesis' in window) {
             speechSynthesis.cancel(); // Puraani speech roko
             const utterance = new SpeechSynthesisUtterance(text);
-            // ... (aap yahan voice etc. set kar sakte hain) ...
             speechSynthesis.speak(utterance);
         }
     }
@@ -1200,6 +1201,7 @@ micButton.addEventListener('click', () => {
     </script>
 </body>
 </html>
+
 
 
 
