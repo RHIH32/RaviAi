@@ -666,48 +666,24 @@ function loadVoices() {
     console.log("Voices loaded. Hindi voice:", hindiVoice ? hindiVoice.name : "None");
 }
 
-// ==========================================================
-// YEH FINAL DEBUGGING CODE HAI. PURAANE CODE KI JAGAH ISE PASTE KAREIN.
-// ==========================================================
-
-let isMuted = false;
-console.log("INITIAL STATE: App Mute hai? ->", isMuted);
-
-// Mute button ka event listener
-muteButton.addEventListener('click', () => {
-    console.log("MUTE BUTTON CLICKED: Puraani state thi ->", isMuted);
-    isMuted = !isMuted; // State ko badlo
-    console.log("MUTE BUTTON CLICKED: Nayi state hai ->", isMuted);
-    updateMuteButtonIcon();
-    
-    if (isMuted && window.speechSynthesis) {
-        speechSynthesis.cancel();
-    }
-});
-
-// Bolne wala function (TTS)
 function speak(text) {
-    console.log("--- SPEAK FUNCTION SHURU HUA ---");
-    console.log("SPEAK FUNCTION: Check kar raha hai ki app Mute hai? ->", isMuted);
+    if (isMuted || !text) return; 
 
-    if (!text || isMuted) {
-        console.log("SPEAK FUNCTION: App muted hai ya text khaali hai. Aawaz nahi aayegi.");
-        console.log("--- SPEAK FUNCTION KHATM HUA ---");
-        return;
-    }
-
-    console.log("SPEAK FUNCTION: App Mute nahi hai. Aawaz aani chahiye.");
+    // Pehle check karo ki yeh Android App hai ya normal browser
     if (window.Android && typeof window.Android.speak === 'function') {
-        console.log("SPEAK FUNCTION: Native Android TTS ko command bhej raha hai.");
+        // Agar Android App hai, to native function call karo
         window.Android.speak(text);
-    } else if ('speechSynthesis' in window) {
-        console.log("SPEAK FUNCTION: Web browser TTS ka istemaal kar raha hai.");
-        speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        speechSynthesis.speak(utterance);
+    } else {
+        // Agar normal browser hai, to web wala speech synthesis chalao
+        if ('speechSynthesis' in window) {
+            speechSynthesis.cancel(); // Puraani speech roko
+            const utterance = new SpeechSynthesisUtterance(text);
+            // ... (aap yahan voice etc. set kar sakte hain) ...
+            speechSynthesis.speak(utterance);
+        }
     }
-    console.log("--- SPEAK FUNCTION KHATM HUA ---");
 }
+
 function updateMuteButtonIcon() {
     if (muteButton) {
         muteButton.innerHTML = isMuted ? speakerOffIcon : speakerOnIcon;
@@ -1242,6 +1218,7 @@ micButton.addEventListener('click', () => {
     </script>
 </body>
 </html>
+
 
 
 
