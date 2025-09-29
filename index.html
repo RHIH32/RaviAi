@@ -698,12 +698,15 @@ if (isSpeechSupported) {
     loadVoices();
 } else {
     console.error("Speech Synthesis API is NOT supported.");
-    if (muteButton) muteButton.style.display = 'none';
     
-    // Yahan check karo ki yeh Android App to nahi hai
+    // NAYA CHECK: Agar app normal browser mein hai (Android App nahi hai),
+    // tabhi buttons ko hide karne ka socho.
     if (!window.Android) {
-        if (micButton) micButton.style.display = 'none'; // Sirf browser mein hide karo
+        if (muteButton) muteButton.style.display = 'none';
+        if (micButton) micButton.style.display = 'none';
     }
+    // Agar yeh Android App hai, to mute button ko dikhne do, kyunki
+    // bolne ka kaam native code karega.
 }
         // --- Speech Recognition (STT) ---
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1197,6 +1200,7 @@ micButton.addEventListener('click', () => {
     </script>
 </body>
 </html>
+
 
 
 
