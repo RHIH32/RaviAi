@@ -996,7 +996,7 @@ micButton.addEventListener('click', () => {
         function setupEventListeners() {
             menuButton.addEventListener('click', toggleSidebar);
             collapseSidebarButton.addEventListener('click', toggleSidebar);
-            
+            newChatButton.addEventListener('click', startNewChat);
             loginForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const username = usernameInput.value.trim();
@@ -1176,6 +1176,7 @@ micButton.addEventListener('click', () => {
     </script>
 </body>
 </html>
+
 
 
 
