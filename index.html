@@ -8,8 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- Razorpay Checkout Script for payments -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <!-- Prism.js for syntax highlighting -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
@@ -171,16 +169,7 @@
 </div>
     
     <!-- Payment Modal -->
-    <div id="payment-modal" class="hidden absolute inset-0 z-50 flex items-center justify-center">
-         <div class="bg-white/20 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-sm mx-4 border border-white/30 text-gray-800">
-             <h2 class="text-3xl font-bold mb-2 text-center">Monthly Subscription</h2>
-             <p class="font-medium mb-6 text-center">To continue using Ravi AI, please subscribe for ₹10 per month.</p>
-             <div class="space-y-3">
-                 <button id="payment-button" class="w-full flex items-center justify-center p-3 bg-blue-600 text-white rounded-lg font-semibold shadow-md hover:bg-blue-700 transition-colors">Subscribe Now</button>
-             </div>
-             <p id="payment-error" class="text-xs text-center mt-4 text-red-500 font-bold hidden"></p>
-        </div>
-    </div>
+   
 
 
     <!-- Main App Container -->
@@ -402,9 +391,6 @@ auth.getRedirectResult()
 // ------------------------------------------------------------------
         // --- DOM Elements ---
         const loginScreen = document.getElementById('login-screen');
-        const paymentModal = document.getElementById('payment-modal');
-        const paymentButton = document.getElementById('payment-button');
-        const paymentError = document.getElementById('payment-error');
         const appContainer = document.getElementById('app-container');
         const loginForm = document.getElementById('login-form');
         const usernameInput = document.getElementById('username-input');
@@ -447,17 +433,15 @@ auth.getRedirectResult()
         const closeTermsModal = document.getElementById('close-terms-modal');
 
         // --- State ---
-        let conversations = {};
+       let conversations = {};
         let activeChatId = null;
-        let isMuted = false;
         let currentUser = null;
         let currentUserEmail = null;
+        let isMuted = false;
         let hindiVoice = null;
         let selectedFile = null; 
-
-
-
-        // ==========================================================
+     
+    // ==========================================================
 // YEH FINAL AUR SAHI CODE HAI. PURAANE FUNCTIONS KI JAGAH
 // IS POORE BLOCK KO PASTE KAREIN.
 // ==========================================================
@@ -497,6 +481,7 @@ window.showLanguagePackGuide = function() {
 };
 
         
+
         // --- Initialization ---
      function initialize() {
             const savedUser = localStorage.getItem('ravi-ai-user');
@@ -532,13 +517,6 @@ window.showLanguagePackGuide = function() {
         function showLoginInterface() {
             loginScreen.classList.remove('hidden');
             appContainer.classList.add('hidden');
-            paymentModal.classList.add('hidden');
-        }
-        
-        function showPaymentInterface() {
-            loginScreen.classList.add('hidden');
-            paymentModal.classList.remove('hidden');
-            paymentModal.classList.add('flex');
         }
 
         function showChatInterface() {
@@ -546,7 +524,6 @@ window.showLanguagePackGuide = function() {
             profileName.textContent = currentUser;
             profileEmail.textContent = currentUserEmail;
             loginScreen.classList.add('hidden');
-            paymentModal.classList.add('hidden');
             appContainer.classList.remove('hidden');
             appContainer.classList.add('flex');
             loadConversations();
@@ -564,26 +541,19 @@ window.showLanguagePackGuide = function() {
             menuButton.classList.toggle('hidden');
         }
         
-        // --- Payment Logic ---
-      async function handlePayment() {
-            // Payment ko bypass karke seedha aage badhein
-            console.log("Payment process ko bypass kiya ja raha hai...");
-            
-            // Maan lo ki user ne subscribe kar liya hai
-            localStorage.setItem('ravi-ai-subscribed', 'true');
-            
-            // Ab seedha chat interface dikhao
-            showChatInterface();
-        }
+       
         // --- Login/Logout & Chat History ---
-        function handleLogin(username, email = 'guest@example.com') {
-            currentUser = username;
-            currentUserEmail = email;
-            localStorage.setItem('ravi-ai-user', username);
-            localStorage.setItem('ravi-ai-email', email);
-            showPaymentInterface();
-        }
-
+    function handleLogin(username, email = 'guest@example.com') {
+    currentUser = username;
+    currentUserEmail = email;
+    localStorage.setItem('ravi-ai-user', username);
+    localStorage.setItem('ravi-ai-email', email);
+    
+    // Nayi logic: Bina subscription check kiye seedha chat dikhao
+    localStorage.setItem('ravi-ai-subscribed', 'true'); // Hum maan rahe hain ki user "subscribed" hai free tier ke liye
+    
+    showChatInterface(); // <-- Ise yahan badal dein
+}
         function getStorageKey() { return `ravi-ai-chats-${currentUser}`; }
 
         function loadConversations() {
@@ -690,6 +660,7 @@ function speak(text) {
         speechSynthesis.speak(utterance);
     }
 }
+
 
 function updateMuteButtonIcon() {
     if (muteButton) {
@@ -1040,7 +1011,6 @@ micButton.addEventListener('click', () => {
                 auth.signInWithRedirect(provider);
               });
 
-            paymentButton.addEventListener('click', handlePayment);
 
             logoutButton.addEventListener('click', () => {
                 auth.signOut().then(() => {
@@ -1058,7 +1028,8 @@ micButton.addEventListener('click', () => {
                 });
             });
 
-          muteButton.addEventListener('click', () => { isMuted = !isMuted; updateMuteButtonIcon(); if (isMuted) synth.cancel(); });
+           muteButton.addEventListener('click', () => { isMuted = !isMuted; updateMuteButtonIcon(); if (isMuted) synth.cancel(); });
+
             themeToggleButton.addEventListener('click', () => { document.body.classList.toggle('light-theme'); localStorage.setItem('ravi-ai-theme', document.body.classList.contains('light-theme') ? 'light-theme' : ''); });
             
             chatSearchInput.addEventListener('input', renderChatHistory);
@@ -1205,14 +1176,6 @@ micButton.addEventListener('click', () => {
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
 
 
 
