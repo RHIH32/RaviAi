@@ -1003,14 +1003,40 @@ micButton.addEventListener('click', () => {
                 const email = emailInput.value.trim();
                 if (username && email) handleLogin(username, email);
             });
+
+            // ==========================================================
+function firebaseSignInWithToken(idToken) {
+    console.log("Android se ID Token mil gaya. Ab Firebase mein sign-in kar rahe hain...");
+    const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+    
+    auth.signInWithCredential(credential)
+        .then((result) => {
+            // Sign-in safal hua.
+            const user = result.user;
+            console.log("Firebase sign-in safal:", user.displayName);
+            // Apne purane handleLogin function ko call karke chat interface dikhayein
+            handleLogin(user.displayName, user.email);
+        })
+        .catch((error) => {
+            // Error ko handle karein.
+            console.error("Firebase credential sign-in mein error:", error);
+            alert("Login fail ho gaya: " + error.message);
+        });
+}
             
             guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
             
-            // (REPLACE WITH THIS CORRECT CODE)
-            googleLoginBtn.addEventListener('click', () => {
-                auth.signInWithRedirect(provider);
-              });
-
+           googleLoginBtn.addEventListener('click', () => {
+            // Check karo ki "Android" interface hai ya nahi
+            if (window.Android && typeof window.Android.performGoogleSignIn === 'function') {
+             // Agar hai (matlab app mein chal raha hai), toh native function call karo
+             window.Android.performGoogleSignIn();
+       } else {
+        // Agar nahi hai (matlab browser mein chal raha hai), toh purana tareeka istemal karo
+           console.log("Browser mein chal raha hai, redirect ka istemal kar rahe hain.");
+           auth.signInWithRedirect(provider);
+       }
+         });
 
             logoutButton.addEventListener('click', () => {
                 auth.signOut().then(() => {
@@ -1176,6 +1202,7 @@ micButton.addEventListener('click', () => {
     </script>
 </body>
 </html>
+
 
 
 
