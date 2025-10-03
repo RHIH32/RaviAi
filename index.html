@@ -993,18 +993,7 @@ micButton.addEventListener('click', () => {
             });
         }
 
-        function setupEventListeners() {
-            menuButton.addEventListener('click', toggleSidebar);
-            collapseSidebarButton.addEventListener('click', toggleSidebar);
-            newChatButton.addEventListener('click', startNewChat);
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const username = usernameInput.value.trim();
-                const email = emailInput.value.trim();
-                if (username && email) handleLogin(username, email);
-            });
-
-            // ==========================================================
+         // ==========================================================
 function firebaseSignInWithToken(idToken) {
     console.log("Android se ID Token mil gaya. Ab Firebase mein sign-in kar rahe hain...");
     const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
@@ -1023,6 +1012,17 @@ function firebaseSignInWithToken(idToken) {
             alert("Login fail ho gaya: " + error.message);
         });
 }
+
+        function setupEventListeners() {
+            menuButton.addEventListener('click', toggleSidebar);
+            collapseSidebarButton.addEventListener('click', toggleSidebar);
+            newChatButton.addEventListener('click', startNewChat);
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = usernameInput.value.trim();
+                const email = emailInput.value.trim();
+                if (username && email) handleLogin(username, email);
+            });
             
             guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
             
@@ -1202,6 +1202,7 @@ function firebaseSignInWithToken(idToken) {
     </script>
 </body>
 </html>
+
 
 
 
