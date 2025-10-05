@@ -420,12 +420,6 @@ auth.getRedirectResult()
         const deepResearchToggle = document.getElementById('deep-research-toggle');
         const chatSearchInput = document.getElementById('chat-search-input');
         // New Modal elements
-        const privacyPolicyLink = document.getElementById('privacy-policy-link');
-        const termsOfServiceLink = document.getElementById('terms-of-service-link');
-        const privacyModal = document.getElementById('privacy-modal');
-        const termsModal = document.getElementById('terms-modal');
-        const closePrivacyModal = document.getElementById('close-privacy-modal');
-        const closeTermsModal = document.getElementById('close-terms-modal');
 
         // --- State ---
        let conversations = {};
@@ -1169,30 +1163,7 @@ function firebaseSignInWithToken(idToken) {
             });
 
             // Event listeners for modals
-            privacyPolicyLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                privacyModal.classList.remove('hidden');
-            });
-            termsOfServiceLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                termsModal.classList.remove('hidden');
-            });
-            closePrivacyModal.addEventListener('click', () => {
-                privacyModal.classList.add('hidden');
-            });
-            closeTermsModal.addEventListener('click', () => {
-                termsModal.classList.add('hidden');
-            });
-            privacyModal.addEventListener('click', (e) => {
-                if (e.target === privacyModal) {
-                    privacyModal.classList.add('hidden');
-                }
-            });
-            termsModal.addEventListener('click', (e) => {
-                if (e.target === termsModal) {
-                    termsModal.classList.add('hidden');
-                }
-            });
+           
         }
          initialize();
          
@@ -1200,6 +1171,7 @@ function firebaseSignInWithToken(idToken) {
     </script>
 </body>
 </html>
+
 
 
 
