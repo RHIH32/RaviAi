@@ -13,7 +13,6 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
 // --- NAYA: Firebase Admin SDK Setup ---
-console.log("My Firebase Key is:", process.env.FIREBASE_SERVICE_ACCOUNT_KEY); // <-- YEH NAYI LINE ADD KAREIN
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
