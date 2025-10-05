@@ -13,7 +13,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
 // --- NAYA: Firebase Admin SDK Setup ---
-const serviceAccount = require('./serviceAccountKey.json'); // Yeh file project mein honi chahiye
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
