@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
-// --- NAYA: Firebase Admin SDK Setup ---
+// --- NAYA: Firebase Admin SDK Setup --
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -44,7 +44,7 @@ if (GEMINI_API_KEYS.length === 0) {
 
 // UPDATED: /api/generate with Limit Check
 app.post('/api/generate', async (req, res) => {
-    // Step 1: Frontend se bheja gaya token nikalein
+    console.log("Request received. Server time is:", new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
     const idToken = req.headers.authorization?.split('Bearer ')[1];
     if (!idToken) {
         return res.status(401).send({ error: "Authentication token nahi mila." });
@@ -71,7 +71,14 @@ app.post('/api/generate', async (req, res) => {
         
         const currentApiKey = getNextApiKey();
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${currentApiKey}`;
-        const payload = { contents, ...(systemInstruction && { systemInstruction }) };
+
+        const safetySettings = [
+        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+    ];
+        const payload = { contents, safetySettings, ...(systemInstruction && { systemInstruction }) };
         
         const response = await axios.post(apiUrl, payload);
         const textResponse = response.data.candidates[0].content.parts[0].text;
@@ -114,4 +121,7 @@ app.get('/', (req, res) => {
 // --- Start Server ---
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
+
 });
+
+
