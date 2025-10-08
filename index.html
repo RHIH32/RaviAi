@@ -896,52 +896,75 @@ micButton.addEventListener('click', () => {
             bubble.appendChild(button);
         }
 
-        async function getAIResponse(prompt, fileData = null) {
-    const user = firebase.auth().currentUser;
-
-    if (!user) {
-        alert("Aapka session expire ho gaya hai. Kripya dobara login karein.");
-        typingIndicator.classList.add('hidden');
-        return; 
-    }
-
+       // Puraane 'getAIResponse' function ko isse replace karein
+async function getAIResponse(prompt, fileData = null) {
     try {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            throw new Error("User not authenticated. Please log in again.");
+        }
+
         const idToken = await user.getIdToken(true);
 
-            const systemPrompt = `You are "Ravi AI", a friendly and expressive AI assistant. Your primary language for conversation is Hinglish, and you should use emojis to make the conversation engaging.
-            **Core Instructions:**
-            - **Identity:** When asked about your name or creator, respond with: "Main Ravi AI assistant hu. Ravi ne mujhe banaya hai."
-            - **Formatting:** For mathematical equations, you MUST use LaTeX formatting (e.g., $E=mc^2$). For lists or roadmaps, use markdown lists (*, -, 1.).
-            - **File Analysis:** When a file is provided, analyze its content to answer the user's questions about it.
-            - **Deep Research:** If the user enables "Deep Research", you MUST use your available tools to find the latest and most accurate information before answering.
-            
-            **Action Commands (JSON Responses):**
-            If a user's request DIRECTLY maps to one of the following actions, your ENTIRE response MUST be ONLY the corresponding JSON object. Do not add any conversational text before or after the JSON.
-            - **Google Search:** For requests like "search for X", "find information about Y".
-              {"action": "google", "query": "[search term]", "response": "👉 Is vishay par aur jaankari ke liye yahan click karein."}
-            - **YouTube Search:** For requests like "find a video about X", "show me a YouTube video of Y".
-              {"action": "youtube", "query": "[search term]", "response": "👉 Is video ko dekhne ke liye yahan click karein."}
-            - **WhatsApp Message:** For requests like "send a WhatsApp message to [number]".
-              {"action": "whatsapp", "number": "[phone_number_with_country_code]", "message": "[message_to_send]", "response": "👉 WhatsApp par message bhejne ke liye yahan click karein."}
-            - **Phone Call:** For requests like "call [number]". If the user provides a name instead of a number, you MUST ask for the number first. Do not make up numbers.
-              {"action": "call", "number": "[phone_number]", "response": "👉 Call karne ke liye yahan click karein."}
-            - **Image Generation:** If asked to create an image ("banao", "create", "generate image"), use this JSON: 
-              {"action": "generate_image", "prompt": "[detailed image description]", "response": "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨"}
+        const apiHistory = (conversations[activeChatId]?.messages || [])
+            .filter(msg => msg.role !== 'user') // Purane user messages na bhejein, sirf AI ke jawab bhejein
+            .map(msg => ({
+                role: msg.role,
+                parts: msg.parts
+            }));
 
-            **Code Formatting:**
-            When you provide code in any language (e.g., HTML, CSS, JavaScript, Python), you MUST enclose it in markdown code fences with the language specified. For example:
-            \`\`\`javascript
-            console.log("Hello, World!");
-            \`\`\``;
-            
-             // ... baaki ka code ...
-        const payload = { contents: apiHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
+        const currentMessageParts = [];
+        if (prompt) {
+            currentMessageParts.push({ text: prompt }); // 'prompt' ka istemaal karein, 'userMessage' ka nahi
+        }
+        if (fileData) {
+            currentMessageParts.push({
+                inline_data: {
+                    mime_type: fileData.type,
+                    data: fileData.base64
+                }
+            });
+        }
         
+        // Current user message ko history mein add karein
+        apiHistory.push({ role: 'user', parts: currentMessageParts });
+
+        const systemPrompt = `You are "Ravi AI", a friendly and expressive AI assistant. Your primary language for conversation is Hinglish, and you should use emojis to make the conversation engaging.
+        **Core Instructions:**
+        - **Identity:** When asked about your name or creator, respond with: "Main Ravi AI assistant hu. Ravi ne mujhe banaya hai."
+        - **Formatting:** For mathematical equations, you MUST use LaTeX formatting (e.g., $E=mc^2$). For lists or roadmaps, use markdown lists (*, -, 1.).
+        - **File Analysis:** When a file is provided, analyze its content to answer the user's questions about it.
+        - **Deep Research:** If the user enables "Deep Research", you MUST use your available tools to find the latest and most accurate information before answering.
+        
+        **Action Commands (JSON Responses):**
+        If a user's request DIRECTLY maps to one of the following actions, your ENTIRE response MUST be ONLY the corresponding JSON object. Do not add any conversational text before or after the JSON.
+        - **Google Search:** For requests like "search for X", "find information about Y".
+          {"action": "google", "query": "[search term]", "response": "👉 Is vishay par aur jaankari ke liye yahan click karein."}
+        - **YouTube Search:** For requests like "find a video about X", "show me a YouTube video of Y".
+          {"action": "youtube", "query": "[search term]", "response": "👉 Is video ko dekhne ke liye yahan click karein."}
+        - **WhatsApp Message:** For requests like "send a WhatsApp message to [number]".
+          {"action": "whatsapp", "number": "[phone_number_with_country_code]", "message": "[message_to_send]", "response": "👉 WhatsApp par message bhejne ke liye yahan click karein."}
+        - **Phone Call:** For requests like "call [number]". If the user provides a name instead of a number, you MUST ask for the number first. Do not make up numbers.
+          {"action": "call", "number": "[phone_number]", "response": "👉 Call karne ke liye yahan click karein."}
+        - **Image Generation:** If asked to create an image ("banao", "create", "generate image"), use this JSON: 
+          {"action": "generate_image", "prompt": "[detailed image description]", "response": "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨"}
+
+        **Code Formatting:**
+        When you provide code in any language (e.g., HTML, CSS, JavaScript, Python), you MUST enclose it in markdown code fences with the language specified. For example:
+        \`\`\`javascript
+        console.log("Hello, World!");
+        \`\`\``;
+        
+        const payload = {
+            contents: apiHistory,
+            systemInstruction: { parts: [{ text: systemPrompt }] }
+        };
+
         const response = await fetch('https://raviai-1h96.onrender.com/api/generate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${idToken}` // <-- YEH LINE HONI CHAHIYE
+                'Authorization': `Bearer ${idToken}`
             },
             body: JSON.stringify(payload)
         });
@@ -953,18 +976,19 @@ micButton.addEventListener('click', () => {
 
         const result = await response.json();
         if (result.text) {
-            return result.text;
+            return result.text; // Sahi result yahan se return karein
         }
-        
+
         throw new Error("Invalid API response structure.");
 
     } catch (error) {
-        console.error("Error getting AI response:", error);
-        addMessageToUI('model', `Maaf kijiye, ek samasya aa gayi: ${error.message}`);
+        console.error("Error in getAIResponse:", error);
+        const friendlyMessage = "Maaf kijiye, ek samasya aa gayi hai. Kripya dobara login karke try karein.";
+        addMessageToUI('model', friendlyMessage);
         typingIndicator.classList.add('hidden');
+        return null; // Error ke case mein null return karein
     }
 }
-
         async function generateImage(prompt) {
             const enhancedPrompt = `${prompt}, 8k, photorealistic, highly detailed, professional photography, sharp focus, cinematic lighting`;
             const payload = { prompt: enhancedPrompt };
@@ -1010,14 +1034,50 @@ function firebaseSignInWithToken(idToken) {
             menuButton.addEventListener('click', toggleSidebar);
             collapseSidebarButton.addEventListener('click', toggleSidebar);
             newChatButton.addEventListener('click', startNewChat);
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const username = usernameInput.value.trim();
-                const email = emailInput.value.trim();
-                if (username && email) handleLogin(username, email);
+        loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!username || !email || !password) {
+        alert("Kripya sabhi fields bharein.");
+        return;
+    }
+
+    // Firebase mein naya user create karein
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            // User create ho gaya. Ab uska profile name update karein.
+            const user = userCredential.user;
+            return user.updateProfile({
+                displayName: username
+            }).then(() => {
+                // Profile update hone ke baad login handle karein.
+                console.log("User created and profile updated:", user);
+                handleLogin(user.displayName, user.email);
             });
-            
-            guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
+        })
+        .catch((error) => {
+            // Error handle karein (jaise 'email already in use')
+            console.error("Manual Sign-Up Error:", error);
+            alert("Account banane mein samasya aa gayi: " + error.message);
+        });
+});
+            // Upar wali galat line ko is poore code se replace karein
+guestLoginBtn.addEventListener('click', () => {
+    firebase.auth().signInAnonymously()
+        .then(() => {
+            // Ab Firebase ne ek asli (lekin temporary) guest user bana diya hai.
+            // Iske baad hum chat screen dikhayenge.
+            console.log("Anonymous sign-in successful.");
+            handleLogin('Guest', 'guest@anonymous.com');
+        })
+        .catch((error) => {
+            console.error("Anonymous Sign-In Error:", error);
+            alert("Guest login mein samasya aa gayi: " + error.message);
+        });
+});
             
            
              googleLoginBtn.addEventListener('click', () => {
@@ -1099,54 +1159,69 @@ function firebaseSignInWithToken(idToken) {
 
             removeFileButton.addEventListener('click', () => { selectedFile = null; filePreviewContainer.classList.add('hidden'); });
 
-            chatForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const userMessage = userInput.value.trim();
-                if (!userMessage && !selectedFile) return;
-                synth?.cancel();
-                addMessageToUI('user', userMessage || `Analyzing file: ${selectedFile.name}`);
-                userInput.value = '';
-                typingIndicator.classList.remove('hidden');
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-                if (createImageToggle.checked) {
-                    createImageToggle.checked = false;
-                    userInput.placeholder = "Yahan type karein ya bolein...";
-                    addMessageToUI('model', "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨");
-                    const imageBubble = addAILoadingBubble();
-                    try {
-                        const base64Image = await generateImage(userMessage);
-                        renderGeneratedImage(imageBubble, `data:image/png;base64,${base64Image}`);
-                    } catch (error) {
-                        imageBubble.innerHTML = `<p class="text-red-400">Maaf kijiye, photo banane mein kuch samasya aa gayi.</p>`;
-                    } finally {
-                        typingIndicator.classList.add('hidden');
-                    }
-                    return;
-                }
-                let fileData = null;
-                if (selectedFile) {
-                    try { fileData = await readFileAsBase64(selectedFile); } 
-                    catch (error) {
-                        addMessageToUI('model', "Maaf kijiye, file padhne mein samasya aa gayi.");
-                        typingIndicator.classList.add('hidden');
-                        return;
-                    }
-                }
-                addMessageToHistory('user', userMessage, selectedFile ? {name: selectedFile.name, type: selectedFile.type} : null);
-                selectedFile = null;
-                filePreviewContainer.classList.add('hidden');
-                try {
-                    const aiResponse = await getAIResponse(userMessage, fileData);
-                    addMessageToHistory('model', aiResponse);
-                    handleAIResponse(aiResponse);
-                } catch (error) {
-                    console.error("Error getting AI response:", error);
-                    addMessageToUI('model', "Maaf kijiye, kuch takneeki samasya aa gayi hai.");
-                } finally {
-                    typingIndicator.classList.add('hidden');
-                }
-            });
-            
+         
+            // Puraane 'chatForm.addEventListener' ko isse replace karein
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const userMessage = userInput.value.trim();
+    if (!userMessage && !selectedFile) return;
+
+    // Bolna band karein aur user ka message UI par dikhayein
+    synth?.cancel();
+    addMessageToUI('user', userMessage || `Analyzing file: ${selectedFile.name}`);
+    addMessageToHistory('user', userMessage, selectedFile ? { name: selectedFile.name, type: selectedFile.type } : null);
+    
+    // Input field saaf karein aur typing indicator dikhayein
+    userInput.value = '';
+    typingIndicator.classList.remove('hidden');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    // Agar image create karni hai to alag se handle karein
+    if (createImageToggle.checked) {
+        createImageToggle.checked = false;
+        userInput.placeholder = "Yahan type karein ya bolein...";
+        addMessageToUI('model', "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨");
+        const imageBubble = addAILoadingBubble();
+        try {
+            const base64Image = await generateImage(userMessage);
+            renderGeneratedImage(imageBubble, `data:image/png;base64,${base64Image}`);
+        } catch (error) {
+            imageBubble.innerHTML = `<p class="text-red-400">Maaf kijiye, photo banane mein kuch samasya aa gayi.</p>`;
+        } finally {
+            typingIndicator.classList.add('hidden');
+        }
+        return; // Yahan se function khatm
+    }
+
+    // File ko process karein (agar hai)
+    let fileData = null;
+    if (selectedFile) {
+        try {
+            fileData = await readFileAsBase64(selectedFile);
+        } catch (error) {
+            addMessageToUI('model', "Maaf kijiye, file padhne mein samasya aa gayi.");
+            typingIndicator.classList.add('hidden');
+            return;
+        }
+        selectedFile = null;
+        filePreviewContainer.classList.add('hidden');
+    }
+
+    // AI se response laayein
+    try {
+        const aiResponse = await getAIResponse(userMessage, fileData);
+        if (aiResponse) { // Safety check
+            addMessageToHistory('model', aiResponse);
+            handleAIResponse(aiResponse);
+        }
+    } catch (error) {
+        console.error("Error during AI response fetch:", error);
+        addMessageToUI('model', "Maaf kijiye, kuch takneeki samasya aa gayi hai.");
+    } finally {
+        typingIndicator.classList.add('hidden');
+    }
+});
+               
             chatContainer.addEventListener('click', (e) => {
                 const copyBtn = e.target.closest('.copy-btn');
                 if (copyBtn) {
