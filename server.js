@@ -78,7 +78,7 @@ app.post('/api/generate', async (req, res) => {
         }
         
         const currentApiKey = getNextApiKey();
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${currentApiKey}`;
+       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentApiKey}`;
         
         const safetySettings = [
             { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
