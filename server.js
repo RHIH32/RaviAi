@@ -17,7 +17,9 @@ const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
+
 console.log("Server is using Firebase project:", serviceAccount.project_id);
+
 const db = admin.firestore();
 const DAILY_LIMIT = 20; // Har user ke liye daily 20 message ki limit
 
