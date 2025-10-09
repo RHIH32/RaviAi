@@ -367,25 +367,26 @@ Your subscription payments are handled by our secure third-party payment partner
  };
 
         // Initialize Firebase
-
- firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const provider = new firebase.auth.GoogleAuthProvider();
-
-auth.getRedirectResult()
-    .then((result) => {
-        if (result && result.user) {
-            // Login safal hua!
-            const user = result.user;
-            console.log("Redirect login successful for:", user.displayName);
-            handleLogin(user.displayName, user.email);
-        }
-        // Agar result.user null hai to kuch nahi karna hai
-    }).catch((error) => {
-        // Error handle karein
-        console.error("Google Redirect Login Error:", error.code, error.message);
-        alert("Google login failed: " + error.message);
-    });
+// --- Authentication State Listener (Yeh Sabse Zaroori Hai) ---
+auth.onAuthStateChanged(user => {
+    // Yeh function tabhi chalega jab Firebase confirm kar dega ki user login hai ya nahi
+    
+    if (user) {
+        // Agar user logged in hai
+        console.log("Firebase ne confirm kiya: User logged in hai.", user.displayName);
+        handleSuccessfulLogin(user);
+    } else {
+        // Agar user logged in nahi hai
+        console.log("Firebase ne confirm kiya: User logged out hai.");
+        showLoginInterface();
+        // Sab kuch saaf kar dein taaki purana data na rahe
+        localStorage.clear(); 
+        currentUser = null;
+        currentUserEmail = null;
+        conversations = {};
+        activeChatId = null;
+    }
+});
     
 
 // ------------------------------------------------------------------
@@ -1214,6 +1215,7 @@ async function getAIResponse(prompt, fileData = null) {
     </script>
 </body>
 </html>
+
 
 
 
