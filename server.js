@@ -2,7 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 require('dotenv').config();
-const admin = require('firebase-admin');
+const admin = require('firebase-admin'); // <-- NAYA: Firebase Admin
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -12,13 +12,13 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
-// Firebase Admin SDK Setup
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+// --- NAYA: Firebase Admin SDK Setup ---
+const serviceAccount = require('./serviceAccountKey.json'); // Yeh file project mein honi chahiye
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
-
-console.log("Server is using Firebase project:", serviceAccount.project_id);
+const db = admin.firestore();
+const DAILY_LIMIT = 20; // Har user ke liye daily 20 message ki limit
 
 // --- API Key Configuration ---
 const GEMINI_API_KEYS = process.env.GEMINI_API_KEYS ? process.env.GEMINI_API_KEYS.split(',') : [];
@@ -33,77 +33,78 @@ function getNextApiKey() {
     return key;
 }
 
+// Critical Validation (Razorpay keys hata di gayi hain)
 if (GEMINI_API_KEYS.length === 0) {
     console.error("FATAL ERROR: GEMINI_API_KEYS environment variable is not set correctly.");
     process.exit(1);
 }
 
-// === AI API Endpoints ===
-app.post('/api/generate', async (req, res) => {
-    console.log("--- New Request Received ---");
-    const idToken = req.headers.authorization?.split('Bearer ')[1];
 
+// === AI API Endpoints ===
+
+// UPDATED: /api/generate with Limit Check
+app.post('/api/generate', async (req, res) => {
+    // Step 1: Frontend se bheja gaya token nikalein
+    const idToken = req.headers.authorization?.split('Bearer ')[1];
     if (!idToken) {
-        console.log("Error: Frontend se token nahi mila.");
         return res.status(401).send({ error: "Authentication token nahi mila." });
     }
 
-    console.log("Token mila. Ab verify karne ki koshish kar rahe hain...");
-
     try {
-        // Step 1: Token ko verify karein (Yeh security ke liye zaroori hai)
+        // Step 2: Token ko verify karke user ka UID nikalein
         const decodedToken = await admin.auth().verifyIdToken(idToken);
-        console.log("Token verification SAFAL. UID:", decodedToken.uid);
+        const uid = decodedToken.uid;
 
-        // Limit check karne wala code yahan se hata diya gaya hai
+        // Step 3: Firestore se user ka usage data nikalein
+        const today = new Date().toISOString().split('T')[0]; // Aaj ki date (e.g., "2025-09-30")
+        const usageDocRef = db.collection('usageLimits').doc(uid);
+        const doc = await usageDocRef.get();
 
-        console.log("User authenticated. Ab Gemini API ko call kar rahe hain...");
-        const { contents, systemInstruction } = req.body;
-        if (!contents) {
-            return res.status(400).json({ error: 'Request body must contain "contents".' });
+        if (doc.exists && doc.data().date === today && doc.data().count >= DAILY_LIMIT) {
+            // Step 4: Agar limit poori ho gayi hai, to error bhejein
+            return res.status(429).send({ error: "Aapki aaj ki free limit poori ho gayi hai." });
         }
+
+        // Step 5: Agar limit baaki hai, to Gemini API ko call karein
+        const { contents, systemInstruction } = req.body;
+        if (!contents) return res.status(400).json({ error: 'Request body must contain "contents".' });
         
         const currentApiKey = getNextApiKey();
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentApiKey}`;
-        
-        const safetySettings = [
-            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-        ];
-        const payload = { contents, safetySettings, ...(systemInstruction && { systemInstruction }) };
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${currentApiKey}`;
+        const payload = { contents, ...(systemInstruction && { systemInstruction }) };
         
         const response = await axios.post(apiUrl, payload);
-
-        if (!response.data.candidates || response.data.candidates.length === 0) {
-            console.error("Gemini API returned no candidates.");
-            return res.status(500).json({ error: "AI model ne response generate nahi kiya." });
-        }
         const textResponse = response.data.candidates[0].content.parts[0].text;
         
-        console.log("Gemini se response mil gaya.");
-        
-        // Limit update karne wala code bhi yahan se hata diya gaya hai
+        // Step 6: Success ke baad, Firestore mein count update karein
+        const currentCount = (doc.exists && doc.data().date === today) ? doc.data().count : 0;
+        await usageDocRef.set({
+            date: today,
+            count: currentCount + 1
+        }, { merge: true }); // 'merge: true' zaroori hai taaki puraana data delete na ho
         
         res.json({ text: textResponse });
 
     } catch (error) {
-        console.error("!!! TOKEN VERIFICATION FAIL HUA YA KOI AUR ERROR AAYA !!!");
-        console.error("Error Code:", error.code);
-        console.error("Error Message:", error.message);
-
-        return res.status(401).send({ 
-            error: "Token verification fail ho gaya.", 
-            details: `Error code: ${error.code}`
-        });
+        console.error('Error in /api/generate:', error.response ? error.response.data : error.message);
+        if (error.code === 'auth/id-token-expired') {
+            return res.status(401).send({ error: "Session expire ho gaya, कृपया dobara login karein." });
+        }
+        res.status(500).json({ error: 'Failed to get response from AI model.' });
     }
 });
 
-// Image Generation Endpoint
+
+// Image Generation Endpoint (Ismein abhi limit nahi lagayi hai, aap laga sakte hain)
 app.post('/api/generate-image', async (req, res) => {
     // ... (generate-image ka code waisa hi rahega) ...
+    // NOTE: Aap upar waali limit logic ismein bhi add kar sakte hain
 });
+
+
+// === Payment API Endpoints (DELETE KAR DIYE GAYE) ===
+// (Yahan ab kuchh nahi hai)
+
 
 // === Static File Serving ===
 app.get('/', (req, res) => {
@@ -114,3 +115,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
+
+
