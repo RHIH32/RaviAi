@@ -1233,36 +1233,13 @@ auth.onAuthStateChanged(user => {
     }
 });
 
-function handleSuccessfulLogin(user) {
-    currentUser = user.displayName || 'User'; // Agar naam na ho to 'User' dikhayein
-    currentUserEmail = user.email;
-
-    // Local storage mein user ki details save karein
-    localStorage.setItem('ravi-ai-user', currentUser);
-    localStorage.setItem('ravi-ai-email', currentUserEmail);
-    
-    // Theme check karein
-    const savedTheme = localStorage.getItem('ravi-ai-theme');
-    if (savedTheme) {
-        document.body.classList.add(savedTheme);
-    }
-    
-    // UI setup karein
-    setupIcons();
-    setupEventListeners(); // Event listeners ko yahan call karna zaroori hai
-    showChatInterface();
-}
-
-// NOTE: Aapke code mein pehle se maujood handleLogin, showChatInterface, 
-// aur showLoginInterface functions ko badalne ki zaroorat nahi hai.
-// Bas upar diya gaya naya code add karna hai aur purana initialize() function hatana hai.
-
 // ==========================================================
          
     });
     </script>
 </body>
 </html>
+
 
 
 
