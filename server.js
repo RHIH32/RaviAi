@@ -93,7 +93,8 @@ app.post('/api/generate', async (req, res) => {
         if (!contents) return res.status(400).json({ error: 'Request body must contain "contents".' });
         
         const currentApiKey = getNextApiKey();
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${currentApiKey}`;
+       // Nayi Sahi Line ✅
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentApiKey}`;
         const payload = { contents, ...(systemInstruction && { systemInstruction }) };
         
         const response = await axios.post(apiUrl, payload);
@@ -142,6 +143,7 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
+
 
 
 
