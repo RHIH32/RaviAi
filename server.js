@@ -28,7 +28,7 @@ app.post('/api/generate', async (req, res) => {
         const currentApiKey = getNextApiKey();
         const payload = { contents, ...(systemInstruction && { systemInstruction }) };
         // Nayi Sahi Line ✅
-        const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${currentApiKey}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${currentApiKey}`;
         const response = await axios.post(apiUrl, payload);
         const textResponse = response.data.candidates[0].content.parts[0].text;
         
@@ -143,6 +143,7 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
+
 
 
 
