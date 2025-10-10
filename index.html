@@ -199,11 +199,6 @@
                     <p id="profile-email" class="text-xs truncate sidebar-subtext"></p>
                 </div>
                 <!-- Privacy and Terms Links -->
-                <div class="border-t my-2 border-color"></div>
-                <div class="space-y-1 text-sm flex-shrink-0">
-                    <a href="#" id="privacy-policy-link" class="block p-2 rounded-lg hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">Privacy Policy</a>
-                    <a href="#" id="terms-of-service-link" class="block p-2 rounded-lg hover:bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">Terms of Service</a>
-                </div>
                 <div class="flex items-center justify-between mt-4 flex-shrink-0">
                     <button id="theme-toggle-button" class="p-2 rounded-full sidebar-button"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg></button>
                     <button id="logout-button" class="p-2 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg></button>
@@ -425,13 +420,7 @@ auth.getRedirectResult()
         const createImageToggle = document.getElementById('create-image-toggle');
         const deepResearchToggle = document.getElementById('deep-research-toggle');
         const chatSearchInput = document.getElementById('chat-search-input');
-        // New Modal elements
-        const privacyPolicyLink = document.getElementById('privacy-policy-link');
-        const termsOfServiceLink = document.getElementById('terms-of-service-link');
-        const privacyModal = document.getElementById('privacy-modal');
-        const termsModal = document.getElementById('terms-modal');
-        const closePrivacyModal = document.getElementById('close-privacy-modal');
-        const closeTermsModal = document.getElementById('close-terms-modal');
+        // New Modal element---
 
         // --- State ---
        let conversations = {};
@@ -1174,31 +1163,6 @@ function firebaseSignInWithToken(idToken) {
                 }
             });
 
-            // Event listeners for modals
-            privacyPolicyLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                privacyModal.classList.remove('hidden');
-            });
-            termsOfServiceLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                termsModal.classList.remove('hidden');
-            });
-            closePrivacyModal.addEventListener('click', () => {
-                privacyModal.classList.add('hidden');
-            });
-            closeTermsModal.addEventListener('click', () => {
-                termsModal.classList.add('hidden');
-            });
-            privacyModal.addEventListener('click', (e) => {
-                if (e.target === privacyModal) {
-                    privacyModal.classList.add('hidden');
-                }
-            });
-            termsModal.addEventListener('click', (e) => {
-                if (e.target === termsModal) {
-                    termsModal.classList.add('hidden');
-                }
-            });
         }
          initialize();
          
