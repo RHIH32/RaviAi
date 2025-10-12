@@ -364,24 +364,29 @@ Your subscription payments are handled by our secure third-party payment partner
 
         // Initialize Firebase
 
- firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const provider = new firebase.auth.GoogleAuthProvider();
+  function initialize() {
+            const savedUser = localStorage.getItem('ravi-ai-user');
+            const savedEmail = localStorage.getItem('ravi-ai-email');
+            const savedTheme = localStorage.getItem('ravi-ai-theme');
+            const isSubscribed = localStorage.getItem('ravi-ai-subscribed');
 
-auth.getRedirectResult()
-  .then((result) => {
-      console.log("Redirect result received:", result); // Naya log
-      if (result && result.user) {
-          const user = result.user;
-          console.log("Google se user mila:", user.displayName); // Naya log
-          handleLogin(user.displayName, user.email);
-      } else {
-          console.log("Redirect ke baad koi user nahi mila."); // Naya log
-      }
-  }).catch((error) => {
-      console.error("Google Redirect Login mein BADA ERROR:", error.code, error.message); // Error ko aasan bhasha mein log karein
-      alert("Google login mein error aaya. Details: " + error.message);
-  });
+            if (savedTheme) {
+                document.body.classList.add(savedTheme);
+            }
+
+            if (savedUser && isSubscribed === 'true') {
+                currentUser = savedUser;
+                currentUserEmail = savedEmail;
+                showChatInterface();
+            } else {
+                showLoginInterface();
+                localStorage.clear(); // Clear all app-related storage on new session
+            }
+            setupIcons();
+            setupEventListeners();
+        }
+    
+
     
 
 // ------------------------------------------------------------------
@@ -473,30 +478,27 @@ window.showLanguagePackGuide = function() {
         
 
         // --- Initialization ---
-    function initialize() {
-            const savedUser = localStorage.getItem('ravi-ai-user');
-            const savedEmail = localStorage.getItem('ravi-ai-email');
-            const savedTheme = localStorage.getItem('ravi-ai-theme');
+  function initialize() {
+            const savedUser = localStorage.getItem('ravi-ai-user');
+            const savedEmail = localStorage.getItem('ravi-ai-email');
+            const savedTheme = localStorage.getItem('ravi-ai-theme');
+            const isSubscribed = localStorage.getItem('ravi-ai-subscribed');
 
-            if (savedTheme) {
-                document.body.classList.add(savedTheme);
-            }
+            if (savedTheme) {
+                document.body.classList.add(savedTheme);
+            }
 
-            // Yahan check karte hain ki user ki details local storage mein hain ya nahi
-            if (savedUser && savedEmail) {
-                currentUser = savedUser;
-                currentUserEmail = savedEmail;
-                showChatInterface();
-            } else {
-                // Agar user login nahi hai, to sirf login screen dikhayein.
-                // Hum yahan se localStorage.clear() hata chuke hain.
-                showLoginInterface();
-            }
-            
-            setupIcons();
-            setupEventListeners();
-      }
-
+            if (savedUser && isSubscribed === 'true') {
+                currentUser = savedUser;
+                currentUserEmail = savedEmail;
+                showChatInterface();
+            } else {
+                showLoginInterface();
+                localStorage.clear(); // Clear all app-related storage on new session
+            }
+            setupIcons();
+            setupEventListeners();
+        }
         // --- setupIcons ---
         function setupIcons() {
             micButton.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>`;
