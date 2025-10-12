@@ -369,19 +369,19 @@ Your subscription payments are handled by our secure third-party payment partner
         const provider = new firebase.auth.GoogleAuthProvider();
 
 auth.getRedirectResult()
-    .then((result) => {
-        if (result && result.user) {
-            // Login safal hua!
-            const user = result.user;
-            console.log("Redirect login successful for:", user.displayName);
-            handleLogin(user.displayName, user.email);
-        }
-        // Agar result.user null hai to kuch nahi karna hai
-    }).catch((error) => {
-        // Error handle karein
-        console.error("Google Redirect Login Error:", error.code, error.message);
-        alert("Google login failed: " + error.message);
-    });
+  .then((result) => {
+      console.log("Redirect result received:", result); // Naya log
+      if (result && result.user) {
+          const user = result.user;
+          console.log("Google se user mila:", user.displayName); // Naya log
+          handleLogin(user.displayName, user.email);
+      } else {
+          console.log("Redirect ke baad koi user nahi mila."); // Naya log
+      }
+  }).catch((error) => {
+      console.error("Google Redirect Login mein BADA ERROR:", error.code, error.message); // Error ko aasan bhasha mein log karein
+      alert("Google login mein error aaya. Details: " + error.message);
+  });
     
 
 // ------------------------------------------------------------------
