@@ -473,27 +473,29 @@ window.showLanguagePackGuide = function() {
         
 
         // --- Initialization ---
-     function initialize() {
-            const savedUser = localStorage.getItem('ravi-ai-user');
-            const savedEmail = localStorage.getItem('ravi-ai-email');
-            const savedTheme = localStorage.getItem('ravi-ai-theme');
-            const isSubscribed = localStorage.getItem('ravi-ai-subscribed');
+    function initialize() {
+            const savedUser = localStorage.getItem('ravi-ai-user');
+            const savedEmail = localStorage.getItem('ravi-ai-email');
+            const savedTheme = localStorage.getItem('ravi-ai-theme');
 
-            if (savedTheme) {
-                document.body.classList.add(savedTheme);
-            }
+            if (savedTheme) {
+                document.body.classList.add(savedTheme);
+            }
 
-            if (savedUser && isSubscribed === 'true') {
-                currentUser = savedUser;
-                currentUserEmail = savedEmail;
-                showChatInterface();
-            } else {
-                showLoginInterface();
-                localStorage.clear(); // Clear all app-related storage on new session
-            }
-            setupIcons();
-            setupEventListeners();
-        }
+            // Yahan check karte hain ki user ki details local storage mein hain ya nahi
+            if (savedUser && savedEmail) {
+                currentUser = savedUser;
+                currentUserEmail = savedEmail;
+                showChatInterface();
+            } else {
+                // Agar user login nahi hai, to sirf login screen dikhayein.
+                // Hum yahan se localStorage.clear() hata chuke hain.
+                showLoginInterface();
+            }
+            
+            setupIcons();
+            setupEventListeners();
+      }
 
         // --- setupIcons ---
         function setupIcons() {
