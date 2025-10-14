@@ -3,10 +3,25 @@ const axios = require('axios');
 const cors = require('cors');
 require('dotenv').config();
 
-// NAYA: Firebase Admin SDK ko setup karna zaroori hai
+// =================================================================
+// === ==> YAHAN DHYAAN DEIN: Service Key ko Environment Variable se load karna <== ===
+// =================================================================
 const admin = require('firebase-admin');
-// YEH FILE AAPKO APNE FIREBASE PROJECT SE DOWNLOAD KARNI HOGI
-const serviceAccount = require('./firebase-service-account-key.json');
+
+// Step 1: Render.com se environment variable ko padhein
+const serviceAccount_JSON = process.env.FIREBASE_SERVICE_ACCOUNT;
+
+// Step 2: Check karein ki variable set hai ya nahi
+if (!serviceAccount_JSON) {
+    console.error("FATAL ERROR: The FIREBASE_SERVICE_ACCOUNT environment variable is not set on Render.com.");
+    console.error("Please add it in your service's 'Environment' tab.");
+    process.exit(1); // Server ko band kar dein agar key nahi hai
+}
+
+// Step 3: JSON string ko object mein convert karein
+const serviceAccount = JSON.parse(serviceAccount_JSON);
+// =================================================================
+
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -22,7 +37,7 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
-// NAYA: Daily limit yahan set karein
+// Daily limit yahan set karein
 const DAILY_LIMIT = 20;
 
 // --- API Key Configuration ---
@@ -45,7 +60,7 @@ if (GEMINI_API_KEYS.length === 0) {
 
 // === AI API Endpoints ===
 
-// UPDATED: /api/generate with Limit Check Activated
+// /api/generate with Limit Check Activated
 app.post('/api/generate', async (req, res) => {
     const idToken = req.headers.authorization?.split('Bearer ')[1];
     if (!idToken) {
@@ -60,23 +75,20 @@ app.post('/api/generate', async (req, res) => {
         const usageDocRef = db.collection('usageLimits').doc(uid);
         const doc = await usageDocRef.get();
 
-        // UNCOMMENT KIYA GAYA: Limit check ab kaam karega
         if (doc.exists && doc.data().date === today && doc.data().count >= DAILY_LIMIT) {
-            return res.status(429).send({ error: "Aapki aaj ki free limit (20 messages) poori ho gayi hai." });
+            return res.status(429).send({ error: `Aapki aaj ki free limit (${DAILY_LIMIT} messages) poori ho gayi hai.` });
         }
 
-        // Gemini API ko call karein
         const { contents, systemInstruction } = req.body;
         if (!contents) return res.status(400).json({ error: 'Request body must contain "contents".' });
         
         const currentApiKey = getNextApiKey();
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${currentApiKey}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${currentApiKey}`;
         const payload = { contents, ...(systemInstruction && { systemInstruction }) };
         
         const response = await axios.post(apiUrl, payload);
         const textResponse = response.data.candidates[0].content.parts[0].text;
         
-        // UNCOMMENT KIYA GAYA: Success ke baad, count update karein
         const currentCount = (doc.exists && doc.data().date === today) ? doc.data().count : 0;
         await usageDocRef.set({
             date: today,
@@ -94,7 +106,7 @@ app.post('/api/generate', async (req, res) => {
     }
 });
 
-// UPDATED: Image Generation Endpoint with the SAME Limit
+// Image Generation Endpoint with the SAME Limit
 app.post('/api/generate-image', async (req, res) => {
     const idToken = req.headers.authorization?.split('Bearer ')[1];
     if (!idToken) {
@@ -109,35 +121,33 @@ app.post('/api/generate-image', async (req, res) => {
         const usageDocRef = db.collection('usageLimits').doc(uid);
         const doc = await usageDocRef.get();
 
-        // Limit check ab yahan bhi kaam karega
         if (doc.exists && doc.data().date === today && doc.data().count >= DAILY_LIMIT) {
-            return res.status(429).send({ error: "Aapki aaj ki free limit (20 messages/images) poori ho gayi hai." });
+            return res.status(429).send({ error: `Aapki aaj ki free limit (${DAILY_LIMIT} messages/images) poori ho gayi hai.` });
         }
 
-        // Image generation logic
         const { prompt } = req.body;
         if (!prompt) return res.status(400).json({ error: 'Request body must contain "prompt".' });
 
-        const imageApiKey = getNextApiKey(); // You might use a different key for images if needed
-        const imageUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${imageApiKey}`; // Replace with actual image generation model if different
-        // NOTE: This is a placeholder for actual image generation API call structure.
-        // Assuming Gemini text-to-image API. Adjust payload as per official documentation.
-        // The actual image generation logic might be different. I am keeping your core logic.
-        const response = await axios.post(imageUrl, { contents: [{ parts: [{ text: `Generate an image of: ${prompt}` }] }] });
-        const generatedImageContent = response.data.candidates[0].content.parts[0].text; // Placeholder, adjust based on actual API response for images
+        const currentApiKey = getNextApiKey();
+        // NOTE: Make sure your image generation logic/API call is correct here.
+        // This is a placeholder for your actual image generation logic.
+        const response = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${currentApiKey}`, {
+             instances: { prompt: prompt },
+             parameters: { "sampleCount": 1 }
+        });
 
-        // Count update yahan bhi karein
+        const generatedImageBase64 = response.data.predictions[0].bytesBase64Encoded;
+        
         const currentCount = (doc.exists && doc.data().date === today) ? doc.data().count : 0;
         await usageDocRef.set({
             date: today,
             count: currentCount + 1
         }, { merge: true });
 
-        // Send back a placeholder or the actual image data
-        res.json({ base64Image: generatedImageContent }); // Assuming you get base64 image data
+        res.json({ base64Image: generatedImageBase64 });
 
     } catch (error) {
-        console.error('Error in /api/generate-image:', error.message);
+        console.error('Error in /api/generate-image:', error.response ? JSON.stringify(error.response.data, null, 2) : error.message);
         res.status(500).json({ error: 'Failed to generate image.' });
     }
 });
@@ -150,5 +160,5 @@ app.get('/', (req, res) => {
 
 // --- Start Server ---
 app.listen(port, () => {
-    console.log(`Ravi AI server is running at http://localhost:${port}`);
+    console.log(`Ravi AI server is running on port ${port}`);
 });
