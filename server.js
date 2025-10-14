@@ -3,19 +3,6 @@ const axios = require('axios');
 const cors = require('cors');
 require('dotenv').config();
 
-// --- NAYA: Firebase Admin SDK Setup ---
-const admin = require('firebase-admin');
-// ZAROORI: Yeh file download karke apne project folder mein rakhein
-const serviceAccount = require('./serviceAccountKey.json'); 
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
-// Firestore database ko initialize karein
-const db = admin.firestore();
-// =====================================
-
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -155,5 +142,6 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
+
 
 
