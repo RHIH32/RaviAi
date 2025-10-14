@@ -26,7 +26,53 @@ app.use(express.static(__dirname));
 
 // --- NAYA: Firebase Admin SDK Setup ---
 // ==========================================================
+// PURAANE /api/generate FUNCTION KI JAGAH YEH PASTE KAREIN
+// ==========================================================
 
+app.post('/api/generate', async (req, res) => {
+    // Ab yahan koi token check nahi hai
+    try {
+        const { contents, systemInstruction } = req.body;
+        if (!contents) {
+            return res.status(400).json({ error: 'Request body must contain "contents".' });
+        }
+        
+        const currentApiKey = getNextApiKey();
+        const payload = { contents, ...(systemInstruction && { systemInstruction }) };
+        // Nayi Sahi Line ✅
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${currentApiKey}`;
+        const response = await axios.post(apiUrl, payload);
+        const textResponse = response.data.candidates[0].content.parts[0].text;
+        
+        res.json({ text: textResponse });
+
+    } catch (error) {
+        console.error('Error in /api/generate:', error.response ? error.response.data : error.message);
+        res.status(500).json({ error: 'Failed to get response from AI model.' });
+    }
+});
+
+// --- API Key Configuration ---
+const GEMINI_API_KEYS = process.env.GEMINI_API_KEYS ? process.env.GEMINI_API_KEYS.split(',') : [];
+let currentKeyIndex = 0;
+
+function getNextApiKey() {
+    if (GEMINI_API_KEYS.length === 0) {
+        throw new Error("No Gemini API keys found in .env file.");
+    }
+    const key = GEMINI_API_KEYS[currentKeyIndex];
+    currentKeyIndex = (currentKeyIndex + 1) % GEMINI_API_KEYS.length;
+    return key;
+}
+
+// Critical Validation (Razorpay keys hata di gayi hain)
+if (GEMINI_API_KEYS.length === 0) {
+    console.error("FATAL ERROR: GEMINI_API_KEYS environment variable is not set correctly.");
+    process.exit(1);
+}
+
+
+// === AI API Endpoints ===
 
 // UPDATED: /api/generate with Limit Check
 app.post('/api/generate', async (req, res) => {
@@ -60,7 +106,7 @@ app.post('/api/generate', async (req, res) => {
         if (!contents) return res.status(400).json({ error: 'Request body must contain "contents".' });
         
         const currentApiKey = getNextApiKey();
-       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${currentApiKey}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${currentApiKey}`;
         const payload = { contents, ...(systemInstruction && { systemInstruction }) };
         
         const response = await axios.post(apiUrl, payload);
@@ -109,7 +155,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
-
-
 
 
