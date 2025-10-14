@@ -948,45 +948,73 @@ micButton.addEventListener('click', () => {
             console.log("Hello, World!");
             \`\`\``;
             
-            const currentChatHistory = conversations[activeChatId]?.messages || [];
-            const userPromptParts = [{ text: prompt }];
-            if (fileData) {
-                userPromptParts.push({
-                    inlineData: {
-                        mimeType: fileData.type,
-                        data: fileData.base64
-                    }
-                });
-            }
+           const user = auth.currentUser;
+    if (!user) {
+        alert("Aap login nahi hain! Kripya dobara login karein.");
+        throw new Error("User not authenticated");
+    }
+    const idToken = await user.getIdToken();
 
-            const apiHistory = [ ...currentChatHistory, { role: "user", parts: userPromptParts } ];
-            const payload = { contents: apiHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
-            const response = await fetch('https://raviai-1h96.onrender.com/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
-            const result = await response.json();
-            if (result.text) return result.text;
-            throw new Error("Invalid API response structure.");
-        }
+    const currentChatHistory = conversations[activeChatId]?.messages || [];
+    const userPromptParts = [{ text: prompt }];
+    if (fileData) {
+        userPromptParts.push({
+            inlineData: { mimeType: fileData.type, data: fileData.base64 }
+        });
+    }
 
-        async function generateImage(prompt) {
-            const enhancedPrompt = `${prompt}, 8k, photorealistic, highly detailed, professional photography, sharp focus, cinematic lighting`;
-            const payload = { prompt: enhancedPrompt };
-            const response = await fetch('https://raviai-1h96.onrender.com/api/generate-image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error(`Image generation failed with status ${response.status}`);
-            const result = await response.json();
-            if (result.base64Image) return result.base64Image;
-            throw new Error("Invalid image response structure.");
-        }
-        
-        function readFileAsBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve({ base64: reader.result.split(',')[1], type: file.type, name: file.name });
-                reader.onerror = (error) => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
+    const apiHistory = [ ...currentChatHistory, { role: "user", parts: userPromptParts } ];
+    const payload = { contents: apiHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
+    
+    const response = await fetch('https://raviai-1h96.onrender.com/api/generate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}` // <-- 401 ERROR KA FIX YAHAN HAI
+        },
+        body: JSON.stringify(payload)
+    });
 
+    if (!response.ok) {
+        const errorData = await response.json();
+        alert(`Server se error aaya: ${errorData.error || response.statusText}`);
+        throw new Error(`API request failed with status ${response.status}`);
+    }
+    
+    const result = await response.json();
+    if (result.text) return result.text;
+    throw new Error("Invalid API response structure.");
+}
+      async function generateImage(prompt) {
+    const user = auth.currentUser;
+    if (!user) {
+        alert("Aap login nahi hain! Kripya dobara login karein.");
+        throw new Error("User not authenticated");
+    }
+    const idToken = await user.getIdToken();
+
+    const enhancedPrompt = `${prompt}, 8k, photorealistic, highly detailed, professional photography, sharp focus, cinematic lighting`;
+    const payload = { prompt: enhancedPrompt };
+    
+    const response = await fetch('https://raviai-1h96.onrender.com/api/generate-image', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}` // <-- 401 ERROR KA FIX YAHAN BHI HAI
+        },
+        body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json();
+        alert(`Server se error aaya: ${errorData.error || response.statusText}`);
+        throw new Error(`Image generation failed with status ${response.status}`);
+    }
+    
+    const result = await response.json();
+    if (result.base64Image) return result.base64Image;
+    throw new Error("Invalid image response structure.");
+}
                // ==========================================================
 // === YEH NAYA FUNCTION ADD KAREIN ===
 // ==========================================================
@@ -1023,33 +1051,15 @@ function firebaseSignInWithToken(idToken) {
             guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
             
            
-             googleLoginBtn.addEventListener('click', () => {
-            // Check karo ki "Android" interface hai ya nahi
-            if (window.Android && typeof window.Android.performGoogleSignIn === 'function') {
-             // Agar hai (matlab app mein chal raha hai), toh native function call karo
-             window.Android.performGoogleSignIn();
-       } else {
-        // Agar nahi hai (matlab browser mein chal raha hai), toh purana tareeka istemal karo
-           console.log("Browser mein chal raha hai, redirect ka istemal kar rahe hain.");
-           auth.signInWithRedirect(provider);
-       }
-         });
+            googleLoginBtn.addEventListener('click', () => {
+    // Sirf is line se Google login shuru ho jaayega
+    auth.signInWithRedirect(provider);
+});
 
-            logoutButton.addEventListener('click', () => {
-                auth.signOut().then(() => {
-                    localStorage.clear();
-                    currentUser = null;
-                    currentUserEmail = null;
-                    conversations = {};
-                    activeChatId = null;
-                    showLoginInterface();
-                }).catch((error) => {
-                    console.error("Logout Error:", error);
-                     // Fallback for local-only logout
-                    localStorage.clear();
-                    showLoginInterface();
-                });
-            });
+logoutButton.addEventListener('click', () => {
+    // Sirf is line se user logout ho jaayega
+    auth.signOut(); 
+});
 
            muteButton.addEventListener('click', () => { isMuted = !isMuted; updateMuteButtonIcon(); if (isMuted) synth.cancel(); });
 
