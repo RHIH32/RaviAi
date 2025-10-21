@@ -13,7 +13,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 const db = admin.firestore();
-const DAILY_LIMIT = 50; // Aap apni free limit yahan set kar sakte hain
+const DAILY_LIMIT = 20; // Aap apni free limit yahan set kar sakte hain
 // ------------------------------------
 
 const app = express();
@@ -99,4 +99,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
+
 
