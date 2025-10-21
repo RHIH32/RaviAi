@@ -728,80 +728,62 @@ micButton.addEventListener('click', () => {
             saveConversations();
         }
 
-         async function handleAIResponse(response, shouldSpeak = true) {
-    try {
-        const jsonMatch = response.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            throw new Error("No JSON object found in the response.");
-        }
+        async function handleAIResponse(response, shouldSpeak = true) {
+             try {
+                // Use a regex to find a JSON object within the response string. This is more robust.
+                const jsonMatch = response.match(/\{[\s\S]*\}/);
+                if (!jsonMatch) {
+                    throw new Error("No JSON object found in the response.");
+                }
 
-        const command = JSON.parse(jsonMatch[0]);
-        
-        // Handle Image Generation first
-        if (command.action === 'generate_image') {
-            addMessageToUI('model', command.response);
-            const loadingBubble = addAILoadingBubble();
-            try {
-                const base64Image = await generateImage(command.prompt);
-                renderGeneratedImage(loadingBubble, `data:image/png;base64,${base64Image}`);
-            } catch (e) {
-                loadingBubble.innerHTML = `<p class="text-red-400">Photo banane mein samasya aa gayi. 😔</p>`;
+                const command = JSON.parse(jsonMatch[0]);
+                let url = '', buttonText = '', buttonIcon = '';
+                
+                if (command.action === 'generate_image') {
+                    addMessageToUI('model', command.response);
+                    const loadingBubble = addAILoadingBubble();
+                    try {
+                        const base64Image = await generateImage(command.prompt);
+                        renderGeneratedImage(loadingBubble, `data:image/png;base64,${base64Image}`);
+                    } catch (e) {
+                        loadingBubble.innerHTML = `<p class="text-red-400">Photo banane mein samasya aa gayi. 😔</p>`;
+                    }
+                    return;
+                }
+
+                switch (command.action) {
+                    case 'google':
+                        url = `https://www.google.com/search?q=${encodeURIComponent(command.query)}`;
+                        buttonText = 'Google par dekhein';
+                        buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>`;
+                        break;
+                    case 'youtube':
+                        url = `https://www.youtube.com/results?search_query=${encodeURIComponent(command.query)}`;
+                        buttonText = 'YouTube par kholein';
+                        buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                        break;
+                    case 'whatsapp':
+                        url = `https://wa.me/${command.number}?text=${encodeURIComponent(command.message)}`;
+                        buttonText = 'WhatsApp par bhejein';
+                        buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>`;
+                        break;
+                    case 'call':
+                        url = `tel:${command.number}`;
+                        buttonText = 'Abhi call karein';
+                        buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>`;
+                        break;
+                    default: throw new Error("Unknown command in JSON.");
+                }
+                addMessageWithAction(command.response, buttonText, buttonIcon, url);
+                if (shouldSpeak) speak(command.response);
+
+            } catch (error) {
+                // If no JSON is found or parsing fails, treat it as a regular message.
+                addMessageToUI('model', response);
+                if (shouldSpeak) speak(response.replace(/```[\s\S]*?```/g, '').replace(/\$\$(.*?)\$\$|\$(.*?)\$/g, ''));
             }
-            return;
         }
 
-        // Handle 'call' action DIRECTLY
-        if (command.action === 'call') {
-            addMessageToUI('model', command.response);
-            if (shouldSpeak) speak(command.response);
-            const callUrl = `tel:${command.number}`;
-            window.location.href = callUrl;
-            return;
-        }
-
-        // --- YAHAN NAYA BADLAAV KIYA GAYA HAI 'play_youtube_video' KE LIYE ---
-        if (command.action === 'play_youtube_video') {
-            addMessageToUI('model', command.response); // AI ka response UI mein dikhao
-            if (shouldSpeak) speak(command.response);
-            
-            // Seedha video URL ko naye tab mein kholo
-            if (command.url) {
-                window.open(command.url, '_blank');
-            } else {
-                addMessageToUI('model', 'Maaf kijiye, YouTube video ka URL nahi mil paya. 😕');
-            }
-            return; // Yahan function rok dein
-        }
-        // --- BADLAAV KHATM ---
-
-        // Baaki ke actions (Google, WhatsApp) pehle jaise hi link banayenge
-        let url = '', buttonText = '', buttonIcon = '';
-        
-        switch (command.action) {
-            case 'google':
-                url = `https://www.google.com/search?q=${encodeURIComponent(command.query)}`;
-                buttonText = 'Google par dekhein';
-                buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>`;
-                break;
-            case 'whatsapp':
-                url = `https://wa.me/${command.number}?text=${encodeURIComponent(command.message)}`;
-                buttonText = 'WhatsApp par bhejein';
-                buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>`;
-                break;
-            default: throw new Error("Unknown command in JSON or action not handled.");
-        }
-        
-        // Ye function ab sirf Google aur WhatsApp ke liye call hoga
-        addMessageWithAction(command.response, buttonText, buttonIcon, url);
-        if (shouldSpeak) speak(command.response);
-
-    } catch (error) {
-        console.error("Error handling AI response:", error);
-        addMessageToUI('model', response); // Agar JSON nahi mila ya koi error hua, to use normal message ki tarah dikhao
-        if (shouldSpeak) speak(response.replace(/```[\s\S]*?```/g, '').replace(/\$\$(.*?)\$\$|\$(.*?)\$/g, ''));
-    }
-}
-        
         function addAILoadingBubble() {
             const wrapper = document.createElement('div');
             wrapper.className = 'flex justify-start';
@@ -941,34 +923,30 @@ micButton.addEventListener('click', () => {
 
         async function getAIResponse(prompt, fileData = null) {
             const systemPrompt = `You are "Ravi AI", a friendly and expressive AI assistant. Your primary language for conversation is Hinglish, and you should use emojis to make the conversation engaging.
-    **Core Instructions:**
-    - **Identity:** When asked about your name or creator, respond with: "Main Ravi AI assistant hu. Ravi ne mujhe banaya hai."
-    - **Formatting:** For mathematical equations, you MUST use LaTeX formatting (e.g., $E=mc^2$). For lists or roadmaps, use markdown lists (*, -, 1.).
-    - **File Analysis:** When a file is provided, analyze its content to answer the user's questions about it.
-    - **Deep Research:** If the user enables "Deep Research", you MUST use your available tools to find the latest and most accurate information before answering.
-    - **Real-Time Information (News, Time, Date):**
-      - Jab aapse live news ya haal ki ghatnaon ke baare mein poocha jaaye, to aapko is tarah se jawaab dena hai: "Main ek AI hoon aur mere paas real-time news ka access nahi hai, lekin main aapke liye is topic par Google search kar sakta hoon. 🧐" Iske baad aapko us news topic ke liye Google Search wala JSON command zaroor dena hai.
-      - Jab aapse current time ya date poochi jaaye, to aapko jawaab dena hai: "Main ek AI hoon aur aapka exact local time nahi bata sakta. Kripya apne device ki clock dekhein. 🕒" Aapko time guess karne ki koshish nahi karni hai.
-            
-    **Action Commands (JSON Responses):**
-    If a user's request DIRECTLY maps to one of the following actions, your ENTIRE response MUST be ONLY the corresponding JSON object. Do not add any conversational text before or after the JSON.
-    - **Google Search:** For requests like "search for X", "find information about Y".
-      {"action": "google", "query": "[search term]", "response": "👉 Is vishay par aur jaankari ke liye yahan click karein."}
-    - **YouTube Play (Direct Video):** For requests like "play X on YouTube", "show me a YouTube video of Y", "YouTube par koi bhi video chalao", "koi bhi gaana chalao". AI ko \`Youtube\` tool ka upyog karke sabse relevant video ka seedha URL nikalna hai aur is format mein dena hai:
-      {"action": "play_youtube_video", "url": "[THE_DIRECT_YOUTUBE_VIDEO_URL]", "response": "Yeh video play ho raha hai! ▶️"}
-    - **WhatsApp Message:** For requests like "send a WhatsApp message to [number]".
-      {"action": "whatsapp", "number": "[phone_number_with_country_code]", "message": "[message_to_send]", "response": "👉 WhatsApp par message bhejne ke liye yahan click karein."}
-    - **Phone Call:** For requests like "call [number]". If the user provides a name instead of a number, you MUST ask for the number first. Do not make up numbers.
-      {"action": "call", "number": "[phone_number]", "response": "👉 Call karne ke liye yahan click karein."}
-    - **Image Generation:** If asked to create an image ("banao", "create", "generate image"), use this JSON: 
-      {"action": "generate_image", "prompt": "[detailed image description]", "response": "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨"}
+            **Core Instructions:**
+            - **Identity:** When asked about your name or creator, respond with: "Main Ravi AI assistant hu. Ravi ne mujhe banaya hai."
+            - **Formatting:** For mathematical equations, you MUST use LaTeX formatting (e.g., $E=mc^2$). For lists or roadmaps, use markdown lists (*, -, 1.).
+            - **File Analysis:** When a file is provided, analyze its content to answer the user's questions about it.
+            - **Deep Research:** If the user enables "Deep Research", you MUST use your available tools to find the latest and most accurate information before answering.
 
-    **Code Formatting:**
-    When you provide code in any language (e.g., HTML, CSS, JavaScript, Python), you MUST enclose it in markdown code fences with the language specified. For example:
-    \`\`\`javascript
-    console.log("Hello, World!");
-    \`\`\`
-    `;
+            **Action Commands (JSON Responses):**
+            If a user's request DIRECTLY maps to one of the following actions, your ENTIRE response MUST be ONLY the corresponding JSON object. Do not add any conversational text before or after the JSON.
+            - **Google Search:** For requests like "search for X", "find information about Y".
+              {"action": "google", "query": "[search term]", "response": "👉 Is vishay par aur jaankari ke liye yahan click karein."}
+            - **YouTube Search:** For requests like "find a video about X", "show me a YouTube video of Y".
+              {"action": "youtube", "query": "[search term]", "response": "👉 Is video ko dekhne ke liye yahan click karein."}
+            - **WhatsApp Message:** For requests like "send a WhatsApp message to [number]".
+              {"action": "whatsapp", "number": "[phone_number_with_country_code]", "message": "[message_to_send]", "response": "👉 WhatsApp par message bhejne ke liye yahan click karein."}
+            - **Phone Call:** For requests like "call [number]". If the user provides a name instead of a number, you MUST ask for the number first. Do not make up numbers.
+              {"action": "call", "number": "[phone_number]", "response": "👉 Call karne ke liye yahan click karein."}
+            - **Image Generation:** If asked to create an image ("banao", "create", "generate image"), use this JSON: 
+              {"action": "generate_image", "prompt": "[detailed image description]", "response": "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨"}
+
+            **Code Formatting:**
+            When you provide code in any language (e.g., HTML, CSS, JavaScript, Python), you MUST enclose it in markdown code fences with the language specified. For example:
+            \`\`\`javascript
+            console.log("Hello, World!");
+            \`\`\``;
             
             const currentChatHistory = conversations[activeChatId]?.messages || [];
             const userPromptParts = [{ text: prompt }];
@@ -1198,29 +1176,3 @@ function firebaseSignInWithToken(idToken) {
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
