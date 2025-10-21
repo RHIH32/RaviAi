@@ -366,22 +366,6 @@ Your subscription payments are handled by our secure third-party payment partner
  firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
-
-
-    auth.getRedirectResult()
-    .then((result) => {
-        if (result && result.user) {
-            // Login safal hua!
-            const user = result.user;
-            console.log("Redirect login successful for:", user.displayName);
-            handleLogin(user.displayName, user.email);
-        }
-        // Agar result.user null hai to kuch nahi karna hai
-    }).catch((error) => {
-        // Error handle karein
-        console.error("Google Redirect Login Error:", error.code, error.message);
-        alert("Google login failed: " + error.message);
-    });
     
 
 
@@ -483,17 +467,6 @@ window.showLanguagePackGuide = function() {
 
             if (savedTheme) {
                 document.body.classList.add(savedTheme);
-            }
-
-            // Yahan check karte hain ki user ki details local storage mein hain ya nahi
-            if (savedUser && savedEmail) {
-                currentUser = savedUser;
-                currentUserEmail = savedEmail;
-                showChatInterface();
-            } else {
-                // Agar user login nahi hai, to sirf login screen dikhayein.
-                // Hum yahan se localStorage.clear() hata chuke hain.
-                showLoginInterface();
             }
             
             setupIcons();
@@ -1019,6 +992,28 @@ function firebaseSignInWithToken(idToken) {
                 const email = emailInput.value.trim();
                 if (username && email) handleLogin(username, email);
             });
+// ==========================================================
+// === YEH NAYA AUTHENTICATION FUNCTION ADD KAREIN ===
+// ==========================================================
+function setupAuthObserver() {
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            // User sign-in hai (ya to pehle se ya redirect ke baad).
+            // Yeh redirect ke baad apne aap chal jaayega.
+            console.log("Auth Observer: User is signed in!", user.displayName);
+            
+            // User ki details save karke chat interface dikhao
+            handleLogin(user.displayName, user.email);
+            // showChatInterface ab handleLogin ke andar se call ho jaayega
+
+        } else {
+            // User sign-out hai.
+            console.log("Auth Observer: User is signed out.");
+            showLoginInterface(); // Sirf tab login screen dikhao jab user login na ho
+        }
+    });
+}
+            
             
             guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
             
@@ -1170,7 +1165,9 @@ function firebaseSignInWithToken(idToken) {
             // Event listeners for modals
            
         }
-         initialize();
+        // Naya call:
+initialize(); // Ye event listeners set karne ke liye zaroori hai
+setupAuthObserver(); // Ye authentication handle karega
          
     });
     </script>
