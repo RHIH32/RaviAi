@@ -992,27 +992,6 @@ function firebaseSignInWithToken(idToken) {
                 const email = emailInput.value.trim();
                 if (username && email) handleLogin(username, email);
             });
-// ==========================================================
-// === YEH NAYA AUTHENTICATION FUNCTION ADD KAREIN ===
-// ==========================================================
-function setupAuthObserver() {
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            // User sign-in hai (ya to pehle se ya redirect ke baad).
-            // Yeh redirect ke baad apne aap chal jaayega.
-            console.log("Auth Observer: User is signed in!", user.displayName);
-            
-            // User ki details save karke chat interface dikhao
-            handleLogin(user.displayName, user.email);
-            // showChatInterface ab handleLogin ke andar se call ho jaayega
-
-        } else {
-            // User sign-out hai.
-            console.log("Auth Observer: User is signed out.");
-            showLoginInterface(); // Sirf tab login screen dikhao jab user login na ho
-        }
-    });
-}
             
             
             guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
@@ -1045,6 +1024,28 @@ function setupAuthObserver() {
                     showLoginInterface();
                 });
             });
+
+            // ==========================================================
+// === YEH NAYA AUTHENTICATION FUNCTION ADD KAREIN ===
+// ==========================================================
+function setupAuthObserver() {
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            // User sign-in hai (ya to pehle se ya redirect ke baad).
+            // Yeh redirect ke baad apne aap chal jaayega.
+            console.log("Auth Observer: User is signed in!", user.displayName);
+            
+            // User ki details save karke chat interface dikhao
+            handleLogin(user.displayName, user.email);
+            // showChatInterface ab handleLogin ke andar se call ho jaayega
+
+        } else {
+            // User sign-out hai.
+            console.log("Auth Observer: User is signed out.");
+            showLoginInterface(); // Sirf tab login screen dikhao jab user login na ho
+        }
+    });
+}
 
            muteButton.addEventListener('click', () => { isMuted = !isMuted; updateMuteButtonIcon(); if (isMuted) synth.cancel(); });
 
