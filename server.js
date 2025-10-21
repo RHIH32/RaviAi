@@ -7,7 +7,7 @@ require('dotenv').config();
 const admin = require('firebase-admin');
 // ZAROORI: Apne Firebase project se 'serviceAccountKey.json' file download karke
 // is file ke saath rakhein.
-const serviceAccount = require('./serviceAccountKey.json');
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -99,3 +99,4 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
+
