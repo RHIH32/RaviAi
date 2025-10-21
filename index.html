@@ -1,4 +1,3 @@
-          
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -366,6 +365,22 @@ Your subscription payments are handled by our secure third-party payment partner
  firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
+
+
+    auth.getRedirectResult()
+    .then((result) => {
+        if (result && result.user) {
+            // Login safal hua!
+            const user = result.user;
+            console.log("Redirect login successful for:", user.displayName);
+            handleLogin(user.displayName, user.email);
+        }
+        // Agar result.user null hai to kuch nahi karna hai
+    }).catch((error) => {
+        // Error handle karein
+        console.error("Google Redirect Login Error:", error.code, error.message);
+        alert("Google login failed: " + error.message);
+    });
     
 
 
@@ -467,6 +482,17 @@ window.showLanguagePackGuide = function() {
 
             if (savedTheme) {
                 document.body.classList.add(savedTheme);
+            }
+
+            // Yahan check karte hain ki user ki details local storage mein hain ya nahi
+            if (savedUser && savedEmail) {
+                currentUser = savedUser;
+                currentUserEmail = savedEmail;
+                showChatInterface();
+            } else {
+                // Agar user login nahi hai, to sirf login screen dikhayein.
+                // Hum yahan se localStorage.clear() hata chuke hain.
+                showLoginInterface();
             }
             
             setupIcons();
@@ -902,6 +928,10 @@ micButton.addEventListener('click', () => {
             - **File Analysis:** When a file is provided, analyze its content to answer the user's questions about it.
             - **Deep Research:** If the user enables "Deep Research", you MUST use your available tools to find the latest and most accurate information before answering.
 
+         - **Real-Time Information (News, Time, Date):**
+            - Jab aapse live news ya haal ki ghatnaon ke baare mein poocha jaaye, to aapko is tarah se jawaab dena hai: "Main ek AI hoon aur mere paas real-time news ka access nahi hai, lekin main aapke liye is topic par Google search kar sakta hoon. 🧐" Iske baad aapko us news topic ke liye Google Search wala JSON command zaroor dena hai.
+            - Jab aapse current time ya date poochi jaaye, to aapko jawaab dena hai: "Main ek AI hoon aur aapka exact local time nahi bata sakta. Kripya apne device ki clock dekhein. 🕒" Aapko time guess karne ki koshish nahi karni hai.
+            
             **Action Commands (JSON Responses):**
             If a user's request DIRECTLY maps to one of the following actions, your ENTIRE response MUST be ONLY the corresponding JSON object. Do not add any conversational text before or after the JSON.
             - **Google Search:** For requests like "search for X", "find information about Y".
@@ -993,7 +1023,6 @@ function firebaseSignInWithToken(idToken) {
                 if (username && email) handleLogin(username, email);
             });
             
-            
             guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
             
            
@@ -1024,28 +1053,6 @@ function firebaseSignInWithToken(idToken) {
                     showLoginInterface();
                 });
             });
-
-            // ==========================================================
-// === YEH NAYA AUTHENTICATION FUNCTION ADD KAREIN ===
-// ==========================================================
-function setupAuthObserver() {
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            // User sign-in hai (ya to pehle se ya redirect ke baad).
-            // Yeh redirect ke baad apne aap chal jaayega.
-            console.log("Auth Observer: User is signed in!", user.displayName);
-            
-            // User ki details save karke chat interface dikhao
-            handleLogin(user.displayName, user.email);
-            // showChatInterface ab handleLogin ke andar se call ho jaayega
-
-        } else {
-            // User sign-out hai.
-            console.log("Auth Observer: User is signed out.");
-            showLoginInterface(); // Sirf tab login screen dikhao jab user login na ho
-        }
-    });
-}
 
            muteButton.addEventListener('click', () => { isMuted = !isMuted; updateMuteButtonIcon(); if (isMuted) synth.cancel(); });
 
@@ -1166,35 +1173,9 @@ function setupAuthObserver() {
             // Event listeners for modals
            
         }
-          // ==========================================================
-// === YEH NAYA AUTHENTICATION FUNCTION ADD KAREIN ===
-// ==========================================================
-function setupAuthObserver() {
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            // User sign-in hai (ya to pehle se ya redirect ke baad).
-            // Yeh redirect ke baad apne aap chal jaayega.
-            console.log("Auth Observer: User is signed in!", user.displayName);
-            
-            // User ki details save karke chat interface dikhao
-            handleLogin(user.displayName, user.email);
-            // showChatInterface ab handleLogin ke andar se call ho jaayega
-
-        } else {
-            // User sign-out hai.
-            console.log("Auth Observer: User is signed out.");
-            showLoginInterface(); // Sirf tab login screen dikhao jab user login na ho
-        }
-    });
-}
-        
-        // Naya call:
-initialize(); // Ye event listeners set karne ke liye zaroori hai
-setupAuthObserver(); // Ye authentication handle karega
+         initialize();
          
     });
     </script>
 </body>
 </html>
-
-    
