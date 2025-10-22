@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Ravi AI</title>
+    <title>IndusGPT</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -139,7 +139,7 @@
     <!-- Login Screen -->
     <div id="login-screen" class="flex items-center justify-center h-full">
         <div class="bg-white/20 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-sm mx-4 border border-white/30">
-            <h2 class="text-3xl font-bold text-gray-800 mb-2 text-center">Welcome to Ravi AI</h2>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2 text-center">Welcome to IndusGPT</h2>
             <p class="text-gray-700 font-medium mb-6 text-center">Login to continue</p>
             <form id="login-form" class="space-y-4">
                 <input type="text" id="username-input" placeholder="Your name..." class="w-full p-3 bg-white/50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
@@ -211,8 +211,8 @@
             <header class="header backdrop-blur-sm p-4 flex items-center justify-between z-10 border-b">
                 <div class="flex items-center">
                     <button id="menu-button" class="hidden mr-4"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
-                    <img src="logooo-removebg-preview.png" alt="Ravi AI Logo" class="h-10 w-10 rounded-full bg-white/10 p-1 object-cover">
-                    <h1 class="animated-text text-xl font-bold ml-2">Ravi AI</h1>
+                    <img src="logooo-removebg-preview.png" alt="IndusGPT Logo" class="h-10 w-10 rounded-full bg-white/10 p-1 object-cover">
+                    <h1 class="animated-text text-xl font-bold ml-2">IndusGPT</h1>
                 </div>
                 <div class="flex items-center space-x-4">
                     <span id="user-name-display" class="font-semibold"></span>
@@ -606,7 +606,7 @@ window.showLanguagePackGuide = function() {
                     else handleAIResponse(msg.parts[0].text, false);
                 });
             } else {
-                const welcomeMsg = `✨ Namaste ${currentUser} 🙏! Main aapka Ravi AI Assistant hoon. Bataaiye, main aaj aapki kis tarah help kar sakta hoon? 😊`;
+                const welcomeMsg = `✨ Namaste ${currentUser} 🙏! Main aapka IndusGPT Assistant hoon. Bataaiye, main aaj aapki kis tarah help kar sakta hoon? 😊`;
                 addMessageToUI('model', welcomeMsg);
             }
             renderChatHistory();
@@ -797,7 +797,7 @@ micButton.addEventListener('click', () => {
         
         function renderGeneratedImage(bubbleElement, imageUrl) {
             bubbleElement.classList.remove('p-3');
-            bubbleElement.innerHTML = `<div class="relative group"><img src="${imageUrl}" class="rounded-lg max-w-full h-auto" alt="Generated image"><span class="absolute bottom-2 left-2 text-xs font-semibold text-white/50 pointer-events-none">Ravi AI</span><a href="${imageUrl}" download="Ravi-AI-Image-${Date.now()}.png" class="absolute bottom-2 right-2 bg-black/50 p-2 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" title="Download Image"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg></a></div>`;
+            bubbleElement.innerHTML = `<div class="relative group"><img src="${imageUrl}" class="rounded-lg max-w-full h-auto" alt="Generated image"><span class="absolute bottom-2 left-2 text-xs font-semibold text-white/50 pointer-events-none">IndusGPT</span><a href="${imageUrl}" download="IndusGPT-Image-${Date.now()}.png" class="absolute bottom-2 right-2 bg-black/50 p-2 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" title="Download Image"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg></a></div>`;
         }
 
         function addMessageToUI(sender, message) {
@@ -915,15 +915,15 @@ micButton.addEventListener('click', () => {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 doc.text(content.replace(/\*\*/g, ''), 10, 10);
-                doc.save('Ravi-AI-Roadmap.pdf');
+                doc.save('IndusGPT-Roadmap.pdf');
             });
             bubble.appendChild(button);
         }
 
         async function getAIResponse(prompt, fileData = null) {
-            const systemPrompt = `You are "Ravi AI", a friendly and expressive AI assistant. Your primary language for conversation is Hinglish, and you should use emojis to make the conversation engaging.
+            const systemPrompt = `You are "IndusGPT", a friendly and expressive AI assistant. Your primary language for conversation is Hinglish, and you should use emojis to make the conversation engaging.
             **Core Instructions:**
-            - **Identity:** When asked about your name or creator, respond with: "Main Ravi AI assistant hu. Ravi ne mujhe banaya hai."
+            - **Identity:** When asked about your name or creator, respond with: "Main ek IndusGPT assistant hu. Mujhe India ke developer Ravi Kumar ne banaya hai — main ek desi smart AI assistant hoon jo aapke har sawal ka jawab dene ke liye bana hoon!"
             - **Formatting:** For mathematical equations, you MUST use LaTeX formatting (e.g., $E=mc^2$). For lists or roadmaps, use markdown lists (*, -, 1.).
             - **File Analysis:** When a file is provided, analyze its content to answer the user's questions about it.
             - **Deep Research:** If the user enables "Deep Research", you MUST use your available tools to find the latest and most accurate information before answering.
