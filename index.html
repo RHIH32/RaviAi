@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>IndusGPT</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,6 +16,11 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <style>
+           .header {
+    /* 1rem = p-4 (aapki existing padding) + status bar ki height */
+              padding-top: calc(1rem + env(safe-area-inset-top));
+           }
+        
         :root {
             --bg-primary: #111827; --bg-secondary: #1f2937; --bg-tertiary: #374151;
             --text-primary: #f3f4f6; --text-secondary: #9ca3af; --border-color: #4b5563;
