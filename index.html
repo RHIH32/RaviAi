@@ -430,6 +430,10 @@ Your subscription payments are handled by our secure third-party payment partner
         let isMuted = false;
         let hindiVoice = null;
         let selectedFile = null; 
+        // ▼▼▼ YEH NAYA CODE ADD KAREIN ▼▼▼
+        let touchStartX = 0;
+        let touchStartY = 0;
+        const swipeThreshold = 50; // Kam se kam 50px swipe karna zaroori hai
      
     // ==========================================================
 // YEH FINAL AUR SAHI CODE HAI. PURAANE FUNCTIONS KI JAGAH
@@ -1053,6 +1057,45 @@ function firebaseSignInWithToken(idToken) {
                     showLoginInterface();
                 });
             });
+
+            // ▼▼▼ YEH NAYA SWIPE LOGIC ADD KAREIN ▼▼▼
+
+            // Poore app container par swipe detect karein
+            appContainer.addEventListener('touchstart', e => {
+                // Jab haath screen par rakha
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true }); // { passive: true } performance ke liye accha hai
+
+            appContainer.addEventListener('touchend', e => {
+                // Jab haath screen se uthaya
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+
+                const swipeDistX = touchEndX - touchStartX;
+                const swipeDistY = touchEndY - touchStartY;
+
+                // Check karo ki yeh horizontal swipe hai (vertical scroll nahi)
+                if (Math.abs(swipeDistX) > Math.abs(swipeDistY) && Math.abs(swipeDistX) > swipeThreshold) {
+                    
+                    // **SWIPE RIGHT (Menu Kholne ke liye)**
+                    // Check karein ki swipe screen ke left edge (pehle 70px) se shuru hua
+                    if (touchStartX < 70 && swipeDistX > 0 && sidebar.classList.contains('collapsed')) {
+                        toggleSidebar();
+                    } 
+                    // **SWIPE LEFT (Menu Band karne ke liye)**
+                    // Yeh swipe kahin se bhi kiya ja सकता है
+                    else if (swipeDistX < 0 && !sidebar.classList.contains('collapsed')) {
+                        toggleSidebar();
+                    }
+                }
+                
+                // Reset values
+                touchStartX = 0;
+                touchStartY = 0;
+            }, { passive: true });
+
+            // ▲▲▲ YAHAN TAK NAYA CODE ADD KAREIN ▲▲▲
 
            muteButton.addEventListener('click', () => { isMuted = !isMuted; updateMuteButtonIcon(); if (isMuted) synth.cancel(); });
 
