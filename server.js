@@ -66,7 +66,8 @@ app.post('/api/generate', async (req, res) => {
         
         const currentApiKey = getNextApiKey();
         // Sahi model ka naam istemal karein
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${currentApiKey}`;
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${currentApiKey}`;
+
         const payload = { contents, ...(systemInstruction && { systemInstruction }) };
         
         const response = await axios.post(apiUrl, payload);
