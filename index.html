@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1035,13 +1036,9 @@ micButton.addEventListener('click', () => {
         }
 
         async function getAIResponse(prompt, fileData = null) {
-            // --- UPDATE 1: DEFAULT PROMPT LOGIC ---
-            // Agar user ne kuch likha nahi hai par file bheji hai, to default text set karein
-            const effectivePrompt = prompt && prompt.trim() !== "" ? prompt : "Analyze this file deeply and explain it.";
-
             const systemPrompt = `You are "IndusGPT", a friendly and expressive AI assistant. Your primary language for conversation is Hinglish, and you should use emojis to make the conversation engaging.
             **Core Instructions:**
-            - **Identity:** When asked about your name or creator, respond with: "Main ek IndusGPT assistant hu. Mujhe India ke developer Ravi Kumar ne banaya hai — main ek desi smart AI assistant hoon jo aapke har sawal ka jawab dene ke liye bana hoon!"
+            - **Identity:** When asked about your name or creator, respond with: "Main ek IndusGPT assistant hu. Mujhe India ke developer Ravi Kumar ne banaya hai — main ek desi smart AI assistant hoon jo aapke har sawal ka jawab dene ke liye bana hoon!"
             - **Formatting:** For mathematical equations, you MUST use LaTeX formatting (e.g., $E=mc^2$). For lists or roadmaps, use markdown lists (*, -, 1.).
             - **File Analysis:** When a file is provided, analyze its content to answer the user's questions about it.
             - **Deep Research:** If the user enables "Deep Research", you MUST use your available tools to find the latest and most accurate information before answering.
@@ -1070,11 +1067,7 @@ micButton.addEventListener('click', () => {
             \`\`\``;
             
             const currentChatHistory = conversations[activeChatId]?.messages || [];
-            
-            // --- UPDATE 2: USE EFFECTIVE PROMPT ---
-            const userPromptParts = [{ text: effectivePrompt }];
-            
-            // --- UPDATE 3: ATTACH FILE DATA CORRECTLY ---
+            const userPromptParts = [{ text: prompt }];
             if (fileData) {
                 userPromptParts.push({
                     inlineData: {
@@ -1084,34 +1077,15 @@ micButton.addEventListener('click', () => {
                 });
             }
 
-            // History optimize karein (Sirf text rakhein taki request heavy na ho)
-            const cleanHistory = currentChatHistory.map(msg => ({
-                role: msg.role,
-                parts: [{ text: msg.parts[0].text }] 
-            }));
-
-            const apiPayload = [ ...cleanHistory, { role: "user", parts: userPromptParts } ];
-            
-            const payload = { 
-                contents: apiPayload, 
-                systemInstruction: { parts: [{ text: systemPrompt }] } 
-            };
-
-            // --- UPDATE 4: ERROR HANDLING ---
-            const response = await fetch('https://raviai-1h96.onrender.com/api/generate', { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify(payload) 
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(`Server Error ${response.status}: ${errorData.error || response.statusText}`);
-            }
-            
+            const apiHistory = [ ...currentChatHistory, { role: "user", parts: userPromptParts } ];
+            const payload = { contents: apiHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
+            const response = await fetch('https://raviai-1h96.onrender.com/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
             const result = await response.json();
-            return result.text;
+            if (result.text) return result.text;
+            throw new Error("Invalid API response structure.");
         }
+
         async function generateImage(prompt) {
             const enhancedPrompt = `${prompt}, 8k, photorealistic, highly detailed, professional photography, sharp focus, cinematic lighting`;
             const payload = { prompt: enhancedPrompt };
@@ -1315,65 +1289,54 @@ function firebaseSignInWithToken(idToken) {
 
             removeFileButton.addEventListener('click', () => { selectedFile = null; filePreviewContainer.classList.add('hidden'); });
 
-            // --- 3. Chat Submit Logic ---
             chatForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const userMessage = userInput.value.trim();
-                
-                // Agar na text hai, na file, to ruk jao
                 if (!userMessage && !selectedFile) return;
-
                 synth?.cancel();
-
-                // UI me message dikhayein
-                let displayMessage = userMessage;
-                if (!userMessage && selectedFile) displayMessage = `📂 File Sent: ${selectedFile.name}`;
-                
-                // History me save karein
-                addMessageToHistory('user', displayMessage);
-                addMessageToUI('user', displayMessage);
-
-                // Input clear karein
+                addMessageToUI('user', userMessage || `Analyzing file: ${selectedFile.name}`);
                 userInput.value = '';
                 typingIndicator.classList.remove('hidden');
                 chatContainer.scrollTop = chatContainer.scrollHeight;
-
-                // --- FILE READING PROCESS ---
+                if (createImageToggle.checked) {
+                    createImageToggle.checked = false;
+                    userInput.placeholder = "Yahan type karein ya bolein...";
+                    addMessageToUI('model', "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨");
+                    const imageBubble = addAILoadingBubble();
+                    try {
+                        const base64Image = await generateImage(userMessage);
+                        renderGeneratedImage(imageBubble, `data:image/png;base64,${base64Image}`);
+                    } catch (error) {
+                        imageBubble.innerHTML = `<p class="text-red-400">Maaf kijiye, photo banane mein kuch samasya aa gayi.</p>`;
+                    } finally {
+                        typingIndicator.classList.add('hidden');
+                    }
+                    return;
+                }
                 let fileData = null;
                 if (selectedFile) {
-                    try {
-                        console.log("Reading file...");
-                        fileData = await readFileAsBase64(selectedFile);
-                        console.log("File read successful!");
-                    } catch (error) {
-                        console.error("File Read Error:", error);
-                        addMessageToUI('model', "File padhne mein dikkat aayi.");
+                    try { fileData = await readFileAsBase64(selectedFile); } 
+                    catch (error) {
+                        addMessageToUI('model', "Maaf kijiye, file padhne mein samasya aa gayi.");
                         typingIndicator.classList.add('hidden');
                         return;
                     }
                 }
-
-                // File UI se reset karein
+                addMessageToHistory('user', userMessage, selectedFile ? {name: selectedFile.name, type: selectedFile.type} : null);
                 selectedFile = null;
-                document.getElementById('file-preview-container').classList.add('hidden');
-                document.getElementById('file-input').value = '';
-
+                filePreviewContainer.classList.add('hidden');
                 try {
-                    // API Call karein
                     const aiResponse = await getAIResponse(userMessage, fileData);
-                    
-                    // Jawab aane par UI update karein
                     addMessageToHistory('model', aiResponse);
                     handleAIResponse(aiResponse);
-
                 } catch (error) {
-                    console.error("AI Error:", error);
-                    // Agar error 413 ya 500 aaye to user ko batayein
-                    addMessageToUI('model', "Server connect nahi ho raha. Shayad file ka size 50MB se zyada hai, ya server abhi busy hai.");
+                    console.error("Error getting AI response:", error);
+                    addMessageToUI('model', "Maaf kijiye, kuch takneeki samasya aa gayi hai.");
                 } finally {
                     typingIndicator.classList.add('hidden');
                 }
             });
+            
             chatContainer.addEventListener('click', (e) => {
                 const copyBtn = e.target.closest('.copy-btn');
                 if (copyBtn) {
