@@ -228,12 +228,23 @@
                 <div id="typing-indicator" class="px-4 pb-2 hidden"><div class="flex items-center"><div class="ai-bubble p-3 rounded-2xl rounded-bl-none"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div></div>
                 
                 <div id="file-preview-container" class="px-4 pb-2 hidden">
-                    <div class="bg-gray-700/50 dark:bg-gray-200/50 inline-flex items-center text-sm rounded-full px-3 py-1">
-                        <span id="file-preview-name" class="text-xs"></span>
-                        <button id="remove-file-button" class="ml-2 text-gray-400 hover:text-white">&times;</button>
-                    </div>
-                </div>
+    <div class="relative inline-block group">
+        <img id="image-preview-element" class="h-16 w-16 object-cover rounded-lg border-2 border-indigo-500 hidden" src="" alt="Preview">
+        
+        <div id="doc-preview-element" class="h-16 w-16 flex flex-col items-center justify-center bg-gray-800 border-2 border-indigo-500 rounded-lg hidden">
+            <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            <span id="file-preview-name" class="text-[10px] text-gray-300 truncate w-14 text-center">File</span>
+        </div>
 
+        <button id="remove-file-button" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md transition-transform hover:scale-110">
+            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+</div>
                 <form id="chat-form" class="flex items-center input-field rounded-full p-1">
                     <div class="relative">
                         <button type="button" id="options-menu-button" class="p-2"></button>
@@ -242,7 +253,7 @@
                                 <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
                                 <span>Add File</span>
                             </label>
-                            <input type="file" id="file-input" class="hidden">
+                           <input type="file" id="file-input" class="hidden" accept="image/*,application/pdf">
 
                             <label for="create-image-toggle" class="flex justify-between items-center p-2 hover:bg-[var(--bg-tertiary)] rounded-md cursor-pointer text-sm text-[var(--text-primary)]">
                                 <span class="flex items-center">
