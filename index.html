@@ -969,7 +969,7 @@ micButton.addEventListener('click', () => {
 
             const apiHistory = [ ...currentChatHistory, { role: "user", parts: userPromptParts } ];
             const payload = { contents: apiHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
-            const response = await fetch('https://https://indusgpt.vercel.app/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const response = await fetch('https://indusgpt.vercel.app/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
             const result = await response.json();
             if (result.text) return result.text;
@@ -979,7 +979,7 @@ micButton.addEventListener('click', () => {
         async function generateImage(prompt) {
             const enhancedPrompt = `${prompt}, 8k, photorealistic, highly detailed, professional photography, sharp focus, cinematic lighting`;
             const payload = { prompt: enhancedPrompt };
-            const response = await fetch('https://https://indusgpt.vercel.app/api/generate-image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const response = await fetch('https://indusgpt.vercel.app/api/generate-image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             if (!response.ok) throw new Error(`Image generation failed with status ${response.status}`);
             const result = await response.json();
             if (result.base64Image) return result.base64Image;
