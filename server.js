@@ -21,7 +21,9 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+// Limit 50mb kar di taaki photo/pdf send ho sake
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(__dirname));
 
 // --- API Key Configuration ---
@@ -107,8 +109,11 @@ app.post('/api/generate-image', async (req, res) => {
         // 3. Image ko Base64 mein convert karein (Kyuki apka frontend Base64 mangta hai)
         const base64Image = Buffer.from(response.data, 'binary').toString('base64');
 
-        // 4. Frontend ko bhej dein
-        res.json({ base64Image: base64Image });
+       // 4. Frontend ko bhej dein (URL zaroor bhejein history ke liye)
+    res.json({ 
+    base64Image: base64Image,
+    imageUrl: imageUrl 
+});
 
     } catch (error) {
         console.error("Image Gen Error:", error.message);
@@ -126,6 +131,7 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
+
 
 
 
