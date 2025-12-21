@@ -1213,15 +1213,45 @@ function firebaseSignInWithToken(idToken) {
 
             optionsMenuButton.addEventListener('click', (e) => { e.stopPropagation(); optionsPopover.classList.toggle('hidden'); });
             
+           // --- NAYA FILE INPUT LOGIC (Preview ke sath) ---
             fileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
                     selectedFile = file;
-                    filePreviewName.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
-                    filePreviewContainer.classList.remove('hidden');
+                    const previewContainer = document.getElementById('file-preview-container');
+                    const imgPreview = document.getElementById('image-preview-element');
+                    const docPreview = document.getElementById('doc-preview-element');
+                    const fileNameSpan = document.getElementById('file-preview-name');
+
+                    previewContainer.classList.remove('hidden');
                     optionsPopover.classList.add('hidden');
+
+                    // Check karein ki ye Image hai ya Document
+                    if (file.type.startsWith('image/')) {
+                        // Image Preview Dikhao
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            imgPreview.src = e.target.result;
+                            imgPreview.classList.remove('hidden');
+                            docPreview.classList.add('hidden');
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        // Document Icon Dikhao
+                        imgPreview.classList.add('hidden');
+                        docPreview.classList.remove('hidden');
+                        fileNameSpan.textContent = file.name.length > 8 ? file.name.substring(0, 5) + '...' : file.name;
+                    }
                 }
-                e.target.value = null;
+                // Input ko reset na karein yahan, varna file gayab ho jayegi
+            });
+
+            // Remove Button Logic
+            removeFileButton.addEventListener('click', (e) => { 
+                e.preventDefault(); // Button dabne par form submit na ho
+                selectedFile = null; 
+                fileInput.value = ''; // Input clear karein
+                filePreviewContainer.classList.add('hidden'); 
             });
 
             createImageToggle.addEventListener('change', () => {
