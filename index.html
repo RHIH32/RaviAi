@@ -1225,53 +1225,85 @@ function firebaseSignInWithToken(idToken) {
 
             removeFileButton.addEventListener('click', () => { selectedFile = null; filePreviewContainer.classList.add('hidden'); });
 
-            chatForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const userMessage = userInput.value.trim();
-                if (!userMessage && !selectedFile) return;
-                synth?.cancel();
-                addMessageToUI('user', userMessage || `Analyzing file: ${selectedFile.name}`);
-                userInput.value = '';
-                typingIndicator.classList.remove('hidden');
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-                if (createImageToggle.checked) {
-                    createImageToggle.checked = false;
-                    userInput.placeholder = "Yahan type karein ya bolein...";
-                    addMessageToUI('model', "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨");
-                    const imageBubble = addAILoadingBubble();
-                    try {
-                        const base64Image = await generateImage(userMessage);
-                        renderGeneratedImage(imageBubble, `data:image/png;base64,${base64Image}`);
-                    } catch (error) {
-                        imageBubble.innerHTML = `<p class="text-red-400">Maaf kijiye, photo banane mein kuch samasya aa gayi.</p>`;
-                    } finally {
-                        typingIndicator.classList.add('hidden');
-                    }
-                    return;
-                }
-                let fileData = null;
-                if (selectedFile) {
-                    try { fileData = await readFileAsBase64(selectedFile); } 
-                    catch (error) {
-                        addMessageToUI('model', "Maaf kijiye, file padhne mein samasya aa gayi.");
-                        typingIndicator.classList.add('hidden');
-                        return;
-                    }
-                }
-                addMessageToHistory('user', userMessage, selectedFile ? {name: selectedFile.name, type: selectedFile.type} : null);
-                selectedFile = null;
-                filePreviewContainer.classList.add('hidden');
-                try {
-                    const aiResponse = await getAIResponse(userMessage, fileData);
-                    addMessageToHistory('model', aiResponse);
-                    handleAIResponse(aiResponse);
-                } catch (error) {
-                    console.error("Error getting AI response:", error);
-                    addMessageToUI('model', "Maaf kijiye, kuch takneeki samasya aa gayi hai.");
-                } finally {
-                    typingIndicator.classList.add('hidden');
-                }
-            });
+           // --- YEH NAYA CODE HAI (OLD chatForm LISTENER KO REPLACE KAREIN) ---
+
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const userMessage = userInput.value.trim();
+    
+    // Agar message khali hai aur koi file nahi hai, to ruk jao
+    if (!userMessage && !selectedFile) return;
+
+    synth?.cancel(); // Purana bolna band karo
+
+    // --- STEP 1: KEYWORD CHECK (Gemini ko Bypass karne ke liye) ---
+    // In shabdon se hum pakad lenge ki user photo maang raha hai
+    const imageKeywords = [
+        "image", "photo", "tasveer", "picture", "drawing", "sketch", "banao", "create", "generate", "draw"
+    ];
+    
+    // Check karein ki kya user ne "Toggle" on kiya hai YA keyword match ho raha hai
+    // Logic: Agar message me "photo" aur "banao" dono aa jaye, ya "create image" aa jaye
+    const isImageRequest = createImageToggle.checked || (
+        (userMessage.toLowerCase().includes("photo") || userMessage.toLowerCase().includes("image") || userMessage.toLowerCase().includes("tasveer")) &&
+        (userMessage.toLowerCase().includes("banao") || userMessage.toLowerCase().includes("create") || userMessage.toLowerCase().includes("generate") || userMessage.toLowerCase().includes("dikhao"))
+    );
+
+    // --- STEP 2: IMAGE GENERATION (Direct Call - No Gemini) ---
+    if (isImageRequest) {
+        // UI Update
+        addMessageToUI('user', userMessage);
+        userInput.value = '';
+        createImageToggle.checked = false; // Toggle reset kar do
+        userInput.placeholder = "Yahan type karein ya bolein...";
+        
+        // AI ka jawaab (Fake Response taaki user ko lage AI bol raha hai)
+        addMessageToUI('model', "Samajh gaya! Main aapke liye yeh shandaar photo bana raha hoon... 🎨");
+        const imageBubble = addAILoadingBubble();
+        
+        try {
+            // Direct Image API call (Gemini quota safe!)
+            const base64Image = await generateImage(userMessage);
+            renderGeneratedImage(imageBubble, `data:image/png;base64,${base64Image}`);
+        } catch (error) {
+            console.error(error);
+            imageBubble.innerHTML = `<p class="text-red-400">Maaf kijiye, photo banane mein kuch samasya aa gayi.</p>`;
+        }
+        return; // Yahi se wapas laut jao, Gemini ke paas mat jao!
+    }
+
+    // --- STEP 3: NORMAL CHAT (Gemini Call) ---
+    // Agar photo nahi maangi, tabhi Gemini ke paas jao
+    addMessageToUI('user', userMessage || `Analyzing file: ${selectedFile.name}`);
+    userInput.value = '';
+    typingIndicator.classList.remove('hidden');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    let fileData = null;
+    if (selectedFile) {
+        try { fileData = await readFileAsBase64(selectedFile); } 
+        catch (error) {
+            addMessageToUI('model', "Maaf kijiye, file padhne mein samasya aa gayi.");
+            typingIndicator.classList.add('hidden');
+            return;
+        }
+    }
+    
+    addMessageToHistory('user', userMessage, selectedFile ? {name: selectedFile.name, type: selectedFile.type} : null);
+    selectedFile = null;
+    filePreviewContainer.classList.add('hidden');
+
+    try {
+        const aiResponse = await getAIResponse(userMessage, fileData);
+        addMessageToHistory('model', aiResponse);
+        handleAIResponse(aiResponse);
+    } catch (error) {
+        console.error("Error getting AI response:", error);
+        addMessageToUI('model', "Maaf kijiye, kuch takneeki samasya aa gayi hai (Quota ya Server Error).");
+    } finally {
+        typingIndicator.classList.add('hidden');
+    }
+});
             
             chatContainer.addEventListener('click', (e) => {
                 const copyBtn = e.target.closest('.copy-btn');
