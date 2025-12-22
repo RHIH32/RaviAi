@@ -67,8 +67,8 @@ app.post('/api/generate', async (req, res) => {
         }
         
         const currentApiKey = getNextApiKey();
-        // Naya (Jo high limit wala hai):
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentApiKey}`;
+        // Option 1: Stable Version (Sabse Safe)
+       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent?key=${currentApiKey}`;
 
         const payload = { contents, ...(systemInstruction && { systemInstruction }) };
         
@@ -131,6 +131,7 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
+
 
 
 
