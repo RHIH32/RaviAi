@@ -17,10 +17,15 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <style>
         
-        :root {
-            --bg-primary: #111827; --bg-secondary: #1f2937; --bg-tertiary: #374151;
-            --text-primary: #f3f4f6; --text-secondary: #9ca3af; --border-color: #4b5563;
-            --header-bg: rgba(17, 24, 39, 0.7);
+       :root {
+            /* Black Theme Colors */
+            --bg-primary: #000000;         /* Main Background Pure Black */
+            --bg-secondary: #121212;       /* Sidebar & Input Bar (Thoda sa gray taaki alag dikhe) */
+            --bg-tertiary: #27272a;        /* Hover effects */
+            --text-primary: #ededed;       /* Text Color White */
+            --text-secondary: #a1a1aa;     /* Secondary Text */
+            --border-color: #333333;       /* Border Color */
+            --header-bg: rgba(0, 0, 0, 0.8); /* Header Transparent Black */
         }
         .light-theme {
             --bg-primary: #f9fafb; --bg-secondary: #ffffff; --bg-tertiary: #f3f4f6;
@@ -45,7 +50,13 @@
             animation: fadeIn 0.3s ease-out; 
             position: relative; 
         }
-        .user-bubble { background-image: linear-gradient(to right, #4338ca, #6d28d9); }
+        .user-bubble { 
+            /* Gradient hata diya */
+            background-image: none; 
+            /* Solid Dark Gray color */
+            background-color: #2f2f2f; 
+            color: #ffffff;
+        }
         .ai-bubble { background-color: var(--bg-tertiary); color: var(--text-primary); }
         
         .typing-indicator span, .image-loader span { height: 8px; width: 8px; background-color: var(--text-secondary); border-radius: 50%; display: inline-block; animation: bounce 1.4s infinite ease-in-out both; }
@@ -181,7 +192,7 @@
                 <button id="collapse-sidebar-button" class="text-gray-400 hover:text-white"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
             </div>
             <div class="flex flex-col flex-grow overflow-hidden">
-                <button id="new-chat-button" class="w-full flex items-center justify-center p-2 mb-2 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors flex-shrink-0 text-white"><svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>New Chat</button>
+                <button id="new-chat-button" class="w-full flex items-center justify-center p-3 mb-2 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors flex-shrink-0 text-white shadow-sm"><svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>New Chat</button>
                 <div class="border-t my-2 border-color"></div>
                 <!-- Search Input -->
                 <div class="relative mb-2">
@@ -224,56 +235,71 @@
             <main id="chat-container" class="flex-1 p-4 space-y-4 overflow-y-auto"></main>
 
             <!-- Footer -->
-            <footer class="footer backdrop-blur-sm p-3 border-t">
-                <div id="typing-indicator" class="px-4 pb-2 hidden"><div class="flex items-center"><div class="ai-bubble p-3 rounded-2xl rounded-bl-none"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div></div>
+            <footer class="footer backdrop-blur-sm p-0 z-20 w-full">
+                
+                <div id="typing-indicator" class="px-4 pb-2 hidden">
+                    <div class="flex items-center">
+                        <div class="bg-[var(--bg-tertiary)] p-3 rounded-2xl rounded-bl-none text-[var(--text-primary)]">
+                            <div class="typing-indicator"><span></span><span></span><span></span></div>
+                        </div>
+                    </div>
+                </div>
                 
                 <div id="file-preview-container" class="px-4 pb-2 hidden">
-                    <div class="bg-gray-700/50 dark:bg-gray-200/50 inline-flex items-center text-sm rounded-full px-3 py-1">
-                        <span id="file-preview-name" class="text-xs"></span>
-                        <button id="remove-file-button" class="ml-2 text-gray-400 hover:text-white">&times;</button>
+                    <div class="bg-gray-700/80 backdrop-blur text-white inline-flex items-center text-sm rounded-full px-4 py-2 shadow-lg border border-gray-600">
+                        <span id="file-preview-name" class="text-xs font-medium"></span>
+                        <button id="remove-file-button" class="ml-3 text-gray-300 hover:text-white bg-gray-600 rounded-full p-0.5 w-5 h-5 flex items-center justify-center">&times;</button>
                     </div>
                 </div>
 
-                <form id="chat-form" class="flex items-center input-field rounded-full p-1">
-                    <div class="relative">
-                        <button type="button" id="options-menu-button" class="p-2"></button>
-                        <div id="options-popover" class="hidden absolute bottom-full mb-2 left-0 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg shadow-xl p-2 w-48 space-y-1">
-                            <label for="file-input" class="w-full flex items-center p-2 hover:bg-[var(--bg-tertiary)] rounded-md text-sm text-[var(--text-primary)] cursor-pointer">
-                                <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                                <span>Add File</span>
-                            </label>
-                            <input type="file" id="file-input" class="hidden">
+                <div class="p-4 w-full max-w-4xl mx-auto">
+                    <form id="chat-form" class="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[2rem] shadow-2xl p-2 relative transition-all duration-300 focus-within:ring-2 focus-within:ring-indigo-500/50">
+                        
+                        <div class="relative flex-shrink-0">
+                            <button type="button" id="options-menu-button" class="p-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-full transition-colors">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                            </button>
+                            
+                            <div id="options-popover" class="hidden absolute bottom-full mb-4 left-0 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl shadow-2xl p-2 w-56 space-y-1 overflow-hidden z-50">
+                                <label for="file-input" class="w-full flex items-center p-3 hover:bg-[var(--bg-tertiary)] rounded-xl text-sm text-[var(--text-primary)] cursor-pointer transition-colors">
+                                    <svg class="h-5 w-5 mr-3 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                    <span class="font-medium">Upload File</span>
+                                </label>
+                                <input type="file" id="file-input" class="hidden">
 
-                            <label for="create-image-toggle" class="flex justify-between items-center p-2 hover:bg-[var(--bg-tertiary)] rounded-md cursor-pointer text-sm text-[var(--text-primary)]">
-                                <span class="flex items-center">
-                                    <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    <span>Create Image</span>
-                                </span>
-                                <div class="relative">
-                                    <input type="checkbox" id="create-image-toggle" class="toggle-checkbox">
-                                    <div class="toggle-switch"></div>
-                                </div>
-                            </label>
+                                <label for="create-image-toggle" class="flex justify-between items-center p-3 hover:bg-[var(--bg-tertiary)] rounded-xl cursor-pointer text-sm text-[var(--text-primary)] transition-colors">
+                                    <span class="flex items-center">
+                                        <svg class="h-5 w-5 mr-3 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <span class="font-medium">Generate Image</span>
+                                    </span>
+                                    <div class="relative">
+                                        <input type="checkbox" id="create-image-toggle" class="toggle-checkbox">
+                                        <div class="toggle-switch"></div>
+                                    </div>
+                                </label>
 
-                            <label for="deep-research-toggle" class="flex justify-between items-center p-2 hover:bg-[var(--bg-tertiary)] rounded-md cursor-pointer text-sm text-[var(--text-primary)]">
-                                <span class="flex items-center">
-                                    <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                    <span>Deep Research</span>
-                                </span>
-                                <div class="relative">
-                                    <input type="checkbox" id="deep-research-toggle" class="toggle-checkbox">
-                                    <div class="toggle-switch"></div>
-                                </div>
-                            </label>
+                                <label for="deep-research-toggle" class="flex justify-between items-center p-3 hover:bg-[var(--bg-tertiary)] rounded-xl cursor-pointer text-sm text-[var(--text-primary)] transition-colors">
+                                    <span class="flex items-center">
+                                        <svg class="h-5 w-5 mr-3 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                        <span class="font-medium">Deep Research</span>
+                                    </span>
+                                    <div class="relative">
+                                        <input type="checkbox" id="deep-research-toggle" class="toggle-checkbox">
+                                        <div class="toggle-switch"></div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <input type="text" id="user-input" placeholder="Yahan type karein ya bolein..." class="flex-1 min-w-0 bg-transparent px-4 py-2 focus:outline-none">
-                    
-                    <button type="button" id="mic-button" class="p-2"></button>
-                    
-                    <button type="submit" id="send-button" class="p-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-lg"></button>
-                </form>
+                        
+                        <input type="text" id="user-input" placeholder="Yahan type karein ya bolein..." class="flex-1 min-w-0 bg-transparent px-4 py-3 text-[var(--text-primary)] placeholder-gray-500 focus:outline-none text-base" autocomplete="off">
+                        
+                        <button type="button" id="mic-button" class="p-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-full transition-colors mr-1">
+                            </button>
+                        
+                        <button type="submit" id="send-button" class="p-3 bg-white text-black rounded-full shadow-lg hover:bg-gray-200 hover:scale-105 transition-all transform flex-shrink-0">
+                            </button>
+                    </form>
+                </div>
             </footer>
         </div>
     </div>
@@ -583,7 +609,7 @@ window.showLanguagePackGuide = function() {
 
             filteredChats.sort((a, b) => b.id.split('-')[1] - a.id.split('-')[1]).forEach(chat => {
                 const itemWrapper = document.createElement('div');
-                itemWrapper.className = `group p-2 rounded-lg flex items-center justify-between w-full cursor-pointer hover:bg-gray-700 ${chat.id === activeChatId ? 'bg-indigo-500' : ''}`;
+                itemWrapper.className = `group p-2 rounded-lg flex items-center justify-between w-full cursor-pointer hover:bg-gray-800 ${chat.id === activeChatId ? 'bg-gray-800' : ''}`;
                 const itemButton = document.createElement('button');
                 itemButton.className = 'flex-grow text-left truncate';
                 itemButton.textContent = chat.title;
