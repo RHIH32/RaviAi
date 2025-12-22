@@ -21,7 +21,9 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+// Limit 50mb kar di taaki photo/pdf send ho sake
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(__dirname));
 
 // --- API Key Configuration ---
@@ -65,8 +67,8 @@ app.post('/api/generate', async (req, res) => {
         }
         
         const currentApiKey = getNextApiKey();
-        // Sahi model ka naam istemal karein
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${currentApiKey}`;
+        // Naya (Jo high limit wala hai):
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentApiKey}`;
 
         const payload = { contents, ...(systemInstruction && { systemInstruction }) };
         
@@ -86,9 +88,38 @@ app.post('/api/generate', async (req, res) => {
     }
 });
 
-// Image Generation Endpoint
+
+// === API: IMAGE GENERATION (Pollinations.ai - Free & No Key) ===
 app.post('/api/generate-image', async (req, res) => {
-    // ... (generate-image ka code waisa hi rahega) ...
+    try {
+        const { prompt } = req.body;
+        if (!prompt) {
+            return res.status(400).json({ error: "Prompt is required" });
+        }
+
+        console.log("Generating image for:", prompt);
+
+        // 1. Pollinations AI ka URL banayein (Seed add karte hain taki har baar alag image bane)
+        const seed = Math.floor(Math.random() * 10000);
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed}&width=512&height=512&nologo=true`;
+
+        // 2. Image ko download karein (Binary format mein)
+        const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+
+        // 3. Image ko Base64 mein convert karein (Kyuki apka frontend Base64 mangta hai)
+        const base64Image = Buffer.from(response.data, 'binary').toString('base64');
+
+       // 4. Frontend ko bhej dein (URL zaroor bhejein history ke liye)
+    res.json({ 
+    base64Image: base64Image,
+    imageUrl: imageUrl 
+});
+
+    } catch (error) {
+        console.error("Image Gen Error:", error.message);
+        // Agar fail ho jaye, to user ko error dikhayein
+        res.status(500).json({ error: "Image generation failed. Try again." });
+    }
 });
 
 // === Static File Serving ===
@@ -100,4 +131,8 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
+
+
+
+
 
