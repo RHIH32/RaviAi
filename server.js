@@ -69,7 +69,7 @@ app.post('/api/generate', async (req, res) => {
         const currentApiKey = getNextApiKey();
         // Option 1: Stable Version (Sabse Safe)
       // Naya / Sahi Code (High Limit wala):
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${currentApiKey}`;
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${currentApiKey}`;
         const payload = { contents, ...(systemInstruction && { systemInstruction }) };
         
         const response = await axios.post(apiUrl, payload);
@@ -131,6 +131,7 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
+
 
 
 
