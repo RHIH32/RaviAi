@@ -920,21 +920,31 @@ async function typeWriter(element, htmlText) {
         // --- UPDATED: addMessageToUI with Animation ---
 async function addMessageToUI(sender, message, animate = false) {
     const wrapper = document.createElement('div');
+    // User ka message right mein, AI ka left mein
     wrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} w-full`;
     
     const bubble = document.createElement('div');
-    bubble.className = `message-bubble p-3 rounded-2xl ${sender === 'user' ? 'user-bubble text-white' : 'ai-bubble'}`;
+
+    // === YAHAN STYLING CHANGE KI HAI ===
+    if (sender === 'user') {
+        // User ke liye: Purple Box (Bubble) rahega
+        bubble.className = 'message-bubble p-3 rounded-2xl user-bubble text-white max-w-[85%]';
+    } else {
+        // AI ke liye: Box hata diya (Transparent), sirf text dikhega
+        bubble.className = 'message-bubble py-2 px-1 w-full text-[var(--text-primary)]';
+    }
     
     // Markdown Formatting (Bold, Italic, Newline)
-    // Note: Code blocks (```) ko hum animate nahi karte taaki layout na toote
     const formattedMessage = message
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')             // Italic
-        .replace(/\n/g, '<br>');                           // New line
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')            
+        .replace(/\n/g, '<br>');                           
 
-    // Agar Model hai aur Animation ON hai, aur message mein Code Block nahi hai
+    // Agar Model hai, Animation ON hai, aur Code Block nahi hai
     if (sender === 'model' && animate && !message.includes('```')) {
         const p = document.createElement('p');
+        // Font size thoda bada aur line-height adjust kiya taaki saaf dikhe
+        p.className = "leading-relaxed text-base"; 
         bubble.appendChild(p);
         wrapper.appendChild(bubble);
         document.getElementById('chat-container').appendChild(wrapper);
@@ -944,22 +954,24 @@ async function addMessageToUI(sender, message, animate = false) {
     } else {
         // Normal render (User message ya Code Blocks ke liye)
         const p = document.createElement('p');
+        p.className = "leading-relaxed text-base";
         p.innerHTML = formattedMessage;
         bubble.appendChild(p);
         wrapper.appendChild(bubble);
         document.getElementById('chat-container').appendChild(wrapper);
     }
 
-    // Buttons add karna (Copy, PDF etc. sirf AI messages par)
+    // Buttons (Copy, PDF) sirf AI messages par, lekin ab thoda subtle dikhenge
     if (sender === 'model' && !message.includes('```')) {
          const copyButton = document.createElement('button');
-         copyButton.className = 'copy-btn';
-         copyButton.innerHTML = `<svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
-         // Copy button logic
+         // Button ko thoda adjust kiya taaki text ke upar na chadh jaye
+         copyButton.className = 'copy-btn ml-2'; 
+         copyButton.innerHTML = `<svg class="h-4 w-4 text-gray-400 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
+         
          copyButton.onclick = () => {
             navigator.clipboard.writeText(message);
             copyButton.innerHTML = `<svg class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
-            setTimeout(() => copyButton.innerHTML = `<svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`, 2000);
+            setTimeout(() => copyButton.innerHTML = `<svg class="h-4 w-4 text-gray-400 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`, 2000);
          };
          bubble.appendChild(copyButton);
     }
