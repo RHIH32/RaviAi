@@ -27,10 +27,46 @@
             --border-color: #333333;       /* Border Color */
             --header-bg: rgba(0, 0, 0, 0.8); /* Header Transparent Black */
         }
+        /* Light Theme Variables - Clean & Professional */
         .light-theme {
-            --bg-primary: #f9fafb; --bg-secondary: #ffffff; --bg-tertiary: #f3f4f6;
-            --text-primary: #1f2937; --text-secondary: #6b7280; --border-color: #d1d5db;
-            --header-bg: rgba(255, 255, 255, 0.7);
+            --bg-primary: #ffffff;         /* Pure White Background */
+            --bg-secondary: #f3f4f6;       /* Light Gray (Sidebar/Input) */
+            --bg-tertiary: #e5e7eb;        /* Hover States */
+            --text-primary: #111827;       /* Dark Text (Not pure black, soft dark) */
+            --text-secondary: #6b7280;     /* Gray Text */
+            --border-color: #e5e7eb;       /* Subtle Borders */
+            --header-bg: rgba(255, 255, 255, 0.8); /* Glassmorphism Header */
+        }
+
+        /* Light Theme Specific Overrides */
+        
+        /* User Bubble: Light Mode mein Black Bubble achha lagta hai */
+        .light-theme .user-bubble {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+
+        /* Sidebar & Active Chat Fix for Light Mode */
+        .light-theme #sidebar {
+            background-color: #f9fafb; /* Very light gray */
+            border-right: 1px solid #e5e7eb;
+        }
+        
+        /* New Chat Button in Light Mode */
+        .light-theme #new-chat-button {
+            background-color: #ffffff;
+            color: #111827;
+            border: 1px solid #d1d5db;
+        }
+        .light-theme #new-chat-button:hover {
+            background-color: #f3f4f6;
+        }
+        
+        /* Input Bar in Light Mode */
+        .light-theme #chat-form {
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Soft Shadow */
+            border: 1px solid #e5e7eb;
         }
         body {
             font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent;
@@ -192,7 +228,7 @@
                 <button id="collapse-sidebar-button" class="text-gray-400 hover:text-white"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
             </div>
             <div class="flex flex-col flex-grow overflow-hidden">
-                <button id="new-chat-button" class="w-full flex items-center justify-center p-3 mb-2 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors flex-shrink-0 text-white shadow-sm"><svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>New Chat</button>
+                <button id="new-chat-button" class="w-full flex items-center justify-center p-3 mb-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg hover:opacity-80 transition-all flex-shrink-0 text-[var(--text-primary)] shadow-sm font-medium"><svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>New Chat</button>
                 <div class="border-t my-2 border-color"></div>
                 <!-- Search Input -->
                 <div class="relative mb-2">
@@ -609,7 +645,7 @@ window.showLanguagePackGuide = function() {
 
             filteredChats.sort((a, b) => b.id.split('-')[1] - a.id.split('-')[1]).forEach(chat => {
                 const itemWrapper = document.createElement('div');
-                itemWrapper.className = `group p-2 rounded-lg flex items-center justify-between w-full cursor-pointer hover:bg-gray-800 ${chat.id === activeChatId ? 'bg-gray-800' : ''}`;
+                itemWrapper.className = `group p-2 rounded-lg flex items-center justify-between w-full cursor-pointer hover:bg-[var(--bg-tertiary)] transition-colors border border-transparent ${chat.id === activeChatId ? 'bg-[var(--bg-tertiary)] border-[var(--border-color)]' : ''}`;
                 const itemButton = document.createElement('button');
                 itemButton.className = 'flex-grow text-left truncate';
                 itemButton.textContent = chat.title;
@@ -633,22 +669,81 @@ window.showLanguagePackGuide = function() {
             saveConversations();
         }
 
-        function loadChat(chatId) {
+      function loadChat(chatId) {
             chatContainer.innerHTML = '';
             activeChatId = chatId;
             const chat = conversations[chatId];
+            
             if (chat && chat.messages.length > 0) {
                 chat.messages.forEach(msg => {
                     if (msg.role === 'user') addMessageToUI('user', msg.parts[0].text);
                     else handleAIResponse(msg.parts[0].text, false);
                 });
             } else {
-                const welcomeMsg = `✨ Namaste ${currentUser} 🙏! Main aapka IndusGPT Assistant hoon. Bataaiye, main aaj aapki kis tarah help kar sakta hoon? 😊`;
-                addMessageToUI('model', welcomeMsg);
+                // === DYNAMIC WELCOME SCREEN (Light/Dark Compatible) ===
+                
+                const welcomeContainer = document.createElement('div');
+                welcomeContainer.className = 'flex flex-col items-center justify-center h-full w-full px-4 mt-10 opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]';
+                
+                // 1. Logo / Greeting
+                welcomeContainer.innerHTML = `
+                    <div class="mb-8 text-center">
+                        <div class="bg-[var(--bg-secondary)] p-4 rounded-full inline-block mb-4 shadow-sm">
+                            <img src="logooo-removebg-preview.png" alt="Logo" class="h-12 w-12 object-contain">
+                        </div>
+                        <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-2">Namaste, ${currentUser || 'User'}!</h2>
+                        <p class="text-[var(--text-secondary)]">Main IndusGPT hoon. Aaj main aapki kya madad kar sakta hoon?</p>
+                    </div>
+                `;
+
+                // 2. Suggestion Cards Grid
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl';
+
+                const suggestions = [
+                    { icon: '🎨', text: 'Ek futurist car ki photo banao', sub: 'Image Generation' },
+                    { icon: '📝', text: 'Leave application likh kar do', sub: 'Writing' },
+                    { icon: '💻', text: 'HTML aur CSS mein calculator code', sub: 'Coding' },
+                    { icon: '🧠', text: 'Black hole kya hota hai samjhao', sub: 'Knowledge' }
+                ];
+
+                suggestions.forEach(item => {
+                    const card = document.createElement('button');
+                    // === YAHAN MAIN CHANGE HAI ===
+                    // Ab hum direct color nahi, balki variables use kar rahe hain
+                    card.className = 'text-left p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] transition-all shadow-sm group';
+                    
+                    card.innerHTML = `
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h3 class="font-medium text-[var(--text-primary)] text-sm mb-1">${item.text}</h3>
+                                <p class="text-xs text-[var(--text-secondary)]">${item.sub}</p>
+                            </div>
+                            <span class="text-xl opacity-70 group-hover:scale-110 transition-transform">${item.icon}</span>
+                        </div>
+                    `;
+                    card.onclick = () => handleSuggestionClick(item.text);
+                    grid.appendChild(card);
+                });
+
+                welcomeContainer.appendChild(grid);
+                chatContainer.appendChild(welcomeContainer);
             }
             renderChatHistory();
         }
 
+
+        // --- Suggestion Card Click Handler ---
+        function handleSuggestionClick(text) {
+            const userInput = document.getElementById('user-input');
+            const chatForm = document.getElementById('chat-form');
+            
+            // Input box mein text daal kar form submit karo
+            if (userInput && chatForm) {
+                userInput.value = text;
+                chatForm.dispatchEvent(new Event('submit', { cancelable: true }));
+            }
+        }
         // --- Speech Synthesis (TTS) ---
 // YEH FINAL AUR SAHI CODE HAI
 
