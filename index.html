@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -229,23 +228,12 @@
                 <div id="typing-indicator" class="px-4 pb-2 hidden"><div class="flex items-center"><div class="ai-bubble p-3 rounded-2xl rounded-bl-none"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div></div>
                 
                 <div id="file-preview-container" class="px-4 pb-2 hidden">
-    <div class="relative inline-block group">
-        <img id="image-preview-element" class="h-16 w-16 object-cover rounded-lg border-2 border-indigo-500 hidden" src="" alt="Preview">
-        
-        <div id="doc-preview-element" class="h-16 w-16 flex flex-col items-center justify-center bg-gray-800 border-2 border-indigo-500 rounded-lg hidden">
-            <svg class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-            </svg>
-            <span id="file-preview-name" class="text-[10px] text-gray-300 truncate w-14 text-center">File</span>
-        </div>
+                    <div class="bg-gray-700/50 dark:bg-gray-200/50 inline-flex items-center text-sm rounded-full px-3 py-1">
+                        <span id="file-preview-name" class="text-xs"></span>
+                        <button id="remove-file-button" class="ml-2 text-gray-400 hover:text-white">&times;</button>
+                    </div>
+                </div>
 
-        <button id="remove-file-button" class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md transition-transform hover:scale-110">
-            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
-    </div>
-</div>
                 <form id="chat-form" class="flex items-center input-field rounded-full p-1">
                     <div class="relative">
                         <button type="button" id="options-menu-button" class="p-2"></button>
@@ -254,7 +242,7 @@
                                 <svg class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
                                 <span>Add File</span>
                             </label>
-                           <input type="file" id="file-input" class="hidden" accept="image/*,application/pdf">
+                            <input type="file" id="file-input" class="hidden">
 
                             <label for="create-image-toggle" class="flex justify-between items-center p-2 hover:bg-[var(--bg-tertiary)] rounded-md cursor-pointer text-sm text-[var(--text-primary)]">
                                 <span class="flex items-center">
@@ -360,14 +348,6 @@ Your subscription payments are handled by our secure third-party payment partner
     </div>
 
 
-
-    <div id="image-viewer-modal" class="hidden fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="relative w-full max-w-4xl max-h-screen flex flex-col items-center">
-        <button id="close-image-viewer" class="absolute -top-10 right-0 text-white text-3xl font-bold hover:text-gray-300">&times;</button>
-        <img id="full-screen-image" src="" alt="Full Screen" class="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl">
-        <a id="download-btn-modal" class="mt-4 bg-white text-black px-6 py-2 rounded-full font-bold cursor-pointer hover:bg-gray-200">Download Image</a>
-    </div>
-</div>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- Firebase Configuration ---
@@ -494,6 +474,7 @@ window.onListeningEnded = function() {
 window.showLanguagePackGuide = function() {
     alert("Hindi bhasha sunne mein samasya aa rahi hai.\n\nPhone ki settings mein jaakar 'Offline speech recognition' se Hindi (भारत) pack install karein.");
 };
+
         
 
         // --- function  Initialization ---
@@ -819,80 +800,10 @@ micButton.addEventListener('click', () => {
             return bubble;
         }
         
-      // --- YEH NAYA FUNCTION PASTE KAREIN ---
         function renderGeneratedImage(bubbleElement, imageUrl) {
             bubbleElement.classList.remove('p-3');
-            
-            // Check karein ki ye base64 hai ya URL
-            const isBase64 = imageUrl.startsWith('data:image');
-            // Mobile app detection
-            const isAndroidApp = window.Android && window.Android.downloadBase64Image;
-
-            bubbleElement.innerHTML = `
-                <div class="relative group cursor-pointer">
-                    <img src="${imageUrl}" 
-                         onclick="openImageViewer('${imageUrl}')" 
-                         class="rounded-lg max-w-full h-auto border border-gray-700 shadow-lg hover:opacity-90 transition-opacity" 
-                         alt="Generated image">
-                    
-                    <span class="absolute bottom-2 left-2 text-xs font-semibold text-white/70 pointer-events-none drop-shadow-md">IndusGPT</span>
-                    
-                    <button onclick="handleImageDownload('${imageUrl}')" 
-                            class="absolute bottom-2 right-2 bg-black/60 hover:bg-black/80 p-2 rounded-full text-white backdrop-blur-sm transition-all" 
-                            title="Download">
-                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                    </button>
-                </div>`;
+            bubbleElement.innerHTML = `<div class="relative group"><img src="${imageUrl}" class="rounded-lg max-w-full h-auto" alt="Generated image"><span class="absolute bottom-2 left-2 text-xs font-semibold text-white/50 pointer-events-none">IndusGPT</span><a href="${imageUrl}" download="IndusGPT-Image-${Date.now()}.png" class="absolute bottom-2 right-2 bg-black/50 p-2 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" title="Download Image"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg></a></div>`;
         }
-
-        // --- NAYE HELPER FUNCTIONS (Ise renderGeneratedImage ke theek neeche rakhein) ---
-
-        // 1. Image ko bada karne ke liye (Zoom)
-        window.openImageViewer = function(url) {
-            const modal = document.getElementById('image-viewer-modal');
-            const img = document.getElementById('full-screen-image');
-            const downloadBtn = document.getElementById('download-btn-modal');
-            
-            if(modal && img) {
-                img.src = url;
-                // Download button ko bhi set karein
-                downloadBtn.onclick = () => handleImageDownload(url);
-                modal.classList.remove('hidden');
-            }
-        };
-
-        // Modal band karne ke liye logic
-        document.getElementById('close-image-viewer')?.addEventListener('click', () => {
-            document.getElementById('image-viewer-modal').classList.add('hidden');
-        });
-        
-        // Modal ke background par click karne se band ho
-        document.getElementById('image-viewer-modal')?.addEventListener('click', (e) => {
-            if (e.target === document.getElementById('image-viewer-modal')) {
-                document.getElementById('image-viewer-modal').classList.add('hidden');
-            }
-        });
-
-        // 2. Download Handle karne ke liye (Sabse Zaroori)
-        window.handleImageDownload = function(url) {
-            // Agar Android App hai
-            if (window.Android && typeof window.Android.downloadBase64Image === 'function') {
-                // Base64 string se 'data:image/png;base64,' hata kar sirf code bhejein
-                const base64Code = url.split(',')[1];
-                window.Android.downloadBase64Image(base64Code);
-            } 
-            // Agar Laptop/Browser hai
-            else {
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `IndusGPT-Image-${Date.now()}.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            }
-        };
 
         function addMessageToUI(sender, message) {
             const wrapper = document.createElement('div');
@@ -1213,45 +1124,15 @@ function firebaseSignInWithToken(idToken) {
 
             optionsMenuButton.addEventListener('click', (e) => { e.stopPropagation(); optionsPopover.classList.toggle('hidden'); });
             
-           // --- NAYA FILE INPUT LOGIC (Preview ke sath) ---
             fileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
                     selectedFile = file;
-                    const previewContainer = document.getElementById('file-preview-container');
-                    const imgPreview = document.getElementById('image-preview-element');
-                    const docPreview = document.getElementById('doc-preview-element');
-                    const fileNameSpan = document.getElementById('file-preview-name');
-
-                    previewContainer.classList.remove('hidden');
+                    filePreviewName.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+                    filePreviewContainer.classList.remove('hidden');
                     optionsPopover.classList.add('hidden');
-
-                    // Check karein ki ye Image hai ya Document
-                    if (file.type.startsWith('image/')) {
-                        // Image Preview Dikhao
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            imgPreview.src = e.target.result;
-                            imgPreview.classList.remove('hidden');
-                            docPreview.classList.add('hidden');
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        // Document Icon Dikhao
-                        imgPreview.classList.add('hidden');
-                        docPreview.classList.remove('hidden');
-                        fileNameSpan.textContent = file.name.length > 8 ? file.name.substring(0, 5) + '...' : file.name;
-                    }
                 }
-                // Input ko reset na karein yahan, varna file gayab ho jayegi
-            });
-
-            // Remove Button Logic
-            removeFileButton.addEventListener('click', (e) => { 
-                e.preventDefault(); // Button dabne par form submit na ho
-                selectedFile = null; 
-                fileInput.value = ''; // Input clear karein
-                filePreviewContainer.classList.add('hidden'); 
+                e.target.value = null;
             });
 
             createImageToggle.addEventListener('change', () => {
