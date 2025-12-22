@@ -179,6 +179,36 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
+
+        /* === MODERN SCROLLBAR (Chrome, Edge, Safari) === */
+        
+        /* Scrollbar ki choudai (width) */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        /* Scrollbar ka rasta (Track) */
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+
+        /* Pakadne wala handle (Thumb) */
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        /* Jab mouse upar le jayein */
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--text-secondary);
+        }
+
+        /* Firefox ke liye */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--bg-tertiary) transparent;
+        }
         /* No need for separate .code-block code style, Prism handles it */
     </style>
 </head>
