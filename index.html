@@ -15,7 +15,31 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="[https://cdn.jsdelivr.net/npm/marked/marked.min.js](https://cdn.jsdelivr.net/npm/marked/marked.min.js)"></script>
+
+<link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css](https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css)">
+<script src="[https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js](https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js)"></script>
     <style>
+
+        /* Code Block Style */
+pre {
+    background-color: #1e1e1e; /* Black/Grey background */
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto; /* Agar code lamba ho to scroll ho */
+    margin: 10px 0;
+    color: #ffffff;
+}
+
+code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+}
+
+/* AI Message Bubble Style (Ensure text wraps) */
+.ai-message {
+    white-space: pre-wrap; /* New lines ko respect kare */
+}
         
        :root {
             /* Black Theme Colors */
@@ -1051,27 +1075,52 @@ micButton.addEventListener('click', () => {
 
 
       // --- Typewriter Effect Helper ---
-async function typeWriter(element, htmlText) {
-    // Text aur HTML tags ko alag karein taaki formatting kharab na ho
-    const tokens = htmlText.split(/(<[^>]*>)/); 
+// Function to display AI response with Typewriter effect & Markdown support
+function typeWriter(element, text, speed = 10) {
+    let i = 0;
     
-    for (const token of tokens) {
-        if (token.startsWith('<')) {
-            // Agar HTML tag hai (e.g., <br>, <b>) to turant add karein
-            element.innerHTML += token;
+    // Markdown options set karein
+    marked.setOptions({
+        highlight: function(code, lang) {
+            const language = highlight.getLanguage(lang) ? lang : 'plaintext';
+            return highlight.highlight(code, { language }).value;
+        },
+        langPrefix: 'hljs language-' // Highlight.js class prefix
+    });
+
+    // Pehle hum raw text dikhayenge, phir dhire dhire update karenge
+    // Lekin Markdown ke sath typewriter mushkil hota hai, 
+    // Isliye hum "Interval" use karke text update karenge aur har baar parse karenge.
+    
+    let currentText = "";
+    
+    let interval = setInterval(() => {
+        if (i < text.length) {
+            // Ek ek akshar jodo
+            currentText += text.charAt(i);
+            
+            // Text ko Markdown (HTML) me badlo
+            element.innerHTML = marked.parse(currentText);
+            
+            // Scroll to bottom (taki naya text dikhta rahe)
+            let chatContainer = document.querySelector(".chat-container"); // Apne container ka class name check karein
+            if(chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            i++;
         } else {
-            // Agar normal text hai to ek-ek akshar type karein
-            for (let i = 0; i < token.length; i++) {
-                element.innerHTML += token[i];
-                // Auto scroll to bottom
-                const chatContainer = document.getElementById('chat-container');
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-                // Typing speed (10ms - 20ms achha rehta hai)
-                await new Promise(resolve => setTimeout(resolve, 15)); 
-            }
+            clearInterval(interval);
+            // Typewriter khatam hone par final highlight apply karein
+            hljs.highlightAll();
         }
-    }
+    }, speed);
 }
+
+// ⚠️ Jaha aap AI ka message receive karte hain, waha is function ko call karein:
+// Example:
+// const messageDiv = document.createElement("div");
+// messageDiv.classList.add("message", "ai-message");
+// chatBox.appendChild(messageDiv);
+// typeWriter(messageDiv, responseData.reply);
 
         // --- UPDATED: addMessageToUI with Animation ---
 async function addMessageToUI(sender, message, animate = false) {
