@@ -15,10 +15,9 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+   <link href="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css)" rel="stylesheet" />
+<script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js)"></script>
+<script src="[https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js](https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js)"></script>
     <style>
 
         /* Code Block Style */
@@ -1075,110 +1074,124 @@ micButton.addEventListener('click', () => {
 
 
       // --- Typewriter Effect Helper ---
-// Function to display AI response with Typewriter effect & Markdown support
-function typeWriter(element, text, speed = 10) {
+// ==========================================================
+// ✅ FIXED TYPEWRITER FUNCTION (Markdown & Code Safe)
+// ==========================================================
+async function typeWriter(element, markdownText) {
+    
+    // 1. Pehle Markdown ko HTML mein badlo
+    let htmlContent = marked.parse(markdownText);
+
+    // 2. Variables set karo
     let i = 0;
-    
-    // Markdown options set karein
-    marked.setOptions({
-        highlight: function(code, lang) {
-            const language = highlight.getLanguage(lang) ? lang : 'plaintext';
-            return highlight.highlight(code, { language }).value;
-        },
-        langPrefix: 'hljs language-' // Highlight.js class prefix
-    });
+    let isTag = false;
+    let currentString = "";
 
-    // Pehle hum raw text dikhayenge, phir dhire dhire update karenge
-    // Lekin Markdown ke sath typewriter mushkil hota hai, 
-    // Isliye hum "Interval" use karke text update karenge aur har baar parse karenge.
-    
-    let currentText = "";
-    
-    let interval = setInterval(() => {
-        if (i < text.length) {
-            // Ek ek akshar jodo
-            currentText += text.charAt(i);
-            
-            // Text ko Markdown (HTML) me badlo
-            element.innerHTML = marked.parse(currentText);
-            
-            // Scroll to bottom (taki naya text dikhta rahe)
-            let chatContainer = document.querySelector(".chat-container"); // Apne container ka class name check karein
-            if(chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+    // 3. Loop chalao
+    while (i < htmlContent.length) {
+        let char = htmlContent.charAt(i);
 
-            i++;
-        } else {
-            clearInterval(interval);
-            // Typewriter khatam hone par final highlight apply karein
-            hljs.highlightAll();
+        // Agar HTML Tag shuru hua (<)
+        if (char === '<') {
+            isTag = true;
         }
-    }, speed);
+
+        currentString += char;
+
+        // Agar HTML Tag khatam hua (>)
+        if (char === '>') {
+            isTag = false;
+        }
+
+        // Agar hum TAG ke andar hain, to loop ko continue karo (Screen update mat karo)
+        // Taaki pura tag ek saath jud jaye
+        if (isTag) {
+            i++;
+            continue; 
+        }
+
+        // Screen par update karo
+        element.innerHTML = currentString;
+        
+        // Scroll to bottom
+        const chatContainer = document.getElementById("chat-container");
+        if(chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        // Speed Control: 
+        // Code likhte waqt tez (5ms), Normal text (15ms)
+        await new Promise(resolve => setTimeout(resolve, 10));
+        
+        i++;
+    }
+
+    // 4. Jab likhna khatam ho jaye, tab Highlight.js chalao
+    element.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightElement(block);
+    });
 }
 
-// ⚠️ Jaha aap AI ka message receive karte hain, waha is function ko call karein:
-// Example:
-// const messageDiv = document.createElement("div");
-// messageDiv.classList.add("message", "ai-message");
-// chatBox.appendChild(messageDiv);
-// typeWriter(messageDiv, responseData.reply);
-
-        // --- UPDATED: addMessageToUI with Animation ---
+// ==========================================================
+// ✅ UPDATED ADD MESSAGE UI
+// ==========================================================
 async function addMessageToUI(sender, message, animate = false) {
     const wrapper = document.createElement('div');
-    // User ka message right mein, AI ka left mein
     wrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} w-full`;
     
     const bubble = document.createElement('div');
 
-    // === YAHAN STYLING CHANGE KI HAI ===
     if (sender === 'user') {
-        // User ke liye: Purple Box (Bubble) rahega
         bubble.className = 'message-bubble p-3 rounded-2xl user-bubble text-white max-w-[85%]';
     } else {
-        // AI ke liye: Box hata diya (Transparent), sirf text dikhega
-        bubble.className = 'message-bubble py-2 px-1 w-full text-[var(--text-primary)]';
+        // AI message transparent background ke sath
+        bubble.className = 'message-bubble py-2 px-1 w-full text-[var(--text-primary)] ai-message';
     }
     
-    // Markdown Formatting (Bold, Italic, Newline)
-    const formattedMessage = message
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') 
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')            
-        .replace(/\n/g, '<br>');                           
+    // Wrapper mein bubble jodo
+    wrapper.appendChild(bubble);
+    document.getElementById('chat-container').appendChild(wrapper);
 
-    // Agar Model hai, Animation ON hai, aur Code Block nahi hai
-    if (sender === 'model' && animate && !message.includes('```')) {
-        const p = document.createElement('p');
-        // Font size thoda bada aur line-height adjust kiya taaki saaf dikhe
-        p.className = "leading-relaxed text-base"; 
-        bubble.appendChild(p);
-        wrapper.appendChild(bubble);
-        document.getElementById('chat-container').appendChild(wrapper);
-        
-        // Typewriter start karein
-        await typeWriter(p, formattedMessage);
-    } else {
-        // Normal render (User message ya Code Blocks ke liye)
+    // === LOGIC START ===
+    
+    if (sender === 'user') {
+        // User ka message normal text
         const p = document.createElement('p');
         p.className = "leading-relaxed text-base";
-        p.innerHTML = formattedMessage;
+        p.innerText = message;
         bubble.appendChild(p);
-        wrapper.appendChild(bubble);
-        document.getElementById('chat-container').appendChild(wrapper);
-    }
+    } 
+    else if (sender === 'model') {
+        // AI Message
+        const contentDiv = document.createElement('div');
+        contentDiv.className = "leading-relaxed text-base";
+        bubble.appendChild(contentDiv);
 
-    // Buttons (Copy, PDF) sirf AI messages par, lekin ab thoda subtle dikhenge
-    if (sender === 'model' && !message.includes('```')) {
-         const copyButton = document.createElement('button');
-         // Button ko thoda adjust kiya taaki text ke upar na chadh jaye
-         copyButton.className = 'copy-btn ml-2'; 
-         copyButton.innerHTML = `<svg class="h-4 w-4 text-gray-400 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
-         
-         copyButton.onclick = () => {
-            navigator.clipboard.writeText(message);
-            copyButton.innerHTML = `<svg class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
-            setTimeout(() => copyButton.innerHTML = `<svg class="h-4 w-4 text-gray-400 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`, 2000);
-         };
-         bubble.appendChild(copyButton);
+        if (animate) {
+            // Agar naya message hai to Typewriter chalao
+            // DHYAN DEIN: Hum seedha 'message' pass kar rahe hain (marked.parse typeWriter karega)
+            await typeWriter(contentDiv, message);
+        } else {
+            // Agar history load ho rahi hai to direct dikhao
+            contentDiv.innerHTML = marked.parse(message);
+            // Code highlight karo
+            contentDiv.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+        }
+
+        // Copy Button Logic
+        if (!message.includes('```')) {
+             const copyButton = document.createElement('button');
+             copyButton.className = 'copy-btn ml-2'; 
+             copyButton.innerHTML = `<svg class="h-4 w-4 text-gray-400 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
+             
+             copyButton.onclick = () => {
+                // Copy original text (Markdown)
+                navigator.clipboard.writeText(message);
+                copyButton.innerHTML = `<svg class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
+                setTimeout(() => copyButton.innerHTML = `<svg class="h-4 w-4 text-gray-400 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`, 2000);
+             };
+             bubble.appendChild(copyButton);
+        }
     }
 
     // Scroll to bottom
