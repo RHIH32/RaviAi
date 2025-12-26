@@ -658,26 +658,31 @@ function loadVoices() {
 }
 
 function speak(text) {
-    if (!text || isMuted) {
-        return; // Agar mute hai ya text nahi hai to kuchh na bolo
+    // 1. Pehle agar kuch bol raha hai to chup karao
+    if (synth) {
+        synth.cancel();
+    }
+    
+    // Agar Android hai to Android ka stop function call karo (agar available ho)
+    if (window.Android && typeof window.Android.stopSpeak === 'function') {
+        window.Android.stopSpeak();
     }
 
-    // --- NAYA CODE: Text ko bolne se pehle saaf karein ---
-    const emojiRegex = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
-    
-    let cleanText = text
-        .replace(emojiRegex, '')      // Sabhi emojis ko hatao
-        .replace(/\*\*(.*?)\*\*/g, '$1') // Bold ke liye **text** se ** hatao
-        .replace(/\*(.*?)\*/g, '$1')   // Italic ke liye *text* se * hatao
-        .replace(/[#*_`]/g, '');     // Baaki ke symbols jaise #, *, _, ` ko bhi hatao
-    // --- YAHAN TAK ---
+    if (!text || isMuted) return;
 
-    // Ab saaf kiye hue text ko bolne ke liye bhejein
+    // Text cleaning (Markdown/Symbols hatana)
+    let cleanText = text
+        .replace(/([^\w\s\u0900-\u097F])/g, '') // Special chars hatana
+        .replace(/\*\*(.*?)\*\*/g, '$1')        // Bold hatana
+        .replace(/\*(.*?)\*/g, '$1')            // Italic hatana
+        .replace(/[#*_`]/g, '');                // Markdown symbols hatana
+
+    // 2. Naya Text Bolo
     if (window.Android && typeof window.Android.speak === 'function') {
-        window.Android.speak(cleanText); // <-- `cleanText` ka istemaal karein
+        window.Android.speak(cleanText);
     } else if (synth) {
-        speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(cleanText); // <-- `cleanText` ka istemaal karein
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        if (hindiVoice) utterance.voice = hindiVoice;
         speechSynthesis.speak(utterance);
     }
 }
@@ -810,7 +815,7 @@ micButton.addEventListener('click', () => {
                     
                     addMessageWithAction(command.response, buttonText, buttonIcon, url);
                     // Agar message naya hai (animate=true), tabhi bolo
-                    if (shouldSpeak && animate) speak(command.response);
+                   
 
                 } else {
                     throw new Error("No JSON");
@@ -822,9 +827,7 @@ micButton.addEventListener('click', () => {
                 await addMessageToUI('model', response, animate); 
                 
                 // Agar message naya hai, tabhi bolo
-                if (shouldSpeak && animate) {
-                    speak(response.replace(/```[\s\S]*?```/g, '').replace(/\$\$(.*?)\$\$|\$(.*?)\$/g, ''));
-                }
+               
             }
         }
 
@@ -955,13 +958,13 @@ async function typeWriter(element, markdownText) {
     });
 }
 
-        async function addMessageToUI(sender, message, animate = false) {
+       async function addMessageToUI(sender, message, animate = false) {
     const wrapper = document.createElement('div');
     wrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} w-full`;
     
     const bubble = document.createElement('div');
 
-    // User aur AI ka Style alag rakhein
+    // Styling
     if (sender === 'user') {
         bubble.className = 'message-bubble p-3 rounded-2xl user-bubble text-white max-w-[85%]';
     } else {
@@ -971,7 +974,7 @@ async function typeWriter(element, markdownText) {
     wrapper.appendChild(bubble);
     document.getElementById('chat-container').appendChild(wrapper);
 
-    // === MESSAGE RENDER LOGIC ===
+    // === MESSAGE CONTENT ===
     if (sender === 'user') {
         const p = document.createElement('p');
         p.className = "leading-relaxed text-base";
@@ -984,33 +987,46 @@ async function typeWriter(element, markdownText) {
         bubble.appendChild(contentDiv);
 
         if (animate) {
-            // ✅ Naya message: Typewriter effect chalao
             await typeWriter(contentDiv, message);
         } else {
-            // ⚡ Purana history: Seedha dikhao (Fast)
             contentDiv.innerHTML = marked.parse(message);
             contentDiv.querySelectorAll('pre code').forEach((block) => {
                 hljs.highlightElement(block);
             });
         }
 
-        // Copy Button (Sirf Text messages ke liye)
+        // --- BUTTONS CONTAINER (Copy + Speak) ---
         if (!message.includes('```')) {
+             const actionDiv = document.createElement('div');
+             actionDiv.className = "flex items-center mt-2 space-x-3"; // Nayi line aur space
+
+             // 1. 🔊 SPEAKER BUTTON (Naya Feature)
+             const speakButton = document.createElement('button');
+             speakButton.className = 'text-gray-400 hover:text-blue-400 transition-colors p-1 rounded-full hover:bg-gray-800/30';
+             speakButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
+             
+             speakButton.onclick = () => {
+                 speak(message); // Us specific message ko bolo
+             };
+             actionDiv.appendChild(speakButton);
+
+             // 2. 📋 COPY BUTTON
              const copyButton = document.createElement('button');
-             copyButton.className = 'copy-btn ml-2'; 
-             copyButton.innerHTML = `<svg class="h-4 w-4 text-gray-400 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
+             copyButton.className = 'text-gray-400 hover:text-green-400 transition-colors p-1 rounded-full hover:bg-gray-800/30'; 
+             copyButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
              
              copyButton.onclick = () => {
                 navigator.clipboard.writeText(message);
-                // Icon change animation
-                copyButton.innerHTML = `<svg class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
-                setTimeout(() => copyButton.innerHTML = `<svg class="h-4 w-4 text-gray-400 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`, 2000);
+                copyButton.innerHTML = `<svg class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
+                setTimeout(() => copyButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`, 2000);
              };
-             bubble.appendChild(copyButton);
+             actionDiv.appendChild(copyButton);
+
+             // Bubble me buttons jodo
+             bubble.appendChild(actionDiv);
         }
     }
 
-    // Scroll to bottom
     const chatContainer = document.getElementById('chat-container');
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
