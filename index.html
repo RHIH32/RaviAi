@@ -117,117 +117,124 @@
 
 
     <!-- Main App Container -->
-   <div id="app-container" class="hidden h-screen w-full flex">
-    <aside id="sidebar" class="w-64 flex-shrink-0 flex flex-col p-4">
-        <div class="flex items-center justify-end mb-4 flex-shrink-0">
-            <button id="collapse-sidebar-button" class="text-gray-400 hover:text-white"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
-        </div>
-        <div class="flex flex-col flex-grow overflow-hidden">
-            <button id="new-chat-button" class="w-full flex items-center justify-center p-3 mb-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg hover:opacity-80 transition-all flex-shrink-0 text-[var(--text-primary)] shadow-sm font-medium"><svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>New Chat</button>
-            <div class="border-t my-2 border-color"></div>
-            <div class="relative mb-2">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+    <div id="app-container" class="hidden h-screen w-full flex">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="w-64 flex-shrink-0 flex flex-col p-4">
+            <div class="flex items-center justify-end mb-4 flex-shrink-0">
+                <button id="collapse-sidebar-button" class="text-gray-400 hover:text-white"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+            </div>
+            <div class="flex flex-col flex-grow overflow-hidden">
+                <button id="new-chat-button" class="w-full flex items-center justify-center p-3 mb-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg hover:opacity-80 transition-all flex-shrink-0 text-[var(--text-primary)] shadow-sm font-medium"><svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>New Chat</button>
+                <div class="border-t my-2 border-color"></div>
+                <!-- Search Input -->
+                <div class="relative mb-2">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input type="text" id="chat-search-input" placeholder="Search chats..." class="w-full bg-[var(--bg-tertiary)] text-[var(--text-primary)] rounded-md py-1.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
                 </div>
-                <input type="text" id="chat-search-input" placeholder="Search chats..." class="w-full bg-[var(--bg-tertiary)] text-[var(--text-primary)] rounded-md py-1.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500">
-            </div>
-            <h3 class="text-sm font-semibold px-2 mb-2 sidebar-subtext">Recent Chats</h3>
-            <div id="chat-history-list" class="flex-1 overflow-y-auto space-y-2"></div>
-            
-            <div class="border-t my-2 border-color"></div>
-            
-            <div class="flex items-center justify-between mt-2 flex-shrink-0">
-                <button id="theme-toggle-button" class="p-2 rounded-full sidebar-button"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg></button>
-                <button id="logout-button" class="p-2 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg></button>
-            </div>
-        </div>
-    </aside>
-
-    <div class="flex-1 flex flex-col main-content overflow-hidden">
-        <header class="header backdrop-blur-sm p-4 pt-8 flex items-center justify-between z-10 border-b">
-            <div class="flex items-center">
-                <button id="menu-button" class="hidden mr-4"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
-                <img src="logooo-removebg-preview.png" alt="IndusGPT Logo" class="h-10 w-10 rounded-full bg-white/10 p-1 object-cover">
-                <h1 class="animated-text text-xl font-bold ml-2">IndusGPT</h1>
-            </div>
-            
-            <div class="relative">
-                <button id="header-profile-btn" class="focus:outline-none">
-                    <img id="header-profile-img" src="https://ui-avatars.com/api/?name=User&background=random" class="h-10 w-10 rounded-full border-2 border-gray-600 object-cover hover:border-white transition-colors">
-                </button>
-
-                <div id="profile-dropdown" class="hidden absolute right-0 mt-2 w-72 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl shadow-2xl z-50 overflow-hidden transform origin-top-right transition-all">
-                    <div class="p-6 flex flex-col items-center border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
-                        <div class="relative group">
-                            <img id="menu-profile-img" src="https://ui-avatars.com/api/?name=User&background=random" class="h-20 w-20 rounded-full object-cover border-4 border-gray-700 shadow-lg">
-                            <label for="profile-upload" class="absolute bottom-0 right-0 bg-blue-600 p-1.5 rounded-full text-white cursor-pointer hover:bg-blue-500 shadow-md">
-                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                            </label>
-                            <input type="file" id="profile-upload" class="hidden" accept="image/*">
-                        </div>
-                        <h3 id="menu-profile-name" class="mt-3 text-lg font-bold text-[var(--text-primary)]">User</h3>
-                    </div>
-                    <div class="p-2">
-                        <button onclick="document.getElementById('settings-modal').classList.remove('hidden'); document.getElementById('profile-dropdown').classList.add('hidden');" class="w-full flex items-center p-3 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors text-left text-[var(--text-primary)]">
-                            <svg class="h-5 w-5 mr-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            <div>
-                                <span class="font-medium">Settings</span>
-                                <p class="text-xs text-[var(--text-secondary)]">Language, Phone, Email</p>
-                            </div>
-                        </button>
-                    </div>
+                <h3 class="text-sm font-semibold px-2 mb-2 sidebar-subtext">Recent Chats</h3>
+                <div id="chat-history-list" class="flex-1 overflow-y-auto space-y-2"></div>
+                <div class="border-t my-2 border-color"></div>
+                <div id="profile-section" class="p-2 rounded-lg profile-bg">
+                    <h3 class="text-sm font-semibold mb-1 sidebar-subtext">Profile</h3>
+                    <p id="profile-name" class="text-sm truncate sidebar-text"></p>
+                    <p id="profile-email" class="text-xs truncate sidebar-subtext"></p>
+                </div>
+                <!-- Privacy and Terms Links -->
+                <div class="flex items-center justify-between mt-4 flex-shrink-0">
+                    <button id="theme-toggle-button" class="p-2 rounded-full sidebar-button"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg></button>
+                    <button id="logout-button" class="p-2 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg></button>
                 </div>
             </div>
-        </header>
+        </aside>
 
-        <main id="chat-container" class="flex-1 p-4 space-y-4 overflow-y-auto"></main>
-
-        <footer class="footer backdrop-blur-sm p-0 z-20 w-full">
-            <div id="typing-indicator" class="px-4 pb-2 hidden">
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col main-content overflow-hidden">
+            <!-- Header -->
+            <header class="header backdrop-blur-sm p-4 pt-8 flex items-center justify-between z-10 border-b">
                 <div class="flex items-center">
-                    <div class="bg-[var(--bg-tertiary)] p-3 rounded-2xl rounded-bl-none text-[var(--text-primary)]">
-                        <div class="typing-indicator"><span></span><span></span><span></span></div>
-                    </div>
+                    <button id="menu-button" class="hidden mr-4"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
+                    <img src="logooo-removebg-preview.png" alt="IndusGPT Logo" class="h-10 w-10 rounded-full bg-white/10 p-1 object-cover">
+                    <h1 class="animated-text text-xl font-bold ml-2">IndusGPT</h1>
                 </div>
-            </div>
-            
-            <div id="file-preview-container" class="px-4 pb-2 hidden">
-                <div class="bg-gray-700/80 backdrop-blur text-white inline-flex items-center text-sm rounded-full px-4 py-2 shadow-lg border border-gray-600">
-                    <span id="file-preview-name" class="text-xs font-medium"></span>
-                    <button id="remove-file-button" class="ml-3 text-gray-300 hover:text-white bg-gray-600 rounded-full p-0.5 w-5 h-5 flex items-center justify-center">&times;</button>
+                <div class="flex items-center space-x-4">
+                    <span id="user-name-display" class="font-semibold"></span>
                 </div>
-            </div>
+            </header>
 
-            <div class="p-4 w-full max-w-4xl mx-auto">
-                <form id="chat-form" class="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[2rem] shadow-2xl p-2 relative transition-all duration-300 focus-within:ring-2 focus-within:ring-indigo-500/50">
-                    <div class="relative flex-shrink-0">
-                        <button type="button" id="options-menu-button" class="p-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-full transition-colors">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                        </button>
-                        <div id="options-popover" class="hidden absolute bottom-full mb-4 left-0 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl shadow-2xl p-2 w-56 space-y-1 overflow-hidden z-50">
-                            <label for="file-input" class="w-full flex items-center p-3 hover:bg-[var(--bg-tertiary)] rounded-xl text-sm text-[var(--text-primary)] cursor-pointer transition-colors">
-                                <svg class="h-5 w-5 mr-3 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
-                                <span class="font-medium">Upload File</span>
-                            </label>
-                            <input type="file" id="file-input" class="hidden">
-                            <label for="create-image-toggle" class="flex justify-between items-center p-3 hover:bg-[var(--bg-tertiary)] rounded-xl cursor-pointer text-sm text-[var(--text-primary)] transition-colors">
-                                <span class="flex items-center"><svg class="h-5 w-5 mr-3 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><span class="font-medium">Generate Image</span></span>
-                                <div class="relative"><input type="checkbox" id="create-image-toggle" class="toggle-checkbox"><div class="toggle-switch"></div></div>
-                            </label>
-                            <label for="deep-research-toggle" class="flex justify-between items-center p-3 hover:bg-[var(--bg-tertiary)] rounded-xl cursor-pointer text-sm text-[var(--text-primary)] transition-colors">
-                                <span class="flex items-center"><svg class="h-5 w-5 mr-3 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg><span class="font-medium">Deep Research</span></span>
-                                <div class="relative"><input type="checkbox" id="deep-research-toggle" class="toggle-checkbox"><div class="toggle-switch"></div></div>
-                            </label>
+            <main id="chat-container" class="flex-1 p-4 space-y-4 overflow-y-auto"></main>
+
+            <!-- Footer -->
+            <footer class="footer backdrop-blur-sm p-0 z-20 w-full">
+                
+                <div id="typing-indicator" class="px-4 pb-2 hidden">
+                    <div class="flex items-center">
+                        <div class="bg-[var(--bg-tertiary)] p-3 rounded-2xl rounded-bl-none text-[var(--text-primary)]">
+                            <div class="typing-indicator"><span></span><span></span><span></span></div>
                         </div>
                     </div>
-                    <input type="text" id="user-input" placeholder="Yahan type karein ya bolein..." class="flex-1 min-w-0 bg-transparent px-4 py-3 text-[var(--text-primary)] placeholder-gray-500 focus:outline-none text-base" autocomplete="off">
-                    <button type="button" id="mic-button" class="p-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-full transition-colors mr-1"></button>
-                    <button type="submit" id="send-button" class="p-3 bg-white text-black rounded-full shadow-lg hover:bg-gray-200 hover:scale-105 transition-all transform flex-shrink-0"></button>
-                </form>
-            </div>
-        </footer>
+                </div>
+                
+                <div id="file-preview-container" class="px-4 pb-2 hidden">
+                    <div class="bg-gray-700/80 backdrop-blur text-white inline-flex items-center text-sm rounded-full px-4 py-2 shadow-lg border border-gray-600">
+                        <span id="file-preview-name" class="text-xs font-medium"></span>
+                        <button id="remove-file-button" class="ml-3 text-gray-300 hover:text-white bg-gray-600 rounded-full p-0.5 w-5 h-5 flex items-center justify-center">&times;</button>
+                    </div>
+                </div>
+
+                <div class="p-4 w-full max-w-4xl mx-auto">
+                    <form id="chat-form" class="flex items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[2rem] shadow-2xl p-2 relative transition-all duration-300 focus-within:ring-2 focus-within:ring-indigo-500/50">
+                        
+                        <div class="relative flex-shrink-0">
+                            <button type="button" id="options-menu-button" class="p-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-full transition-colors">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                            </button>
+                            
+                            <div id="options-popover" class="hidden absolute bottom-full mb-4 left-0 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl shadow-2xl p-2 w-56 space-y-1 overflow-hidden z-50">
+                                <label for="file-input" class="w-full flex items-center p-3 hover:bg-[var(--bg-tertiary)] rounded-xl text-sm text-[var(--text-primary)] cursor-pointer transition-colors">
+                                    <svg class="h-5 w-5 mr-3 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                    <span class="font-medium">Upload File</span>
+                                </label>
+                                <input type="file" id="file-input" class="hidden">
+
+                                <label for="create-image-toggle" class="flex justify-between items-center p-3 hover:bg-[var(--bg-tertiary)] rounded-xl cursor-pointer text-sm text-[var(--text-primary)] transition-colors">
+                                    <span class="flex items-center">
+                                        <svg class="h-5 w-5 mr-3 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <span class="font-medium">Generate Image</span>
+                                    </span>
+                                    <div class="relative">
+                                        <input type="checkbox" id="create-image-toggle" class="toggle-checkbox">
+                                        <div class="toggle-switch"></div>
+                                    </div>
+                                </label>
+
+                                <label for="deep-research-toggle" class="flex justify-between items-center p-3 hover:bg-[var(--bg-tertiary)] rounded-xl cursor-pointer text-sm text-[var(--text-primary)] transition-colors">
+                                    <span class="flex items-center">
+                                        <svg class="h-5 w-5 mr-3 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                        <span class="font-medium">Deep Research</span>
+                                    </span>
+                                    <div class="relative">
+                                        <input type="checkbox" id="deep-research-toggle" class="toggle-checkbox">
+                                        <div class="toggle-switch"></div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <input type="text" id="user-input" placeholder="Yahan type karein ya bolein..." class="flex-1 min-w-0 bg-transparent px-4 py-3 text-[var(--text-primary)] placeholder-gray-500 focus:outline-none text-base" autocomplete="off">
+                        
+                        <button type="button" id="mic-button" class="p-3 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-full transition-colors mr-1">
+                            </button>
+                        
+                        <button type="submit" id="send-button" class="p-3 bg-white text-black rounded-full shadow-lg hover:bg-gray-200 hover:scale-105 transition-all transform flex-shrink-0">
+                            </button>
+                    </form>
+                </div>
+            </footer>
+        </div>
     </div>
-</div>
+    
     <!-- Privacy Policy Modal -->
     <div id="privacy-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
         <div class="bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col">
@@ -267,47 +274,6 @@ Your subscription payments are handled by our secure third-party payment partner
         </div>
     </div>
 
-    <div id="settings-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
-    <div class="bg-[var(--bg-secondary)] w-full max-w-md mx-4 rounded-2xl shadow-2xl border border-[var(--border-color)] overflow-hidden">
-        <div class="flex justify-between items-center p-4 border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
-            <h2 class="text-lg font-bold text-[var(--text-primary)]">Settings</h2>
-            <button onclick="document.getElementById('settings-modal').classList.add('hidden')" class="text-gray-400 hover:text-white text-2xl">&times;</button>
-        </div>
-        
-        <div class="p-6 space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Language</label>
-                <select id="settings-language" class="w-full p-3 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="en">English (Default)</option>
-                    <option value="hi">Hindi (हिंदी)</option>
-                    <option value="hinglish">Hinglish</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Email Address</label>
-                <input type="text" id="settings-email" readonly class="w-full p-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg text-gray-500 cursor-not-allowed">
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-[var(--text-secondary)] mb-1">Phone Number</label>
-                <input type="tel" id="settings-phone" placeholder="+91 XXXXX XXXXX" class="w-full p-3 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <div class="pt-2">
-                <a href="#" onclick="alert('IndusGPT - Made by Ravi Kumar using advanced AI.');" class="flex items-center text-blue-400 hover:text-blue-300 text-sm font-medium">
-                    <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    About IndusGPT
-                </a>
-            </div>
-        </div>
-
-        <div class="p-4 border-t border-[var(--border-color)] flex justify-end">
-            <button id="save-settings-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">Save Changes</button>
-        </div>
-    </div>
-</div>
-
     <!-- Terms of Service Modal -->
     <div id="terms-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
         <div class="bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col">
@@ -346,603 +312,1153 @@ Your subscription payments are handled by our secure third-party payment partner
     </div>
 </div>
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // --- 1. Firebase Configuration ---
-    const firebaseConfig = {
-        apiKey: "AIzaSyCTvZ63pkD4C9FnfOwmlKQX1QwDDOW3680",
-        authDomain: "ravi-ai-d1e8a.firebaseapp.com",
-        projectId: "ravi-ai-d1e8a",
-        storageBucket: "ravi-ai-d1e8a.firebasestorage.app",
-        messagingSenderId: "150254318822",
-        appId: "1:150254318822:web:2f78a2307404dc0ca53727",
-        measurementId: "G-5HTXWMEG6M"
-    };
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Firebase Configuration ---
+        // ZAROORI: Apne Firebase project ki details yahan 
+        const firebaseConfig = {
+         apiKey: "AIzaSyCTvZ63pkD4C9FnfOwmlKQX1QwDDOW3680",
+         authDomain: "ravi-ai-d1e8a.firebaseapp.com",
+         projectId: "ravi-ai-d1e8a",
+         storageBucket: "ravi-ai-d1e8a.firebasestorage.app",
+         messagingSenderId: "150254318822",
+         appId: "1:150254318822:web:2f78a2307404dc0ca53727",
+         measurementId: "G-5HTXWMEG6M"
+ };
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const auth = firebase.auth();
-    const provider = new firebase.auth.GoogleAuthProvider();
+        // Initialize Firebase
+ firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const provider = new firebase.auth.GoogleAuthProvider();
 
-    // Google Redirect Result
-    auth.getRedirectResult().then((result) => {
+
+    auth.getRedirectResult()
+    .then((result) => {
         if (result && result.user) {
-            handleLogin(result.user.displayName, result.user.email);
+            // Login safal hua!
+            const user = result.user;
+            console.log("Redirect login successful for:", user.displayName);
+            handleLogin(user.displayName, user.email);
         }
+        // Agar result.user null hai to kuch nahi karna hai
     }).catch((error) => {
-        console.error("Login Error:", error.message);
+        // Error handle karein
+        console.error("Google Redirect Login Error:", error.code, error.message);
+        alert("Google login failed: " + error.message);
     });
+    
 
-    // --- 2. DOM Elements (Ek hi baar define kiye gaye hain) ---
-    const loginScreen = document.getElementById('login-screen');
-    const appContainer = document.getElementById('app-container');
-    const loginForm = document.getElementById('login-form');
-    const usernameInput = document.getElementById('username-input');
-    const emailInput = document.getElementById('email-input');
-    const guestLoginBtn = document.getElementById('guest-login-btn');
-    const googleLoginBtn = document.getElementById('google-login-btn');
-    const userNameDisplay = document.getElementById('user-name-display');
-    const logoutButton = document.getElementById('logout-button');
-    const chatForm = document.getElementById('chat-form');
+
+// ------------------------------------------------------------------
+        // --- DOM Elements ---
+        const loginScreen = document.getElementById('login-screen');
+        const appContainer = document.getElementById('app-container');
+        const loginForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username-input');
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
+        const guestLoginBtn = document.getElementById('guest-login-btn');
+        const googleLoginBtn = document.getElementById('google-login-btn');
+        const userNameDisplay = document.getElementById('user-name-display');
+        const logoutButton = document.getElementById('logout-button');
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+        const chatContainer = document.getElementById('chat-container');
+        const sendButton = document.getElementById('send-button');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const micButton = document.getElementById('mic-button');
+        const muteButton = document.getElementById('mute-button');
+        const sidebar = document.getElementById('sidebar');
+        const menuButton = document.getElementById('menu-button');
+        const collapseSidebarButton = document.getElementById('collapse-sidebar-button');
+        const newChatButton = document.getElementById('new-chat-button');
+        const chatHistoryList = document.getElementById('chat-history-list');
+        const themeToggleButton = document.getElementById('theme-toggle-button');
+        const profileName = document.getElementById('profile-name');
+        const profileEmail = document.getElementById('profile-email');
+        const fileInput = document.getElementById('file-input');
+        const filePreviewContainer = document.getElementById('file-preview-container');
+        const filePreviewName = document.getElementById('file-preview-name');
+        const removeFileButton = document.getElementById('remove-file-button');
+        const optionsMenuButton = document.getElementById('options-menu-button');
+        const optionsPopover = document.getElementById('options-popover');
+        const createImageToggle = document.getElementById('create-image-toggle');
+        const deepResearchToggle = document.getElementById('deep-research-toggle');
+        const chatSearchInput = document.getElementById('chat-search-input');
+        // New Modal elements
+      
+        // --- State ---
+       let conversations = {};
+        let activeChatId = null;
+        let currentUser = null;
+        let currentUserEmail = null;
+        let isMuted = false;
+        let hindiVoice = null;
+        let selectedFile = null; 
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let currentPlayingBtn = null;
+        const swipeThreshold = 50; // Kam se kam 50px swipe karna zaroori hai
+     
+    // ==========================================================
+// YEH FINAL AUR SAHI CODE HAI. PURAANE FUNCTIONS KI JAGAH
+// IS POORE BLOCK KO PASTE KAREIN.
+// ==========================================================
+
+// Android se voice result receive karne ke liye
+window.onVoiceResult = function(text) {
+    console.log("Android se voice result mila:", text);
     const userInput = document.getElementById('user-input');
-    const chatContainer = document.getElementById('chat-container');
     const sendButton = document.getElementById('send-button');
-    const typingIndicator = document.getElementById('typing-indicator');
+    if (userInput && sendButton && text && text.trim().length > 0) {
+        userInput.value = text;
+        sendButton.click(); // Form submit karne ke liye button ko click karo
+    }
+};
+
+        // ✅ ANDROID SE SIGNAL AANE PAR ICON RESET KAREGA
+window.onSpeechFinished = function() {
+    console.log("Android: Speaking finished.");
+    
+    // Agar koi button 'Stop' mode me hai, to use wapas 'Speaker' bana do
+    if (currentPlayingBtn) {
+        currentPlayingBtn.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
+        currentPlayingBtn = null; // Variable khali kar do
+    }
+};
+
+// Jab Android mic sunna shuru kare
+window.onListeningStarted = function() {
+    console.log("Android ne sunna shuru kiya...");
     const micButton = document.getElementById('mic-button');
-    const sidebar = document.getElementById('sidebar');
-    const menuButton = document.getElementById('menu-button');
-    const collapseSidebarButton = document.getElementById('collapse-sidebar-button');
-    const newChatButton = document.getElementById('new-chat-button');
-    const chatHistoryList = document.getElementById('chat-history-list');
-    const themeToggleButton = document.getElementById('theme-toggle-button');
+    if (micButton) {
+        micButton.classList.add('mic-listening'); // Animation on
+    }
+};
+
+// Jab Android mic sunna band kare
+window.onListeningEnded = function() {
+    console.log("Android ne sunna band kiya.");
+    const micButton = document.getElementById('mic-button');
+    if (micButton) {
+        micButton.classList.remove('mic-listening'); // Animation off
+    }
+};
+
+// Jab language pack ki samasya ho
+window.showLanguagePackGuide = function() {
+    alert("Hindi bhasha sunne mein samasya aa rahi hai.\n\nPhone ki settings mein jaakar 'Offline speech recognition' se Hindi (भारत) pack install karein.");
+};
+
+        
+
+        // --- function  Initialization ---
+// ==========================================================
+
+      function initialize() {
+            const savedUser = localStorage.getItem('ravi-ai-user');
+            const savedEmail = localStorage.getItem('ravi-ai-email');
+            const savedTheme = localStorage.getItem('ravi-ai-theme');
+
+            if (savedTheme) {
+                document.body.classList.add(savedTheme);
+            }
+
+            // Yahan check karte hain ki user ki details local storage mein hain ya nahi
+            if (savedUser && savedEmail) {
+                currentUser = savedUser;
+                currentUserEmail = savedEmail;
+                showChatInterface();
+            } else {
+                // Agar user login nahi hai, to sirf login screen dikhayein.
+                // Hum yahan se localStorage.clear() hata chuke hain.
+                showLoginInterface();
+            }
+            
+            setupIcons();
+            setupEventListeners();
+      }
+        // --- setupIcons ---
+        function setupIcons() {
+            micButton.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>`;
+            sendButton.innerHTML = `<svg class="h-6 w-6 transform rotate-90" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>`;
+            optionsMenuButton.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6" /></svg>`;
+            updateMuteButtonIcon();
+        }
+        
+        // --- UI Switching & State ---
+        function showLoginInterface() {
+            loginScreen.classList.remove('hidden');
+            appContainer.classList.add('hidden');
+        }
+
+        function showChatInterface() {
+            userNameDisplay.textContent = `Hi, ${currentUser}!`;
+            profileName.textContent = currentUser;
+            profileEmail.textContent = currentUserEmail;
+            loginScreen.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            appContainer.classList.add('flex');
+            loadConversations();
+            renderChatHistory();
+            if (!activeChatId || !conversations[activeChatId]) {
+                startNewChat();
+            } else {
+                loadChat(activeChatId);
+            }
+        }
+
+        // --- Sidebar Logic ---
+        function toggleSidebar() {
+            sidebar.classList.toggle('collapsed');
+            menuButton.classList.toggle('hidden');
+        }
+        
+       
+        // --- Login/Logout & Chat History ---
+    function handleLogin(username, email = 'guest@example.com') {
+    currentUser = username;
+    currentUserEmail = email;
+    localStorage.setItem('ravi-ai-user', username);
+    localStorage.setItem('ravi-ai-email', email);
     
-    // Profile Elements
-    const headerProfileBtn = document.getElementById('header-profile-btn');
-    const headerProfileImg = document.getElementById('header-profile-img');
-    const profileDropdown = document.getElementById('profile-dropdown');
-    const menuProfileImg = document.getElementById('menu-profile-img');
-    const menuProfileName = document.getElementById('menu-profile-name');
-    const profileUpload = document.getElementById('profile-upload');
+    // Nayi logic: Bina subscription check kiye seedha chat dikhao
+    localStorage.setItem('ravi-ai-subscribed', 'true'); // Hum maan rahe hain ki user "subscribed" hai free tier ke liye
     
-    // Settings Elements
-    const settingsEmail = document.getElementById('settings-email');
-    const settingsPhone = document.getElementById('settings-phone');
-    const settingsLang = document.getElementById('settings-language');
-    const saveSettingsBtn = document.getElementById('save-settings-btn');
+    showChatInterface(); // <-- Ise yahan badal dein
+}
+        function getStorageKey() { return `ravi-ai-chats-${currentUser}`; }
 
-    // Input Options
-    const fileInput = document.getElementById('file-input');
-    const filePreviewContainer = document.getElementById('file-preview-container');
-    const filePreviewName = document.getElementById('file-preview-name');
-    const removeFileButton = document.getElementById('remove-file-button');
-    const optionsMenuButton = document.getElementById('options-menu-button');
-    const optionsPopover = document.getElementById('options-popover');
-    const createImageToggle = document.getElementById('create-image-toggle');
-    const chatSearchInput = document.getElementById('chat-search-input');
+        function loadConversations() {
+            const saved = localStorage.getItem(getStorageKey());
+            conversations = saved ? JSON.parse(saved) : {};
+            const chatIds = Object.keys(conversations);
+            activeChatId = chatIds.length > 0 ? chatIds[chatIds.length - 1] : null;
+        }
 
-    // --- 3. State Variables ---
-    let conversations = {};
-    let activeChatId = null;
-    let currentUser = null;
-    let currentUserEmail = null;
-    let isMuted = false;
-    let hindiVoice = null;
-    let selectedFile = null;
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let currentPlayingBtn = null;
-    const swipeThreshold = 50;
+        function saveConversations() {
+            if (!currentUser) return;
+            localStorage.setItem(getStorageKey(), JSON.stringify(conversations));
+        }
 
-    // --- 4. Android Interface & Audio Logic ---
+        function renderChatHistory() {
+            const searchTerm = chatSearchInput.value.toLowerCase();
+            chatHistoryList.innerHTML = '';
+            
+            const allChats = Object.values(conversations);
+            const filteredChats = searchTerm 
+                ? allChats.filter(chat => chat.title.toLowerCase().includes(searchTerm)) 
+                : allChats;
 
-    // Stop Audio Logic (Fixed)
-    function stopAudio() {
-        if (synth) synth.cancel();
-        if (window.Android && typeof window.Android.stopSpeak === 'function') {
-            window.Android.stopSpeak(); 
+            filteredChats.sort((a, b) => b.id.split('-')[1] - a.id.split('-')[1]).forEach(chat => {
+                const itemWrapper = document.createElement('div');
+                itemWrapper.className = `group p-2 rounded-lg flex items-center justify-between w-full cursor-pointer hover:bg-[var(--bg-tertiary)] transition-colors border border-transparent ${chat.id === activeChatId ? 'bg-[var(--bg-tertiary)] border-[var(--border-color)]' : ''}`;
+                const itemButton = document.createElement('button');
+                itemButton.className = 'flex-grow text-left truncate';
+                itemButton.textContent = chat.title;
+                itemButton.dataset.chatId = chat.id;
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'invisible group-hover:visible p-1 rounded-full hover:bg-red-500/20 ml-2 flex-shrink-0'; 
+                deleteButton.innerHTML = `<svg class="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>`;
+                deleteButton.dataset.chatIdDelete = chat.id;
+                itemWrapper.appendChild(itemButton);
+                itemWrapper.appendChild(deleteButton);
+                chatHistoryList.appendChild(itemWrapper);
+            });
+        }
+        
+        function startNewChat() {
+            const newChatId = `chat-${Date.now()}`;
+            activeChatId = newChatId;
+            conversations[newChatId] = { id: newChatId, title: 'New Chat', messages: [] };
+            loadChat(newChatId);
+            renderChatHistory();
+            saveConversations();
+        }
+
+      function loadChat(chatId) {
+            chatContainer.innerHTML = '';
+            activeChatId = chatId;
+            const chat = conversations[chatId];
+            
+            if (chat && chat.messages.length > 0) {
+                chat.messages.forEach(msg => {
+                    if (msg.role === 'user') addMessageToUI('user', msg.parts[0].text);
+                    else handleAIResponse(msg.parts[0].text, false, false);
+                });
+            } else {
+                // === DYNAMIC WELCOME SCREEN (Light/Dark Compatible) ===
+                
+                const welcomeContainer = document.createElement('div');
+                welcomeContainer.className = 'flex flex-col items-center justify-center h-full w-full px-4 mt-10 opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]';
+                
+                // 1. Logo / Greeting
+                welcomeContainer.innerHTML = `
+                    <div class="mb-8 text-center">
+                        <div class="bg-[var(--bg-secondary)] p-4 rounded-full inline-block mb-4 shadow-sm">
+                            <img src="logooo-removebg-preview.png" alt="Logo" class="h-12 w-12 object-contain">
+                        </div>
+                        <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-2">Namaste, ${currentUser || 'User'}!</h2>
+                        <p class="text-[var(--text-secondary)]">Main IndusGPT hoon. Aaj main aapki kya madad kar sakta hoon?</p>
+                    </div>
+                `;
+
+                // 2. Suggestion Cards Grid
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl';
+
+                const suggestions = [
+                    { icon: '🎨', text: 'Ek futurist car ki photo banao', sub: 'Image Generation' },
+                    { icon: '📝', text: 'Leave application likh kar do', sub: 'Writing' },
+                    { icon: '💻', text: 'HTML aur CSS mein calculator code', sub: 'Coding' },
+                    { icon: '🧠', text: 'Black hole kya hota hai samjhao', sub: 'Knowledge' }
+                ];
+
+                suggestions.forEach(item => {
+                    const card = document.createElement('button');
+                    // === YAHAN MAIN CHANGE HAI ===
+                    // Ab hum direct color nahi, balki variables use kar rahe hain
+                    card.className = 'text-left p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] transition-all shadow-sm group';
+                    
+                    card.innerHTML = `
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <h3 class="font-medium text-[var(--text-primary)] text-sm mb-1">${item.text}</h3>
+                                <p class="text-xs text-[var(--text-secondary)]">${item.sub}</p>
+                            </div>
+                            <span class="text-xl opacity-70 group-hover:scale-110 transition-transform">${item.icon}</span>
+                        </div>
+                    `;
+                    card.onclick = () => handleSuggestionClick(item.text);
+                    grid.appendChild(card);
+                });
+
+                welcomeContainer.appendChild(grid);
+                chatContainer.appendChild(welcomeContainer);
+            }
+            renderChatHistory();
+        }
+
+
+        // --- Suggestion Card Click Handler ---
+        function handleSuggestionClick(text) {
+            const userInput = document.getElementById('user-input');
+            const chatForm = document.getElementById('chat-form');
+            
+            // Input box mein text daal kar form submit karo
+            if (userInput && chatForm) {
+                userInput.value = text;
+                chatForm.dispatchEvent(new Event('submit', { cancelable: true }));
+            }
+        }
+        // --- Speech Synthesis (TTS) ---
+// YEH FINAL AUR SAHI CODE HAI
+
+const isSpeechSupported = 'speechSynthesis' in window && window.speechSynthesis !== null;
+let synth;
+
+const speakerOnIcon = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
+const speakerOffIcon = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l-4-4m0 4l4-4" /></svg>`;
+
+function loadVoices() {
+    if (!isSpeechSupported) return;
+    const voices = synth.getVoices();
+    if (!voices || voices.length === 0) return;
+    hindiVoice = voices.find(v => v.lang === 'hi-IN' && v.name.includes('Google')) || voices.find(v => v.lang === 'hi-IN');
+    console.log("Voices loaded. Hindi voice:", hindiVoice ? hindiVoice.name : "None");
+}
+
+function speak(text) {
+    // 1. Pehle agar kuch bol raha hai to chup karao
+    if (synth) {
+        synth.cancel();
+    }
+    
+    // Agar Android hai to Android ka stop function call karo (agar available ho)
+    if (window.Android && typeof window.Android.stopSpeak === 'function') {
+        window.Android.stopSpeak();
+    }
+
+    if (!text || isMuted) return;
+
+    // Text cleaning (Markdown/Symbols hatana)
+    let cleanText = text
+        .replace(/([^\w\s\u0900-\u097F])/g, '') // Special chars hatana
+        .replace(/\*\*(.*?)\*\*/g, '$1')        // Bold hatana
+        .replace(/\*(.*?)\*/g, '$1')            // Italic hatana
+        .replace(/[#*_`]/g, '');                // Markdown symbols hatana
+
+    // 2. Naya Text Bolo
+    if (window.Android && typeof window.Android.speak === 'function') {
+        window.Android.speak(cleanText);
+    } else if (synth) {
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        if (hindiVoice) utterance.voice = hindiVoice;
+        speechSynthesis.speak(utterance);
+    }
+}
+
+
+
+        // ✅ NEW: Play/Stop Toggle Logic
+function toggleSpeech(text, btnElement) {
+    
+    // Icons Define karein
+    const speakerIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
+    const stopIcon = `<svg class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg>`;
+
+    // 1. Agar wahi button dobara dabaya gaya (STOP karna hai)
+    if (currentPlayingBtn === btnElement) {
+        stopAudio();
+        btnElement.innerHTML = speakerIcon; // Wapas speaker bana do
+        currentPlayingBtn = null;
+        return;
+    }
+
+    // 2. Agar koi aur button pehle se baj raha hai, to use band karo
+    if (currentPlayingBtn) {
+        stopAudio();
+        currentPlayingBtn.innerHTML = speakerIcon; // Purane wale ko reset karo
+    }
+
+    // 3. Naya audio shuru karo
+    startAudio(text);
+    btnElement.innerHTML = stopIcon; // Button ko STOP icon bana do
+    currentPlayingBtn = btnElement;  // Is button ko current set karo
+}
+
+// Audio start karne ka logic
+function startAudio(text) {
+    let cleanText = text.replace(/([^\w\s\u0900-\u097F])/g, '').replace(/\*\*(.*?)\*\*/g, '$1').replace(/[#*_`]/g, '');
+    
+    if (window.Android && typeof window.Android.speak === 'function') {
+        window.Android.speak(cleanText);
+    } else if (synth) {
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        if (hindiVoice) utterance.voice = hindiVoice;
+        
+        // Jab bolna khatam ho jaye, to icon wapas reset karo
+        utterance.onend = () => {
+            if (currentPlayingBtn) {
+                currentPlayingBtn.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
+                currentPlayingBtn = null;
+            }
+        };
+        speechSynthesis.speak(utterance);
+    }
+}
+
+
+// Audio stop karne ka logic
+function stopAudio() {
+    // 1. Laptop ke liye
+    if (synth) {
+        synth.cancel();
+    }
+
+    // 2. Android Mobile ke liye (Naya function call karein)
+    if (window.Android && typeof window.Android.stopSpeak === 'function') {
+        window.Android.stopSpeak(); 
+    }
+}
+
+function updateMuteButtonIcon() {
+    if (muteButton) {
+        muteButton.innerHTML = isMuted ? speakerOffIcon : speakerOnIcon;
+    }
+}
+
+if (isSpeechSupported) {
+    console.log("Speech Synthesis is supported.");
+    synth = window.speechSynthesis;
+    synth.onvoiceschanged = loadVoices;
+    loadVoices();
+} else {
+    console.error("Speech Synthesis API is NOT supported.");
+    
+    // NAYA CHECK: Agar app normal browser mein hai (Android App nahi hai),
+    // tabhi buttons ko hide karne ka socho.
+    if (!window.Android) {
+        if (muteButton) muteButton.style.display = 'none';
+        if (micButton) micButton.style.display = 'none';
+    }
+    // Agar yeh Android App hai, to mute button ko dikhne do, kyunki
+    // bolne ka kaam native code karega.
+}
+        // --- Speech Recognition (STT) ---
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'hi-IN';
+            recognition.interimResults = false;
+            
+            // Iski Jagah Yeh Naya Code Daalein 🔽
+micButton.addEventListener('click', () => {
+    // Pehle check karo ki yeh Android App hai ya normal browser
+    if (window.Android && typeof window.Android.startListening === 'function') {
+        // Agar Android App hai, to native function call karo
+        window.Android.startListening();
+    } else {
+        // Agar normal browser hai, to web wala speech recognition chalao
+        // Yeh aapka original code hai
+        if (SpeechRecognition) { // Dobara check karlo ki browser support karta hai ya nahi
+             micButton.classList.contains('mic-listening') ? recognition.stop() : recognition.start();
+        } else {
+             alert("Voice recognition is browser mein support nahi karta.");
+        }
+    }
+});
+
+            recognition.onstart = () => { micButton.classList.add('mic-listening'); };
+            recognition.onresult = (event) => { userInput.value = event.results[0][0].transcript; chatForm.dispatchEvent(new Event('submit', { cancelable: true })); };
+            recognition.onerror = (event) => { console.error("Speech recognition error:", event.error); };
+            recognition.onend = () => { micButton.classList.remove('mic-listening'); };
+      } else {
+    // Yahan check karo ki yeh Android App to nahi hai
+    if (!window.Android) {
+        micButton.disabled = true; // Sirf browser mein disable karo
+    }
+}
+
+        // --- Main Chat Logic ---
+        function addMessageToHistory(role, text, fileInfo = null) {
+            if (!activeChatId) return;
+            const currentChat = conversations[activeChatId];
+            const messageParts = [{ text }];
+            if (fileInfo) messageParts.push({ file: { name: fileInfo.name, type: fileInfo.type } });
+            currentChat.messages.push({ role, parts: messageParts });
+            if (currentChat.messages.length <= 1 && role === 'user') {
+                currentChat.title = text.substring(0, 25) + (text.length > 25 ? '...' : '');
+                renderChatHistory();
+            }
+            saveConversations();
+        }
+
+      // 3rd Argument 'animate = true' add kiya hai
+        async function handleAIResponse(response, shouldSpeak = true, animate = true) {
+            try {
+                const jsonMatch = response.match(/\{[\s\S]*\}/);
+                
+                if (jsonMatch) {
+                    const command = JSON.parse(jsonMatch[0]);
+                    
+                    // === IMAGE GENERATION FIX ===
+                    if (command.action === 'generate_image') {
+                        // Text dikhao (Animation tabhi jab naya message ho)
+                        await addMessageToUI('model', command.response, animate);
+                        
+                        // Image tabhi generate karo jab animate true ho (yani abhi maangi gayi ho)
+                        // History load karte waqt dubara generate nahi karega
+                        if (animate) {
+                            const loadingBubble = addAILoadingBubble();
+                            try {
+                                const base64Image = await generateImage(command.prompt);
+                                renderGeneratedImage(loadingBubble, `data:image/png;base64,${base64Image}`);
+                            } catch (e) {
+                                loadingBubble.innerHTML = `<p class="text-red-400">Photo banane mein samasya aa gayi.</p>`;
+                            }
+                        }
+                        return;
+                    }
+
+                    // === OTHER COMMANDS (Google, YouTube etc) ===
+                    let url = '', buttonText = '', buttonIcon = '';
+                    switch (command.action) {
+                        case 'google':
+                            url = `https://www.google.com/search?q=${encodeURIComponent(command.query)}`;
+                            buttonText = 'Google par dekhein';
+                            buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>`;
+                            break;
+                        case 'youtube':
+                            url = `https://www.youtube.com/results?search_query=${encodeURIComponent(command.query)}`;
+                            buttonText = 'YouTube par kholein';
+                            buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+                            break;
+                        case 'whatsapp':
+                            url = `https://wa.me/${command.number}?text=${encodeURIComponent(command.message)}`;
+                            buttonText = 'WhatsApp par bhejein';
+                            buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>`;
+                            break;
+                        case 'call':
+                            url = `tel:${command.number}`;
+                            buttonText = 'Abhi call karein';
+                            buttonIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>`;
+                            break;
+                        default: throw new Error("Unknown command");
+                    }
+                    
+                    addMessageWithAction(command.response, buttonText, buttonIcon, url);
+                    // Agar message naya hai (animate=true), tabhi bolo
+                   
+
+                } else {
+                    throw new Error("No JSON");
+                }
+
+            } catch (error) {
+                // === TEXT MESSAGE FIX ===
+                // Yahan hum 'animate' variable pass kar rahe hain (true ya false)
+                await addMessageToUI('model', response, animate); 
+                
+                // Agar message naya hai, tabhi bolo
+               
+            }
+        }
+
+        function addAILoadingBubble() {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex justify-start';
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble p-3 rounded-2xl ai-bubble';
+            bubble.innerHTML = `<div class="image-loader"><span></span><span></span><span></span></div>`;
+            wrapper.appendChild(bubble);
+            chatContainer.appendChild(wrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return bubble;
+        }
+        
+       // --- YEH NAYA FUNCTION PASTE KAREIN ---
+        function renderGeneratedImage(bubbleElement, imageUrl) {
+            bubbleElement.classList.remove('p-3');
+            
+            // Check karein ki ye base64 hai ya URL
+            const isBase64 = imageUrl.startsWith('data:image');
+            // Mobile app detection
+            const isAndroidApp = window.Android && window.Android.downloadBase64Image;
+
+            bubbleElement.innerHTML = `
+                <div class="relative group cursor-pointer">
+                    <img src="${imageUrl}" 
+                         onclick="openImageViewer('${imageUrl}')" 
+                         class="rounded-lg max-w-full h-auto border border-gray-700 shadow-lg hover:opacity-90 transition-opacity" 
+                         alt="Generated image">
+                    
+                    <span class="absolute bottom-2 left-2 text-xs font-semibold text-white/70 pointer-events-none drop-shadow-md">IndusGPT</span>
+                    
+                    <button onclick="handleImageDownload('${imageUrl}')" 
+                            class="absolute bottom-2 right-2 bg-black/60 hover:bg-black/80 p-2 rounded-full text-white backdrop-blur-sm transition-all" 
+                            title="Download">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                    </button>
+                </div>`;
+        }
+
+        // --- NAYE HELPER FUNCTIONS (Ise renderGeneratedImage ke theek neeche rakhein) ---
+
+        // 1. Image ko bada karne ke liye (Zoom)
+        window.openImageViewer = function(url) {
+            const modal = document.getElementById('image-viewer-modal');
+            const img = document.getElementById('full-screen-image');
+            const downloadBtn = document.getElementById('download-btn-modal');
+            
+            if(modal && img) {
+                img.src = url;
+                // Download button ko bhi set karein
+                downloadBtn.onclick = () => handleImageDownload(url);
+                modal.classList.remove('hidden');
+            }
+        };
+
+        // Modal band karne ke liye logic
+        document.getElementById('close-image-viewer')?.addEventListener('click', () => {
+            document.getElementById('image-viewer-modal').classList.add('hidden');
+        });
+        
+        // Modal ke background par click karne se band ho
+        document.getElementById('image-viewer-modal')?.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('image-viewer-modal')) {
+                document.getElementById('image-viewer-modal').classList.add('hidden');
+            }
+        });
+
+        // 2. Download Handle karne ke liye (Sabse Zaroori)
+        window.handleImageDownload = function(url) {
+            // Agar Android App hai
+            if (window.Android && typeof window.Android.downloadBase64Image === 'function') {
+                // Base64 string se 'data:image/png;base64,' hata kar sirf code bhejein
+                const base64Code = url.split(',')[1];
+                window.Android.downloadBase64Image(base64Code);
+            } 
+            // Agar Laptop/Browser hai
+            else {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `IndusGPT-Image-${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        };
+
+
+      // --- Typewriter Effect Helper ---
+async function typeWriter(element, markdownText) {
+    // 1. Pehle Markdown ko HTML mein badlo
+    let htmlContent = marked.parse(markdownText);
+
+    let i = 0;
+    let isTag = false;
+    let currentString = "";
+
+    // 2. Loop jo HTML Tags ko skip karke sirf text type karega
+    while (i < htmlContent.length) {
+        let char = htmlContent.charAt(i);
+
+        if (char === '<') isTag = true;  // Tag shuru
+        currentString += char;
+        if (char === '>') isTag = false; // Tag khatam
+
+        if (isTag) {
+            i++;
+            continue; // Agar tag hai to turant jodo, ruko mat
+        }
+
+        element.innerHTML = currentString;
+        
+        // Auto Scroll
+        const chatContainer = document.getElementById("chat-container");
+        if(chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        // Typing Speed (10ms)
+        await new Promise(resolve => setTimeout(resolve, 10));
+        i++;
+    }
+
+    // 3. Last mein Code Highlight karo
+    element.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightElement(block);
+    });
+}
+
+// ✅ UPDATED addMessageToUI
+async function addMessageToUI(sender, message, animate = false) {
+    // ... (Upar ka code same rahega) ...
+    const wrapper = document.createElement('div');
+    wrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} w-full`;
+    const bubble = document.createElement('div');
+
+    if (sender === 'user') {
+        bubble.className = 'message-bubble p-3 rounded-2xl user-bubble text-white max-w-[85%]';
+    } else {
+        bubble.className = 'message-bubble py-2 px-1 w-full text-[var(--text-primary)] ai-message';
+    }
+    
+    wrapper.appendChild(bubble);
+    document.getElementById('chat-container').appendChild(wrapper);
+
+    // Message Content
+    if (sender === 'user') {
+        const p = document.createElement('p');
+        p.className = "leading-relaxed text-base";
+        p.innerText = message;
+        bubble.appendChild(p);
+    } 
+    else if (sender === 'model') {
+        const contentDiv = document.createElement('div');
+        contentDiv.className = "leading-relaxed text-base";
+        bubble.appendChild(contentDiv);
+
+        if (animate) {
+            await typeWriter(contentDiv, message);
+        } else {
+            contentDiv.innerHTML = marked.parse(message);
+            contentDiv.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+        }
+
+        // --- BUTTONS (Copy + Toggle Speak) ---
+        if (!message.includes('```')) {
+             const actionDiv = document.createElement('div');
+             actionDiv.className = "flex items-center mt-2 space-x-3";
+
+             // 1. 🔊 NEW TOGGLE SPEAKER BUTTON
+             const speakButton = document.createElement('button');
+             speakButton.className = 'text-gray-400 hover:text-blue-400 transition-colors p-1 rounded-full hover:bg-gray-800/30';
+             // Default Speaker Icon
+             speakButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
+             
+             speakButton.onclick = () => {
+                 // ✅ Yahan hum naya function call kar rahe hain
+                 toggleSpeech(message, speakButton); 
+             };
+             actionDiv.appendChild(speakButton);
+
+             // 2. 📋 COPY BUTTON
+             const copyButton = document.createElement('button');
+             copyButton.className = 'text-gray-400 hover:text-green-400 transition-colors p-1 rounded-full hover:bg-gray-800/30'; 
+             copyButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
+             
+             copyButton.onclick = () => {
+                navigator.clipboard.writeText(message);
+                copyButton.innerHTML = `<svg class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
+                setTimeout(() => copyButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`, 2000);
+             };
+             actionDiv.appendChild(copyButton);
+
+             bubble.appendChild(actionDiv);
         }
     }
 
-    // Toggle Play/Stop Logic
-    function toggleSpeech(text, btnElement) {
-        const speakerIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
-        const stopIcon = `<svg class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg>`;
+    const chatContainer = document.getElementById('chat-container');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+        function addMessageWithAction(message, buttonText, buttonIcon, url) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex justify-start w-full';
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble p-3 rounded-2xl ai-bubble';
+            bubble.innerHTML = `<p>${message.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`;
+            const actionLink = document.createElement('a');
+            actionLink.href = url;
+            actionLink.target = '_blank';
+            actionLink.className = 'action-button';
+            actionLink.innerHTML = `${buttonIcon} ${buttonText}`;
+            bubble.appendChild(actionLink);
+            wrapper.appendChild(bubble);
+            chatContainer.appendChild(wrapper);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
 
-        if (currentPlayingBtn === btnElement) {
-            stopAudio();
-            btnElement.innerHTML = speakerIcon;
-            currentPlayingBtn = null;
+        function addPdfDownloadButton(bubble, content) {
+            const button = document.createElement('button');
+            button.innerHTML = `<svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg><span>Download PDF</span>`;
+            button.className = 'action-button';
+            button.addEventListener('click', () => {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                doc.text(content.replace(/\*\*/g, ''), 10, 10);
+                doc.save('IndusGPT-Roadmap.pdf');
+            });
+            bubble.appendChild(button);
+        }
+
+        async function getAIResponse(prompt, fileData = null) {
+            const systemPrompt = `You are "IndusGPT", a friendly and expressive AI assistant. Your primary language for conversation is Hinglish, and you should use emojis to make the conversation engaging.
+            **Core Instructions:**
+            - **Identity:** When asked about your name or creator, respond with: "Main ek IndusGPT assistant hu. Mujhe India ke developer Ravi Kumar ne banaya hai — main ek desi smart AI assistant hoon jo aapke har sawal ka jawab dene ke liye bana hoon!"
+            - **Formatting:** For mathematical equations, you MUST use LaTeX formatting (e.g., $E=mc^2$). For lists or roadmaps, use markdown lists (*, -, 1.).
+            - **File Analysis:** When a file is provided, analyze its content to answer the user's questions about it.
+            - **Deep Research:** If the user enables "Deep Research", you MUST use your available tools to find the latest and most accurate information before answering.
+
+         - **Real-Time Information (News, Time, Date):**
+            - Jab aapse live news ya haal ki ghatnaon ke baare mein poocha jaaye, to aapko is tarah se jawaab dena hai: "Main ek AI hoon aur mere paas real-time news ka access nahi hai, lekin main aapke liye is topic par Google search kar sakta hoon. 🧐" Iske baad aapko us news topic ke liye Google Search wala JSON command zaroor dena hai.
+            - Jab aapse current time ya date poochi jaaye, to aapko jawaab dena hai: "Main ek AI hoon aur aapka exact local time nahi bata sakta. Kripya apne device ki clock dekhein. 🕒" Aapko time guess karne ki koshish nahi karni hai.
+            
+            **Action Commands (JSON Responses):**
+            If a user's request DIRECTLY maps to one of the following actions, your ENTIRE response MUST be ONLY the corresponding JSON object. Do not add any conversational text before or after the JSON.
+            - **Google Search:** For requests like "search for X", "find information about Y".
+              {"action": "google", "query": "[search term]", "response": "👉 Is vishay par aur jaankari ke liye yahan click karein."}
+            - **YouTube Search:** For requests like "find a video about X", "show me a YouTube video of Y".
+              {"action": "youtube", "query": "[search term]", "response": "👉 Is video ko dekhne ke liye yahan click karein."}
+            - **WhatsApp Message:** For requests like "send a WhatsApp message to [number]".
+              {"action": "whatsapp", "number": "[phone_number_with_country_code]", "message": "[message_to_send]", "response": "👉 WhatsApp par message bhejne ke liye yahan click karein."}
+            - **Phone Call:** For requests like "call [number]". If the user provides a name instead of a number, you MUST ask for the number first. Do not make up numbers.
+              {"action": "call", "number": "[phone_number]", "response": "👉 Call karne ke liye yahan click karein."}
+            - **Image Generation:** If asked to create an image ("banao", "create", "generate image"), use this JSON: 
+              {"action": "generate_image", "prompt": "[detailed image description]", "response": "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨"}
+
+            **Code Formatting:**
+            When you provide code in any language (e.g., HTML, CSS, JavaScript, Python), you MUST enclose it in markdown code fences with the language specified. For example:
+            \`\`\`javascript
+            console.log("Hello, World!");
+            \`\`\``;
+            
+            const currentChatHistory = conversations[activeChatId]?.messages || [];
+            const userPromptParts = [{ text: prompt }];
+            if (fileData) {
+                userPromptParts.push({
+                    inlineData: {
+                        mimeType: fileData.type,
+                        data: fileData.base64
+                    }
+                });
+            }
+
+            const apiHistory = [ ...currentChatHistory, { role: "user", parts: userPromptParts } ];
+            const payload = { contents: apiHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
+            const response = await fetch('https://raviai-1h96.onrender.com/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
+            const result = await response.json();
+            if (result.text) return result.text;
+            throw new Error("Invalid API response structure.");
+        }
+
+        async function generateImage(prompt) {
+            const enhancedPrompt = `${prompt}, 8k, photorealistic, highly detailed, professional photography, sharp focus, cinematic lighting`;
+            const payload = { prompt: enhancedPrompt };
+            const response = await fetch('https://raviai-1h96.onrender.com/api/generate-image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error(`Image generation failed with status ${response.status}`);
+            const result = await response.json();
+            if (result.base64Image) return result.base64Image;
+            throw new Error("Invalid image response structure.");
+        }
+        
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve({ base64: reader.result.split(',')[1], type: file.type, name: file.name });
+                reader.onerror = (error) => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+               // ==========================================================
+// === YEH NAYA FUNCTION ADD KAREIN ===
+// ==========================================================
+function firebaseSignInWithToken(idToken) {
+    console.log("Android se ID Token mil gaya. Ab Firebase mein sign-in kar rahe hain...");
+    const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+    
+    auth.signInWithCredential(credential)
+        .then((result) => {
+            // Sign-in safal hua.
+            const user = result.user;
+            console.log("Firebase sign-in safal:", user.displayName);
+            // Apne purane handleLogin function ko call karke chat interface dikhayein
+            handleLogin(user.displayName, user.email);
+        })
+        .catch((error) => {
+            // Error ko handle karein.
+            console.error("Firebase credential sign-in mein error:", error);
+            alert("Login fail ho gaya: " + error.message);
+        });
+}
+
+        function setupEventListeners() {
+            menuButton.addEventListener('click', toggleSidebar);
+            collapseSidebarButton.addEventListener('click', toggleSidebar);
+            newChatButton.addEventListener('click', startNewChat);
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = usernameInput.value.trim();
+                const email = emailInput.value.trim();
+                if (username && email) handleLogin(username, email);
+            });
+            
+            guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
+            
+           
+             googleLoginBtn.addEventListener('click', () => {
+            // Check karo ki "Android" interface hai ya nahi
+            if (window.Android && typeof window.Android.performGoogleSignIn === 'function') {
+             // Agar hai (matlab app mein chal raha hai), toh native function call karo
+             window.Android.performGoogleSignIn();
+       } else {
+        // Agar nahi hai (matlab browser mein chal raha hai), toh purana tareeka istemal karo
+           console.log("Browser mein chal raha hai, redirect ka istemal kar rahe hain.");
+           auth.signInWithRedirect(provider);
+       }
+         });
+
+            logoutButton.addEventListener('click', () => {
+                auth.signOut().then(() => {
+                    localStorage.clear();
+                    currentUser = null;
+                    currentUserEmail = null;
+                    conversations = {};
+                    activeChatId = null;
+                    showLoginInterface();
+                }).catch((error) => {
+                    console.error("Logout Error:", error);
+                     // Fallback for local-only logout
+                    localStorage.clear();
+                    showLoginInterface();
+                });
+            });
+
+            // ▼▼▼ YEH NAYA SWIPE LOGIC ADD KAREIN ▼▼▼
+
+            // Poore app container par swipe detect karein
+            appContainer.addEventListener('touchstart', e => {
+                // Jab haath screen par rakha
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true }); // { passive: true } performance ke liye accha hai
+
+            appContainer.addEventListener('touchend', e => {
+                // Jab haath screen se uthaya
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+
+                const swipeDistX = touchEndX - touchStartX;
+                const swipeDistY = touchEndY - touchStartY;
+
+                // Check karo ki yeh horizontal swipe hai (vertical scroll nahi)
+                if (Math.abs(swipeDistX) > Math.abs(swipeDistY) && Math.abs(swipeDistX) > swipeThreshold) {
+                    
+                    // **SWIPE RIGHT (Menu Kholne ke liye)**
+                    // Check karein ki swipe screen ke left edge (pehle 70px) se shuru hua
+                    if (touchStartX < 70 && swipeDistX > 0 && sidebar.classList.contains('collapsed')) {
+                        toggleSidebar();
+                    } 
+                    // **SWIPE LEFT (Menu Band karne ke liye)**
+                    // Yeh swipe kahin se bhi kiya ja सकता है
+                    else if (swipeDistX < 0 && !sidebar.classList.contains('collapsed')) {
+                        toggleSidebar();
+                    }
+                }
+                
+                // Reset values
+                touchStartX = 0;
+                touchStartY = 0;
+            }, { passive: true });
+
+            // ▲▲▲ YAHAN TAK NAYA CODE ADD KAREIN ▲▲▲
+
+            themeToggleButton.addEventListener('click', () => { document.body.classList.toggle('light-theme'); localStorage.setItem('ravi-ai-theme', document.body.classList.contains('light-theme') ? 'light-theme' : ''); });
+            
+            chatSearchInput.addEventListener('input', renderChatHistory);
+
+            chatHistoryList.addEventListener('click', (e) => {
+                const chatButton = e.target.closest('button[data-chat-id]');
+                const deleteButton = e.target.closest('button[data-chat-id-delete]');
+                if (deleteButton) {
+                    const chatIdToDelete = deleteButton.dataset.chatIdDelete;
+                    delete conversations[chatIdToDelete];
+                    saveConversations();
+                    if (activeChatId === chatIdToDelete) {
+                        const remaining = Object.keys(conversations);
+                        if (remaining.length > 0) loadChat(remaining[remaining.length - 1]);
+                        else startNewChat();
+                    }
+                    renderChatHistory();
+                } else if (chatButton) {
+                    loadChat(chatButton.dataset.chatId);
+                }
+            });
+
+            optionsMenuButton.addEventListener('click', (e) => { e.stopPropagation(); optionsPopover.classList.toggle('hidden'); });
+            
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    selectedFile = file;
+                    filePreviewName.textContent = file.name.length > 20 ? file.name.substring(0, 17) + '...' : file.name;
+                    filePreviewContainer.classList.remove('hidden');
+                    optionsPopover.classList.add('hidden');
+                }
+                e.target.value = null;
+            });
+
+            createImageToggle.addEventListener('change', () => {
+                userInput.placeholder = createImageToggle.checked ? "Aap kya photo banwana chahte hain?" : "Yahan type karein ya bolein...";
+                optionsPopover.classList.add('hidden');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!optionsPopover.classList.contains('hidden') && !optionsPopover.contains(e.target) && !optionsMenuButton.contains(e.target)) {
+                    optionsPopover.classList.add('hidden');
+                }
+
+            });
+
+            removeFileButton.addEventListener('click', () => { selectedFile = null; filePreviewContainer.classList.add('hidden'); });
+
+           // --- YEH NAYA CODE HAI (OLD chatForm LISTENER KO REPLACE KAREIN) ---
+
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const userMessage = userInput.value.trim();
+    
+    // Agar message khali hai aur koi file nahi hai, to ruk jao
+    if (!userMessage && !selectedFile) return;
+
+    synth?.cancel(); // Purana bolna band karo
+
+    // --- STEP 1: KEYWORD CHECK (Gemini ko Bypass karne ke liye) ---
+    // In shabdon se hum pakad lenge ki user photo maang raha hai
+    const imageKeywords = [
+        "image", "photo", "tasveer", "picture", "drawing", "sketch", "banao", "create", "generate", "draw"
+    ];
+    
+    // Check karein ki kya user ne "Toggle" on kiya hai YA keyword match ho raha hai
+    // Logic: Agar message me "photo" aur "banao" dono aa jaye, ya "create image" aa jaye
+    const isImageRequest = createImageToggle.checked || (
+        (userMessage.toLowerCase().includes("photo") || userMessage.toLowerCase().includes("image") || userMessage.toLowerCase().includes("tasveer")) &&
+        (userMessage.toLowerCase().includes("banao") || userMessage.toLowerCase().includes("create") || userMessage.toLowerCase().includes("generate") || userMessage.toLowerCase().includes("dikhao"))
+    );
+
+    // --- STEP 2: IMAGE GENERATION (Direct Call - No Gemini) ---
+    if (isImageRequest) {
+        // UI Update
+        addMessageToUI('user', userMessage);
+        userInput.value = '';
+        createImageToggle.checked = false; // Toggle reset kar do
+        userInput.placeholder = "Yahan type karein ya bolein...";
+        
+        // AI ka jawaab (Fake Response taaki user ko lage AI bol raha hai)
+        addMessageToUI('model', "Samajh gaya! Main aapke liye yeh shandaar photo bana raha hoon... 🎨");
+        const imageBubble = addAILoadingBubble();
+        
+        try {
+            // Direct Image API call (Gemini quota safe!)
+            const base64Image = await generateImage(userMessage);
+            renderGeneratedImage(imageBubble, `data:image/png;base64,${base64Image}`);
+        } catch (error) {
+            console.error(error);
+            imageBubble.innerHTML = `<p class="text-red-400">Maaf kijiye, photo banane mein kuch samasya aa gayi.</p>`;
+        }
+        return; // Yahi se wapas laut jao, Gemini ke paas mat jao!
+    }
+
+    // --- STEP 3: NORMAL CHAT (Gemini Call) ---
+    // Agar photo nahi maangi, tabhi Gemini ke paas jao
+    addMessageToUI('user', userMessage || `Analyzing file: ${selectedFile.name}`);
+    userInput.value = '';
+    typingIndicator.classList.remove('hidden');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    let fileData = null;
+    if (selectedFile) {
+        try { fileData = await readFileAsBase64(selectedFile); } 
+        catch (error) {
+            addMessageToUI('model', "Maaf kijiye, file padhne mein samasya aa gayi.");
+            typingIndicator.classList.add('hidden');
             return;
         }
-
-        if (currentPlayingBtn) {
-            stopAudio();
-            currentPlayingBtn.innerHTML = speakerIcon;
-        }
-
-        startAudio(text);
-        btnElement.innerHTML = stopIcon;
-        currentPlayingBtn = btnElement;
     }
-
-    function startAudio(text) {
-        let cleanText = text.replace(/([^\w\s\u0900-\u097F])/g, '').replace(/\*\*(.*?)\*\*/g, '$1').replace(/[#*_`]/g, '');
-        
-        if (window.Android && typeof window.Android.speak === 'function') {
-            window.Android.speak(cleanText);
-        } else if (synth) {
-            const utterance = new SpeechSynthesisUtterance(cleanText);
-            if (hindiVoice) utterance.voice = hindiVoice;
-            utterance.onend = () => {
-                if (currentPlayingBtn) {
-                    currentPlayingBtn.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
-                    currentPlayingBtn = null;
-                }
-            };
-            speechSynthesis.speak(utterance);
-        }
-    }
-
-    // Android Callbacks
-    window.onSpeechFinished = function() {
-        if (currentPlayingBtn) {
-            currentPlayingBtn.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
-            currentPlayingBtn = null;
-        }
-    };
-
-    window.onVoiceResult = function(text) {
-        if (userInput && sendButton && text && text.trim().length > 0) {
-            userInput.value = text;
-            sendButton.click();
-        }
-    };
     
-    window.onListeningStarted = function() { if (micButton) micButton.classList.add('mic-listening'); };
-    window.onListeningEnded = function() { if (micButton) micButton.classList.remove('mic-listening'); };
+    addMessageToHistory('user', userMessage, selectedFile ? {name: selectedFile.name, type: selectedFile.type} : null);
+    selectedFile = null;
+    filePreviewContainer.classList.add('hidden');
 
-    window.firebaseSignInWithToken = function(idToken) {
-        const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
-        auth.signInWithCredential(credential).then((result) => {
-            handleLogin(result.user.displayName, result.user.email);
-        }).catch((error) => alert("Login failed: " + error.message));
-    };
-
-    // --- 5. Initialization Functions ---
-    function initialize() {
-        const savedUser = localStorage.getItem('ravi-ai-user');
-        const savedEmail = localStorage.getItem('ravi-ai-email');
-        const savedTheme = localStorage.getItem('ravi-ai-theme');
-
-        if (savedTheme) document.body.classList.add(savedTheme);
-
-        if (savedUser && savedEmail) {
-            currentUser = savedUser;
-            currentUserEmail = savedEmail;
-            showChatInterface();
-        } else {
-            showLoginInterface();
-        }
-        
-        setupIcons();
-        setupEventListeners();
-        loadProfileData(); // Load profile on startup
+    try {
+        const aiResponse = await getAIResponse(userMessage, fileData);
+        addMessageToHistory('model', aiResponse);
+        handleAIResponse(aiResponse);
+    } catch (error) {
+        console.error("Error getting AI response:", error);
+        addMessageToUI('model', "Maaf kijiye, kuch takneeki samasya aa gayi hai (Quota ya Server Error).");
+    } finally {
+        typingIndicator.classList.add('hidden');
     }
-
-    function setupIcons() {
-        micButton.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>`;
-        sendButton.innerHTML = `<svg class="h-6 w-6 transform rotate-90" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>`;
-        optionsMenuButton.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6" /></svg>`;
-    }
-
-    function showLoginInterface() {
-        loginScreen.classList.remove('hidden');
-        appContainer.classList.add('hidden');
-    }
-
-    function showChatInterface() {
-        // Crash Prevention: Check if userNameDisplay exists
-        if(userNameDisplay) userNameDisplay.textContent = `Hi, ${currentUser}!`;
-
-        // Profile Update
-        if(menuProfileName) menuProfileName.textContent = currentUser;
-        if(settingsEmail) settingsEmail.value = currentUserEmail || '';
-        
-        loadProfileData();
-
-        loginScreen.classList.add('hidden');
-        appContainer.classList.remove('hidden');
-        appContainer.classList.add('flex');
-        loadConversations();
-        renderChatHistory();
-        if (!activeChatId || !conversations[activeChatId]) startNewChat();
-        else loadChat(activeChatId);
-    }
-
-    function loadProfileData() {
-        const savedImg = localStorage.getItem('user-profile-pic');
-        if (savedImg) {
-            headerProfileImg.src = savedImg;
-            menuProfileImg.src = savedImg;
-        } else if (currentUser) {
-            const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser)}&background=random`;
-            headerProfileImg.src = avatarUrl;
-            menuProfileImg.src = avatarUrl;
-        }
-
-        const savedPhone = localStorage.getItem('user-phone');
-        if (savedPhone && settingsPhone) settingsPhone.value = savedPhone;
-        
-        const savedLang = localStorage.getItem('user-lang');
-        if (savedLang && settingsLang) settingsLang.value = savedLang;
-    }
-
-    function handleLogin(username, email = 'guest@example.com') {
-        currentUser = username;
-        currentUserEmail = email;
-        localStorage.setItem('ravi-ai-user', username);
-        localStorage.setItem('ravi-ai-email', email);
-        showChatInterface();
-    }
-
-    // --- 6. Chat Logic ---
-    function getStorageKey() { return `ravi-ai-chats-${currentUser}`; }
-
-    function loadConversations() {
-        const saved = localStorage.getItem(getStorageKey());
-        conversations = saved ? JSON.parse(saved) : {};
-        const chatIds = Object.keys(conversations);
-        activeChatId = chatIds.length > 0 ? chatIds[chatIds.length - 1] : null;
-    }
-
-    function saveConversations() {
-        if (!currentUser) return;
-        localStorage.setItem(getStorageKey(), JSON.stringify(conversations));
-    }
-
-    function renderChatHistory() {
-        const searchTerm = chatSearchInput.value.toLowerCase();
-        chatHistoryList.innerHTML = '';
-        const allChats = Object.values(conversations);
-        const filteredChats = searchTerm ? allChats.filter(chat => chat.title.toLowerCase().includes(searchTerm)) : allChats;
-
-        filteredChats.sort((a, b) => b.id.split('-')[1] - a.id.split('-')[1]).forEach(chat => {
-            const itemWrapper = document.createElement('div');
-            itemWrapper.className = `group p-2 rounded-lg flex items-center justify-between w-full cursor-pointer hover:bg-[var(--bg-tertiary)] transition-colors border border-transparent ${chat.id === activeChatId ? 'bg-[var(--bg-tertiary)] border-[var(--border-color)]' : ''}`;
-            const itemButton = document.createElement('button');
-            itemButton.className = 'flex-grow text-left truncate';
-            itemButton.textContent = chat.title;
-            itemButton.onclick = () => loadChat(chat.id);
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'invisible group-hover:visible p-1 rounded-full hover:bg-red-500/20 ml-2 flex-shrink-0'; 
-            deleteButton.innerHTML = `<svg class="h-4 w-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>`;
-            deleteButton.onclick = (e) => {
-                e.stopPropagation();
-                delete conversations[chat.id];
-                saveConversations();
-                if (activeChatId === chat.id) {
-                    const remaining = Object.keys(conversations);
-                    if (remaining.length > 0) loadChat(remaining[remaining.length - 1]);
-                    else startNewChat();
-                }
-                renderChatHistory();
-            };
-            itemWrapper.appendChild(itemButton);
-            itemWrapper.appendChild(deleteButton);
-            chatHistoryList.appendChild(itemWrapper);
-        });
-    }
-
-    function startNewChat() {
-        const newChatId = `chat-${Date.now()}`;
-        activeChatId = newChatId;
-        conversations[newChatId] = { id: newChatId, title: 'New Chat', messages: [] };
-        loadChat(newChatId);
-        renderChatHistory();
-        saveConversations();
-    }
-
-    function loadChat(chatId) {
-        chatContainer.innerHTML = '';
-        activeChatId = chatId;
-        const chat = conversations[chatId];
-        
-        if (chat && chat.messages.length > 0) {
-            chat.messages.forEach(msg => {
-                if (msg.role === 'user') addMessageToUI('user', msg.parts[0].text);
-                else addMessageToUI('model', msg.parts[0].text, false);
-            });
-        } else {
-            // Welcome Screen
-            const welcomeContainer = document.createElement('div');
-            welcomeContainer.className = 'flex flex-col items-center justify-center h-full w-full px-4 mt-10 opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]';
-            welcomeContainer.innerHTML = `
-                <div class="mb-8 text-center">
-                    <div class="bg-[var(--bg-secondary)] p-4 rounded-full inline-block mb-4 shadow-sm">
-                        <img src="logooo-removebg-preview.png" alt="Logo" class="h-12 w-12 object-contain">
-                    </div>
-                    <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-2">Namaste, ${currentUser || 'User'}!</h2>
-                    <p class="text-[var(--text-secondary)]">Main IndusGPT hoon. Aaj main aapki kya madad kar sakta hoon?</p>
-                </div>`;
-            const grid = document.createElement('div');
-            grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl';
-            const suggestions = [
-                { icon: '🎨', text: 'Ek futurist car ki photo banao', sub: 'Image Generation' },
-                { icon: '📝', text: 'Leave application likh kar do', sub: 'Writing' },
-                { icon: '💻', text: 'HTML aur CSS mein calculator code', sub: 'Coding' },
-                { icon: '🧠', text: 'Black hole kya hota hai samjhao', sub: 'Knowledge' }
-            ];
-            suggestions.forEach(item => {
-                const card = document.createElement('button');
-                card.className = 'text-left p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)] transition-all shadow-sm group';
-                card.innerHTML = `
-                    <div class="flex items-start justify-between">
-                        <div><h3 class="font-medium text-[var(--text-primary)] text-sm mb-1">${item.text}</h3><p class="text-xs text-[var(--text-secondary)]">${item.sub}</p></div>
-                        <span class="text-xl opacity-70 group-hover:scale-110 transition-transform">${item.icon}</span>
-                    </div>`;
-                card.onclick = () => { userInput.value = item.text; chatForm.dispatchEvent(new Event('submit', { cancelable: true })); };
-                grid.appendChild(card);
-            });
-            welcomeContainer.appendChild(grid);
-            chatContainer.appendChild(welcomeContainer);
-        }
-        renderChatHistory();
-    }
-
-    // --- 7. Typewriter & UI ---
-    async function typeWriter(element, markdownText) {
-        let htmlContent = marked.parse(markdownText);
-        let i = 0; let isTag = false; let currentString = "";
-        while (i < htmlContent.length) {
-            let char = htmlContent.charAt(i);
-            if (char === '<') isTag = true;
-            currentString += char;
-            if (char === '>') isTag = false;
-            if (isTag) { i++; continue; }
-            element.innerHTML = currentString;
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            await new Promise(resolve => setTimeout(resolve, 10));
-            i++;
-        }
-        element.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
-    }
-
-    async function addMessageToUI(sender, message, animate = false) {
-        const wrapper = document.createElement('div');
-        wrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} w-full`;
-        const bubble = document.createElement('div');
-        if (sender === 'user') bubble.className = 'message-bubble p-3 rounded-2xl user-bubble text-white max-w-[85%]';
-        else bubble.className = 'message-bubble py-2 px-1 w-full text-[var(--text-primary)] ai-message';
-        wrapper.appendChild(bubble);
-        document.getElementById('chat-container').appendChild(wrapper);
-
-        if (sender === 'user') {
-            const p = document.createElement('p');
-            p.className = "leading-relaxed text-base";
-            p.innerText = message;
-            bubble.appendChild(p);
-        } else if (sender === 'model') {
-            const contentDiv = document.createElement('div');
-            contentDiv.className = "leading-relaxed text-base";
-            bubble.appendChild(contentDiv);
-            if (animate) await typeWriter(contentDiv, message);
-            else {
-                contentDiv.innerHTML = marked.parse(message);
-                contentDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
-            }
-
-            if (!message.includes('```')) {
-                const actionDiv = document.createElement('div');
-                actionDiv.className = "flex items-center mt-2 space-x-3";
-                
-                // Speak Button
-                const speakButton = document.createElement('button');
-                speakButton.className = 'text-gray-400 hover:text-blue-400 transition-colors p-1 rounded-full hover:bg-gray-800/30';
-                speakButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
-                speakButton.onclick = () => toggleSpeech(message, speakButton);
-                actionDiv.appendChild(speakButton);
-                
-                // Copy Button
-                const copyButton = document.createElement('button');
-                copyButton.className = 'text-gray-400 hover:text-green-400 transition-colors p-1 rounded-full hover:bg-gray-800/30'; 
-                copyButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
-                copyButton.onclick = () => {
-                    navigator.clipboard.writeText(message);
-                    copyButton.innerHTML = `<svg class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
-                    setTimeout(() => copyButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`, 2000);
-                };
-                actionDiv.appendChild(copyButton);
-                bubble.appendChild(actionDiv);
-            }
-        }
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    // --- 8. API Logic ---
-    async function getAIResponse(prompt, fileData = null) {
-        const systemPrompt = `You are "IndusGPT", a friendly and expressive AI assistant. Your primary language for conversation is Hinglish.`; // Shortened for brevity in response
-        const currentChatHistory = conversations[activeChatId]?.messages || [];
-        const userPromptParts = [{ text: prompt }];
-        if (fileData) userPromptParts.push({ inlineData: { mimeType: fileData.type, data: fileData.base64 } });
-        const apiHistory = [ ...currentChatHistory, { role: "user", parts: userPromptParts } ];
-        const payload = { contents: apiHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
-        const response = await fetch('https://raviai-1h96.onrender.com/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        if (!response.ok) throw new Error(`API error`);
-        const result = await response.json();
-        return result.text;
-    }
-
-    async function handleAIResponse(response, shouldSpeak = true, animate = true) {
-        try {
-            const jsonMatch = response.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                const command = JSON.parse(jsonMatch[0]);
-                if (command.action === 'generate_image') {
-                    await addMessageToUI('model', command.response, animate);
-                    if (animate) {
-                        const loadingBubble = addAILoadingBubble();
-                        try {
-                            const base64Image = await generateImage(command.prompt);
-                            renderGeneratedImage(loadingBubble, `data:image/png;base64,${base64Image}`);
-                        } catch (e) { loadingBubble.innerHTML = `<p class="text-red-400">Error</p>`; }
-                    }
-                    return;
-                }
-                // Handle other JSON actions (google, youtube, etc) - Code same as before
-            } else { throw new Error("No JSON"); }
-        } catch (error) {
-            await addMessageToUI('model', response, animate);
-        }
-    }
-
-    async function generateImage(prompt) {
-        const response = await fetch('https://raviai-1h96.onrender.com/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        const result = await response.json();
-        return result.base64Image;
-    }
-
-    function addAILoadingBubble() {
-        const wrapper = document.createElement('div'); wrapper.className = 'flex justify-start';
-        const bubble = document.createElement('div'); bubble.className = 'message-bubble p-3 rounded-2xl ai-bubble';
-        bubble.innerHTML = `<div class="image-loader"><span></span><span></span><span></span></div>`;
-        wrapper.appendChild(bubble); document.getElementById('chat-container').appendChild(wrapper);
-        return bubble;
-    }
-
-    function renderGeneratedImage(bubble, url) {
-        bubble.classList.remove('p-3');
-        bubble.innerHTML = `<div class="relative group cursor-pointer"><img src="${url}" onclick="openImageViewer('${url}')" class="rounded-lg max-w-full h-auto shadow-lg"><button onclick="handleImageDownload('${url}')" class="absolute bottom-2 right-2 bg-black/60 p-2 rounded-full text-white"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg></button></div>`;
-    }
-
-    function readFileAsBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve({ base64: reader.result.split(',')[1], type: file.type, name: file.name });
-            reader.readAsDataURL(file);
-        });
-    }
-
-    // --- 9. Event Listeners ---
-    function setupEventListeners() {
-        menuButton.addEventListener('click', toggleSidebar);
-        collapseSidebarButton.addEventListener('click', toggleSidebar);
-        newChatButton.addEventListener('click', startNewChat);
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (usernameInput.value.trim()) handleLogin(usernameInput.value.trim(), emailInput.value.trim());
-        });
-        guestLoginBtn.addEventListener('click', () => handleLogin('Guest'));
-        googleLoginBtn.addEventListener('click', () => {
-            if (window.Android && typeof window.Android.performGoogleSignIn === 'function') window.Android.performGoogleSignIn();
-            else auth.signInWithRedirect(provider);
-        });
-        logoutButton.addEventListener('click', () => {
-            auth.signOut().finally(() => { localStorage.clear(); showLoginInterface(); });
-        });
-        
-        // Profile Events
-        headerProfileBtn.addEventListener('click', (e) => { e.stopPropagation(); profileDropdown.classList.toggle('hidden'); loadProfileData(); });
-        document.addEventListener('click', (e) => { if (!profileDropdown.contains(e.target) && !headerProfileBtn.contains(e.target)) profileDropdown.classList.add('hidden'); });
-        profileUpload.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    localStorage.setItem('user-profile-pic', event.target.result);
-                    loadProfileData();
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-        saveSettingsBtn.addEventListener('click', () => {
-            localStorage.setItem('user-phone', settingsPhone.value);
-            localStorage.setItem('user-lang', settingsLang.value);
-            document.getElementById('settings-modal').classList.add('hidden');
-        });
-
-        // Swipe
-        appContainer.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; }, { passive: true });
-        appContainer.addEventListener('touchend', e => {
-            const swipeDistX = e.changedTouches[0].clientX - touchStartX;
-            if (Math.abs(swipeDistX) > swipeThreshold) {
-                if (touchStartX < 70 && swipeDistX > 0) toggleSidebar();
-                else if (swipeDistX < 0) toggleSidebar();
-            }
-        }, { passive: true });
-
-        themeToggleButton.addEventListener('click', () => { document.body.classList.toggle('light-theme'); localStorage.setItem('ravi-ai-theme', document.body.classList.contains('light-theme') ? 'light-theme' : ''); });
-        chatSearchInput.addEventListener('input', renderChatHistory);
-
-        // Chat Form
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const msg = userInput.value.trim();
-            if (!msg && !selectedFile) return;
-            stopAudio();
-
-            const isImageRequest = createImageToggle.checked || (msg.toLowerCase().includes("image") && msg.toLowerCase().includes("create")); 
-            if (isImageRequest) {
-                addMessageToUI('user', msg); userInput.value = '';
-                addMessageToUI('model', "Creating image...");
-                const bub = addAILoadingBubble();
-                try {
-                    const img = await generateImage(msg);
-                    renderGeneratedImage(bub, `data:image/png;base64,${img}`);
-                } catch(e) { bub.innerHTML = "Error"; }
-                return;
-            }
-
-            addMessageToUI('user', msg || `File: ${selectedFile.name}`);
-            userInput.value = ''; typingIndicator.classList.remove('hidden'); chatContainer.scrollTop = chatContainer.scrollHeight;
-            
-            let fileData = null;
-            if (selectedFile) {
-                try { fileData = await readFileAsBase64(selectedFile); } catch(e) { return; }
-            }
-            addMessageToHistory('user', msg, selectedFile);
-            selectedFile = null; filePreviewContainer.classList.add('hidden');
-            
-            try {
-                const aiMsg = await getAIResponse(msg, fileData);
-                addMessageToHistory('model', aiMsg);
-                handleAIResponse(aiMsg);
-            } catch(e) { addMessageToUI('model', "Error."); }
-            finally { typingIndicator.classList.add('hidden'); }
-        });
-
-        // Mic
-        micButton.addEventListener('click', () => {
-             if (window.Android && typeof window.Android.startListening === 'function') window.Android.startListening();
-             else { /* Browser Speech Logic here if needed */ }
-        });
-        
-        fileInput.addEventListener('change', (e) => {
-            if(e.target.files[0]) { selectedFile = e.target.files[0]; filePreviewContainer.classList.remove('hidden'); filePreviewName.textContent = selectedFile.name; }
-        });
-        removeFileButton.addEventListener('click', () => { selectedFile = null; filePreviewContainer.classList.add('hidden'); });
-        optionsMenuButton.addEventListener('click', (e) => { e.stopPropagation(); optionsPopover.classList.toggle('hidden'); });
-        document.addEventListener('click', (e) => { if (!optionsPopover.contains(e.target) && !optionsMenuButton.contains(e.target)) optionsPopover.classList.add('hidden'); });
-    }
-
-    // --- Speech Helper ---
-    const isSpeechSupported = 'speechSynthesis' in window;
-    let synth = isSpeechSupported ? window.speechSynthesis : null;
-    if(synth) synth.onvoiceschanged = loadVoices;
-
-    // --- Helpers ---
-    window.openImageViewer = function(url) {
-        document.getElementById('full-screen-image').src = url;
-        document.getElementById('image-viewer-modal').classList.remove('hidden');
-        document.getElementById('download-btn-modal').onclick = () => handleImageDownload(url);
-    };
-    document.getElementById('close-image-viewer').onclick = () => document.getElementById('image-viewer-modal').classList.add('hidden');
-    window.handleImageDownload = function(url) {
-        if(window.Android) window.Android.downloadBase64Image(url.split(',')[1]);
-        else { const a = document.createElement('a'); a.href = url; a.download = 'img.png'; a.click(); }
-    };
-
-    initialize();
 });
-</script>
-   </body>
+            
+            chatContainer.addEventListener('click', (e) => {
+                const copyBtn = e.target.closest('.copy-btn');
+                if (copyBtn) {
+                    const textToCopy = copyBtn.closest('.message-bubble').querySelector('p').innerText;
+                    const textArea = document.createElement('textarea');
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    copyBtn.innerHTML = `<svg class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
+                    setTimeout(() => {
+                        copyBtn.innerHTML = `<svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
+                    }, 1500);
+                }
+            });
+
+            // Event listeners for modals
+           
+        }
+         initialize();
+         
+    });
+    </script>
+</body>
 </html>
