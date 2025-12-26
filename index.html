@@ -736,15 +736,19 @@ function startAudio(text) {
     }
 }
 
+
 // Audio stop karne ka logic
 function stopAudio() {
-    if (synth) synth.cancel();
-    // Android ke liye hack: Khali text bhejo taaki wo chup ho jaye
-    if (window.Android && typeof window.Android.speak === 'function') {
-        window.Android.speak(""); 
+    // 1. Laptop ke liye
+    if (synth) {
+        synth.cancel();
+    }
+
+    // 2. Android Mobile ke liye (Naya function call karein)
+    if (window.Android && typeof window.Android.stopSpeak === 'function') {
+        window.Android.stopSpeak(); 
     }
 }
-
 
 function updateMuteButtonIcon() {
     if (muteButton) {
