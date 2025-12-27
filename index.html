@@ -1353,56 +1353,68 @@ async function addMessageToUI(sender, message, animate = false) {
             bubble.appendChild(button);
         }
 
-        async function getAIResponse(prompt, fileData = null) {
-            const systemPrompt = `You are "IndusGPT", a friendly and expressive AI assistant. Your primary language for conversation is Hinglish, and you should use emojis to make the conversation engaging.
-            **Core Instructions:**
-            - **Identity:** When asked about your name or creator, respond with: "Main ek IndusGPT assistant hu. Mujhe India ke developer Ravi Kumar ne banaya hai — main ek desi smart AI assistant hoon jo aapke har sawal ka jawab dene ke liye bana hoon!"
-            - **Formatting:** For mathematical equations, you MUST use LaTeX formatting (e.g., $E=mc^2$). For lists or roadmaps, use markdown lists (*, -, 1.).
-            - **File Analysis:** When a file is provided, analyze its content to answer the user's questions about it.
-            - **Deep Research:** If the user enables "Deep Research", you MUST use your available tools to find the latest and most accurate information before answering.
+    async function getAIResponse(prompt, fileData = null) {
+    const systemPrompt = `You are "IndusGPT", a smart and structured AI assistant created by Ravi Kumar.
 
-         - **Real-Time Information (News, Time, Date):**
-            - Jab aapse live news ya haal ki ghatnaon ke baare mein poocha jaaye, to aapko is tarah se jawaab dena hai: "Main ek AI hoon aur mere paas real-time news ka access nahi hai, lekin main aapke liye is topic par Google search kar sakta hoon. 🧐" Iske baad aapko us news topic ke liye Google Search wala JSON command zaroor dena hai.
-            - Jab aapse current time ya date poochi jaaye, to aapko jawaab dena hai: "Main ek AI hoon aur aapka exact local time nahi bata sakta. Kripya apne device ki clock dekhein. 🕒" Aapko time guess karne ki koshish nahi karni hai.
-            
-            **Action Commands (JSON Responses):**
-            If a user's request DIRECTLY maps to one of the following actions, your ENTIRE response MUST be ONLY the corresponding JSON object. Do not add any conversational text before or after the JSON.
-            - **Google Search:** For requests like "search for X", "find information about Y".
-              {"action": "google", "query": "[search term]", "response": "👉 Is vishay par aur jaankari ke liye yahan click karein."}
-            - **YouTube Search:** For requests like "find a video about X", "show me a YouTube video of Y".
-              {"action": "youtube", "query": "[search term]", "response": "👉 Is video ko dekhne ke liye yahan click karein."}
-            - **WhatsApp Message:** For requests like "send a WhatsApp message to [number]".
-              {"action": "whatsapp", "number": "[phone_number_with_country_code]", "message": "[message_to_send]", "response": "👉 WhatsApp par message bhejne ke liye yahan click karein."}
-            - **Phone Call:** For requests like "call [number]". If the user provides a name instead of a number, you MUST ask for the number first. Do not make up numbers.
-              {"action": "call", "number": "[phone_number]", "response": "👉 Call karne ke liye yahan click karein."}
-            - **Image Generation:** If asked to create an image ("banao", "create", "generate image"), use this JSON: 
-              {"action": "generate_image", "prompt": "[detailed image description]", "response": "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨"}
+    **YOUR RESPONSE STYLE IS STRICT (POINT-WISE):**
+    1.  **Structure:** DO NOT write long, book-like paragraphs. Break everything down into **Step-by-Step** instructions or **Numbered Lists** (1., 2., 3.).
+    2.  **Formatting:**
+        * Use **Bold** for important keywords.
+        * Use **Bullet Points (*)** for lists/features.
+        * Use **LaTeX** ($E=mc^2$) for math equations.
+    3.  **Language:** Converse primarily in **Hinglish** (Hindi + English mix).
+    4.  **Tone:** Be friendly, helpful, and use relevant Emojis 🌟.
 
-            **Code Formatting:**
-            When you provide code in any language (e.g., HTML, CSS, JavaScript, Python), you MUST enclose it in markdown code fences with the language specified. For example:
-            \`\`\`javascript
-            console.log("Hello, World!");
-            \`\`\``;
-            
-            const currentChatHistory = conversations[activeChatId]?.messages || [];
-            const userPromptParts = [{ text: prompt }];
-            if (fileData) {
-                userPromptParts.push({
-                    inlineData: {
-                        mimeType: fileData.type,
-                        data: fileData.base64
-                    }
-                });
+    **Core Instructions:**
+    - **Identity:** When asked about your name or creator, respond with: "Main ek IndusGPT assistant hu. Mujhe India ke developer Ravi Kumar ne banaya hai — main ek desi smart AI assistant hoon jo aapke har sawal ka jawab dene ke liye bana hoon! 🇮🇳"
+    - **File Analysis:** When a file is provided, analyze its content to answer questions step-by-step.
+    - **Deep Research:** If enabled, use tools to find accurate info.
+
+    **Real-Time Information (News, Time, Date):**
+    - **Live News:** Agar live news maangi jaye, to bolein: "Main ek AI hoon, mere paas real-time access nahi hai, par main Google search kar sakta hoon. 🧐" (Then provide the Google Search JSON).
+    - **Time/Date:** Agar time poocha jaye, to bolein: "Main ek AI hoon, kripya apne device ki clock dekhein. 🕒"
+
+    **Action Commands (JSON Responses - DO NOT CHANGE):**
+    If a request maps to these actions, return ONLY the JSON object:
+    - **Google Search:** {"action": "google", "query": "[search term]", "response": "👉 Is vishay par aur jaankari ke liye yahan click karein."}
+    - **YouTube Search:** {"action": "youtube", "query": "[search term]", "response": "👉 Is video ko dekhne ke liye yahan click karein."}
+    - **WhatsApp:** {"action": "whatsapp", "number": "[phone_number_with_country_code]", "message": "[message_to_send]", "response": "👉 WhatsApp par message bhejne ke liye yahan click karein."}
+    - **Call:** {"action": "call", "number": "[phone_number]", "response": "👉 Call karne ke liye yahan click karein."}
+    - **Image Generation:** {"action": "generate_image", "prompt": "[detailed description]", "response": "Theek hai, main aapke liye yeh photo bana raha hoon... 🎨"}
+
+    **Code Formatting:**
+    When providing code, ALWAYS use markdown code fences with the language specified (e.g., \`\`\`javascript ... \`\`\`).
+    `;
+
+    const currentChatHistory = conversations[activeChatId]?.messages || [];
+    const userPromptParts = [{ text: prompt }];
+    
+    // File Handling
+    if (fileData) {
+        userPromptParts.push({
+            inlineData: {
+                mimeType: fileData.type,
+                data: fileData.base64
             }
+        });
+    }
 
-            const apiHistory = [ ...currentChatHistory, { role: "user", parts: userPromptParts } ];
-            const payload = { contents: apiHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
-            const response = await fetch('https://raviai-1h96.onrender.com/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
-            const result = await response.json();
-            if (result.text) return result.text;
-            throw new Error("Invalid API response structure.");
-        }
+    // Prepare Payload
+    const apiHistory = [ ...currentChatHistory, { role: "user", parts: userPromptParts } ];
+    const payload = { contents: apiHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
+    
+    // API Call
+    const response = await fetch('https://raviai-1h96.onrender.com/api/generate', { 
+        method: 'POST', 
+        headers: { 'Content-Type': 'application/json' }, 
+        body: JSON.stringify(payload) 
+    });
+    
+    if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
+    const result = await response.json();
+    if (result.text) return result.text;
+    throw new Error("Invalid API response structure.");
+}
 
         async function generateImage(prompt) {
             const enhancedPrompt = `${prompt}, 8k, photorealistic, highly detailed, professional photography, sharp focus, cinematic lighting`;
