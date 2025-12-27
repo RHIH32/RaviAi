@@ -159,7 +159,6 @@
                     <h1 class="animated-text text-xl font-bold ml-2">IndusGPT</h1>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <span id="user-name-display" class="font-semibold"></span>
                 </div>
             </header>
 
@@ -358,7 +357,6 @@ Your subscription payments are handled by our secure third-party payment partner
         const passwordInput = document.getElementById('password-input');
         const guestLoginBtn = document.getElementById('guest-login-btn');
         const googleLoginBtn = document.getElementById('google-login-btn');
-        const userNameDisplay = document.getElementById('user-name-display');
         const logoutButton = document.getElementById('logout-button');
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
@@ -492,9 +490,8 @@ window.showLanguagePackGuide = function() {
         }
 
         function showChatInterface() {
-            userNameDisplay.textContent = `Hi, ${currentUser}!`;
-            profileName.textContent = currentUser;
-            profileEmail.textContent = currentUserEmail;
+           if(profileName) profileName.textContent = currentUser;
+           if(profileEmail) profileEmail.textContent = currentUserEmail;
             loginScreen.classList.add('hidden');
             appContainer.classList.remove('hidden');
             appContainer.classList.add('flex');
