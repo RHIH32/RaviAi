@@ -19,10 +19,6 @@
     <style>
         /* Code Block Style */
         
-        code {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-        }
         /* ... Baaki CSS wahi rahegi ... */
         .ai-message { white-space: pre-wrap; }
         :root { --bg-primary: #000000; --bg-secondary: #121212; --bg-tertiary: #27272a; --text-primary: #ededed; --text-secondary: #a1a1aa; --border-color: #333333; --header-bg: rgba(0, 0, 0, 0.8); }
@@ -48,35 +44,45 @@
     position: relative;
 }
 
-/* User ka message 85% hi rahega taki wo chat jaisa lage */
+/* --- Message Bubbles Styling --- */
+        
 .user-bubble {
     max-width: 85%;
-    background-image: none;
-    background-color: #2f2f2f;
+    background-color: #2f2f2f; /* Dark Gray Box */
     color: #ffffff;
-    margin-left: auto; /* Right side align karne ke liye */
+    margin-left: auto;
+    border-radius: 12px;
 }
 
-/* AI ka message aur Code block ab 100% width lenge */
+/* AI ka message (Full width, Background HATA diya) */
 .ai-bubble {
-    width: 100%;         /* Full width */
-    max-width: 100%;     /* Full screen limit */
-    background-color: var(--bg-tertiary);
+    width: 100%;
+    max-width: 100%;
+    background-color: transparent !important; /* Background hata diya */
+    box-shadow: none !important; /* Shadow bhi hata di */
     color: var(--text-primary);
-    padding: 10px 20px;  /* Thoda padding taki kinare se chipke nahi */
+    padding: 10px 0; /* Side padding kam kar di */
 }
 
-/* Code block (PRE tag) ko full aur sundar banane ke liye */
+/* --- Code Block Styling --- */
 pre {
-    background-color: #0d0d0d; /* Thoda dark background */
-    padding: 15px;
+    background-color: #1e1e1e !important; /* Sirf Code ka background rahega */
+    border: none !important; /* Border HATA diya */
     border-radius: 8px;
-    overflow-x: auto; /* Horizontal scroll agar code lamba ho */
+    padding: 15px;
+    overflow-x: auto;
     margin: 15px 0;
     color: #e0e0e0;
-    width: 100%;  /* Code block full width */
-    border: 1px solid #333; /* Border for better look */
+    width: 100%;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); /* Thoda sa shadow taaki code utha hua lage */
 }
+
+code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    background-color: transparent !important; /* Code ke andar ka bg clean */
+}
+        
 
         .typing-indicator span, .image-loader span { height: 8px; width: 8px; background-color: var(--text-secondary); border-radius: 50%; display: inline-block; animation: bounce 1.4s infinite ease-in-out both; }
         .typing-indicator span:nth-child(1), .image-loader span:nth-child(1) { animation-delay: -0.32s; } 
