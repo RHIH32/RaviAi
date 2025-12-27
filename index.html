@@ -492,29 +492,36 @@ window.showLanguagePackGuide = function() {
         // --- function  Initialization ---
 // ==========================================================
 
-      function initialize() {
-            const savedUser = localStorage.getItem('ravi-ai-user');
-            const savedEmail = localStorage.getItem('ravi-ai-email');
-            const savedTheme = localStorage.getItem('ravi-ai-theme');
+     // --- Initialization (Fixed Version) ---
+function initialize() {
+    const savedUser = localStorage.getItem('ravi-ai-user');
+    const savedEmail = localStorage.getItem('ravi-ai-email');
+    const savedTheme = localStorage.getItem('ravi-ai-theme');
+    
+    // Theme load karein
+    if (savedTheme) {
+        document.body.classList.add(savedTheme);
+    }
 
-            if (savedTheme) {
-                document.body.classList.add(savedTheme);
-            }
-
-            // Yahan check karte hain ki user ki details local storage mein hain ya nahi
-            if (savedUser && savedEmail) {
-                currentUser = savedUser;
-                currentUserEmail = savedEmail;
-                showChatInterface();
-            } else {
-                // Agar user login nahi hai, to sirf login screen dikhayein.
-                // Hum yahan se localStorage.clear() hata chuke hain.
-                showLoginInterface();
-            }
-            
-            setupIcons();
-            setupEventListeners();
-      }
+    // User data check karein
+    if (savedUser && savedEmail) {
+        currentUser = savedUser;
+        currentUserEmail = savedEmail;
+        
+        // ZAROORI: Saved photo check karein
+        const savedPhoto = localStorage.getItem('ravi-ai-profile-pic');
+        
+        // UI update karein taaki photo aur naam turant dikhe
+        updateProfileUI(savedUser, savedEmail, savedPhoto);
+        
+        showChatInterface();
+    } else {
+        showLoginInterface();
+    }
+    
+    setupIcons();
+    setupEventListeners();
+}
 
 
 
@@ -544,29 +551,31 @@ function handleLogin(username, email = 'guest@example.com', photoUrl = null) {
     showChatInterface();
 }
 
-// --- Helper Function to Update Profile UI ---
+// --- Helper Function to Update Profile UI (Fixed Version) ---
 function updateProfileUI(name, email, photoUrl) {
     // 1. Name & Email Set karein
     if(dropdownName) dropdownName.textContent = name;
     if(dropdownEmail) dropdownEmail.textContent = email;
     
-    // 2. Phone Number (Random Logic for Demo, Firebase Auth se asli number bhi le sakte hain)
-    // Filhal agar user guest nahi hai to number dikhayein
-    if (name !== 'Guest') {
-        const storedPhone = localStorage.getItem('ravi-ai-phone') || '+91 98765 43210';
+    // 2. Phone Number Logic (FIXED: Ab fake number nahi dikhayega)
+    // LocalStorage check karega, agar wahan number nahi hai to "Not Added" dikhayega
+    const storedPhone = localStorage.getItem('ravi-ai-phone');
+    if (storedPhone) {
         if(dropdownPhone) dropdownPhone.textContent = storedPhone;
     } else {
         if(dropdownPhone) dropdownPhone.textContent = "Not Added";
     }
 
-    // 3. Photo Logic (Priority: LocalUpload > FirebaseURL > Default)
+    // 3. Photo Logic (FIXED: Priority -> LocalStorage > LoginURL > Default)
+    // Sabse pehle check karo ki kya user ne apni photo save ki hai?
     const localPhoto = localStorage.getItem('ravi-ai-profile-pic');
+    
+    // Agar local photo hai to wo use karo, nahi to default
     const finalPhoto = localPhoto || photoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6366f1&color=fff`;
     
     if(headerProfileImg) headerProfileImg.src = finalPhoto;
     if(dropdownProfileImg) dropdownProfileImg.src = finalPhoto;
 }
-
 // --- Event Listeners for Profile ---
 // Yeh setupEventListeners function ke andar add karein
 
