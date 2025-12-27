@@ -18,16 +18,7 @@
 
     <style>
         /* Code Block Style */
-        pre {
-            background-color: #1e1e1e;
-            padding: 15px;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 10px 0;
-            color: #ffffff;
-            width: 100% !important; /* Yeh line zaroori hai */
-            min-width: 100%;       /* Yeh bhi add kar dein */
-        }
+        
         code {
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
@@ -46,9 +37,47 @@
         #chat-container::-webkit-scrollbar-track, #chat-history-list::-webkit-scrollbar-track { background: var(--bg-tertiary); }
         #chat-container::-webkit-scrollbar-thumb, #chat-history-list::-webkit-scrollbar-thumb { background: var(--text-secondary); border-radius: 3px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .message-bubble { max-width: 85%; word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; animation: fadeIn 0.3s ease-out; position: relative; }
-        .user-bubble { background-image: none; background-color: #2f2f2f; color: #ffffff; }
-        .ai-bubble { background-color: var(--bg-tertiary); color: var(--text-primary); }
+
+        /* Purana .message-bubble hata kar yeh naya code daalein */
+
+.message-bubble {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    animation: fadeIn 0.3s ease-out;
+    position: relative;
+}
+
+/* User ka message 85% hi rahega taki wo chat jaisa lage */
+.user-bubble {
+    max-width: 85%;
+    background-image: none;
+    background-color: #2f2f2f;
+    color: #ffffff;
+    margin-left: auto; /* Right side align karne ke liye */
+}
+
+/* AI ka message aur Code block ab 100% width lenge */
+.ai-bubble {
+    width: 100%;         /* Full width */
+    max-width: 100%;     /* Full screen limit */
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: 10px 20px;  /* Thoda padding taki kinare se chipke nahi */
+}
+
+/* Code block (PRE tag) ko full aur sundar banane ke liye */
+pre {
+    background-color: #0d0d0d; /* Thoda dark background */
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto; /* Horizontal scroll agar code lamba ho */
+    margin: 15px 0;
+    color: #e0e0e0;
+    width: 100%;  /* Code block full width */
+    border: 1px solid #333; /* Border for better look */
+}
+
         .typing-indicator span, .image-loader span { height: 8px; width: 8px; background-color: var(--text-secondary); border-radius: 50%; display: inline-block; animation: bounce 1.4s infinite ease-in-out both; }
         .typing-indicator span:nth-child(1), .image-loader span:nth-child(1) { animation-delay: -0.32s; } 
         .typing-indicator span:nth-child(2), .image-loader span:nth-child(2) { animation-delay: -0.16s; }
@@ -1170,26 +1199,20 @@ async function typeWriter(element, markdownText) {
     });
 }
 
-// ✅ UPDATED addMessageToUI
-
-// ✅ FINAL FIXED addMessageToUI (Detects Code for Full Width)
+// ✅ UPDATED addMessageToUI (Full Width Code Fix)
 async function addMessageToUI(sender, message, animate = false) {
     const wrapper = document.createElement('div');
-    wrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} w-full mb-4`;
+    // User right mein, AI left mein (lekin full width)
+    wrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} w-full mb-4`; 
     
     const bubble = document.createElement('div');
 
-    // Check karein ki message mein Code Block hai ya nahi
-    const hasCode = message.includes('```');
-
     if (sender === 'user') {
-        // User Message: Right side, limited width
-        bubble.className = 'message-bubble p-3 rounded-2xl user-bubble text-white max-w-[85%] rounded-br-none ml-auto';
+        // User ka bubble waisa hi rahega
+        bubble.className = 'message-bubble p-3 rounded-2xl user-bubble text-white';
     } else {
-        // AI Message: 
-        // Agar Code hai (hasCode) -> w-full (Poori Width)
-        // Agar Text hai -> w-fit (Jitna text utni jagah)
-        bubble.className = `message-bubble py-2 px-3 text-[var(--text-primary)] ai-message rounded-bl-none ${hasCode ? 'w-full' : 'w-fit max-w-[95%]'}`; 
+        // AI ka bubble ab FULL WIDTH lega
+        bubble.className = 'message-bubble py-4 px-4 w-full text-[var(--text-primary)] ai-bubble';
     }
     
     wrapper.appendChild(bubble);
@@ -1204,7 +1227,7 @@ async function addMessageToUI(sender, message, animate = false) {
     } 
     else if (sender === 'model') {
         const contentDiv = document.createElement('div');
-        // w-full zaroori hai taaki black box fail sake
+        // Prose class hatayi taki width limit na ho
         contentDiv.className = "leading-relaxed text-base w-full overflow-hidden"; 
         bubble.appendChild(contentDiv);
 
@@ -1217,17 +1240,19 @@ async function addMessageToUI(sender, message, animate = false) {
             });
         }
 
-        // --- Buttons (Copy / Speak) ---
+        // --- BUTTONS (Copy + Speak) ---
         if (!message.includes('```')) {
              const actionDiv = document.createElement('div');
-             actionDiv.className = "flex items-center mt-2 space-x-3";
+             actionDiv.className = "flex items-center mt-3 space-x-3 border-t border-gray-700/30 pt-2";
 
+             // Speaker Button
              const speakButton = document.createElement('button');
              speakButton.className = 'text-gray-400 hover:text-blue-400 transition-colors p-1 rounded-full hover:bg-gray-800/30';
              speakButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
-             speakButton.onclick = () => toggleSpeech(message, speakButton); 
+             speakButton.onclick = () => toggleSpeech(message, speakButton);
              actionDiv.appendChild(speakButton);
 
+             // Copy Button
              const copyButton = document.createElement('button');
              copyButton.className = 'text-gray-400 hover:text-green-400 transition-colors p-1 rounded-full hover:bg-gray-800/30'; 
              copyButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
@@ -1237,13 +1262,15 @@ async function addMessageToUI(sender, message, animate = false) {
                 setTimeout(() => copyButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`, 2000);
              };
              actionDiv.appendChild(copyButton);
+
              bubble.appendChild(actionDiv);
         }
     }
-
+    
     const chatContainer = document.getElementById('chat-container');
     chatContainer.scrollTop = chatContainer.scrollHeight;
 }
+
   
         function addMessageWithAction(message, buttonText, buttonIcon, url) {
             const wrapper = document.createElement('div');
