@@ -903,23 +903,32 @@ function loadVoices() {
 // --- NEW HELPER: Text Cleaning for Better Voice ---
 function cleanTextForTTS(text) {
     return text
-        // 1. Code Blocks ko 'skip' karein (Pura code padhne se bachein)
+        // 1. Code Blocks ko skip karein (Pura code padhne se bachein)
         .replace(/```[\s\S]*?```/g, ' Yahan code diya gaya hai. ')
         
-        // 2. Bold/Italic formatting hatayein (**text** -> text)
-        .replace(/\*\*(.*?)\*\*/g, '$1')
-        .replace(/\*(.*?)\*/g, '$1')
-        
-        // 3. URLs/Links hatayein
+        // 2. URLs/Links hatayein
         .replace(/https?:\/\/\S+/g, 'link')
         
-        // 4. Markdown Symbols hatayein (#, >, `) lekin Punctuation (. , ? !) rakhein
-        .replace(/[#_`>]/g, '')
-        
-        // 5. Numbered Lists ko pause ke liye adjust karein (Example: "1." -> "Point 1.")
-        // Yeh optional hai, agar simple rakhna hai to bas regex se clean karein
-        
-        // 6. Extra spaces aur lines ko single space karein
+        // 3. Bold/Italic ke stars (**) hatayein, taaki "Star Star" na bole
+        .replace(/\*\*/g, '') 
+        .replace(/\*/g, '')   
+        .replace(/__/g, '')   
+
+        // 4. Bullet Points (* ya -) jo line ke shuru mein ho, unhe hata dein
+        // Isse wo "Dash" ya "Star" nahi bolega, seedha point padhega
+        .replace(/^[\*\-]\s+/gm, '') 
+
+        // 5. Numbered Lists (1. 2.) ka DOT (.) hata kar COMMA (,) lagayein
+        // Isse wo "One Dot" nahi bolega, balki "One [pause]" bolega.
+        .replace(/^\s*(\d+)\.\s+/gm, '$1, ') 
+
+        // 6. Colons (:) ko bhi comma banayein taaki natural pause mile
+        .replace(/:/g, ', ')
+
+        // 7. Hash (#) headings hatayein
+        .replace(/#/g, '')
+
+        // 8. Extra spaces clean karein
         .replace(/\s+/g, ' ').trim();
 }
 
