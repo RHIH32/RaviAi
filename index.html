@@ -1353,50 +1353,29 @@ async function addMessageToUI(sender, message, animate = false) {
             bubble.appendChild(button);
         }
 
-  async function getAIResponse(prompt, fileData = null) {
-    // YAHAN MAINE "STRICT RESPONSE STYLE" ADD KIYA HAI
-    const systemPrompt = `You are "IndusGPT", a smart, structured, and friendly AI assistant created by Ravi Kumar.
+ // ✅ UPDATED getAIResponse (Force Step-by-Step Style)
+async function getAIResponse(prompt, fileData = null) {
+    // 1. System Prompt (General Rules)
+    const systemPrompt = `You are "IndusGPT", created by Ravi Kumar. 
+    **STRICT FORMATTING RULES:**
+    - **ALWAYS** use Numbered Lists (1., 2., 3.) or Bullet Points.
+    - **NEVER** write long paragraphs.
+    - **EXPLAIN** things Step-by-Step.
+    - **LANGUAGE:** Hinglish (Hindi + English).
+    
+    If asked for actions (Google/YouTube/Image), return ONLY JSON.`;
 
-    **YOUR RESPONSE STYLE IS STRICTLY "STEP-BY-STEP":**
-    1.  **NO LONG PARAGRAPHS:** Do not write long, book-ish paragraphs.
-    2.  **USE NUMBERED LISTS:** Break down answers into numbered steps (1., 2., 3.).
-    3.  **USE BULLET POINTS:** For features or lists, use bullet points (*).
-    4.  **STEP-BY-STEP EXPLANATION:** Explain complex topics in clear steps (Step 1, Step 2...).
-    5.  **LANGUAGE:** Converse primarily in Hinglish (Hindi + English mix).
-    6.  **EMOJIS:** Use emojis to make it engaging 🌟.
-
-    **Example of how you should reply:**
-    "Haan, main yeh kar sakta hoon. Yahan steps hain:
-    1.  **Step 1:** Pehle file open karein.
-    2.  **Step 2:** Phir edit button dabayein.
-    3.  **Step 3:** Save kar dein."
-
-    **Core Instructions:**
-    - **Identity:** When asked about your name/creator: "Main ek IndusGPT assistant hu. Mujhe India ke developer Ravi Kumar ne banaya hai 🇮🇳."
-    - **Formatting:** Use LaTeX ($E=mc^2$) for math.
-    - **File Analysis:** Analyze files step-by-step.
-    - **Deep Research:** If enabled, provide accurate, latest info.
-
-    **Real-Time Info (News/Time):**
-    - **News:** Say: "Main AI hoon, real-time news nahi hai, par main search kar sakta hoon 🧐" (Then give Google JSON).
-    - **Time:** Say: "Kripya apne device ki clock dekhein 🕒."
-
-    **Action Commands (JSON - DO NOT CHANGE):**
-    If the user asks for these, output ONLY JSON:
-    - **Google:** {"action": "google", "query": "..."}
-    - **YouTube:** {"action": "youtube", "query": "..."}
-    - **WhatsApp:** {"action": "whatsapp", "number": "...", "message": "..."}
-    - **Call:** {"action": "call", "number": "..."}
-    - **Image:** {"action": "generate_image", "prompt": "..."}
-
-    **Code Formatting:**
-    Always use markdown code blocks (\`\`\`javascript ... \`\`\`).
-    `;
+    // 2. Secret Reminder (Har message ke sath ye hidden instruction jayega)
+    const styleReminder = "\n\n[SYSTEM INSTRUCTION: Please answer this strictly in Step-by-Step points or Numbered List. Do not write long paragraphs.]";
+    
+    // User ka asli message + Reminder join kar diya
+    const finalPrompt = prompt + styleReminder;
 
     const currentChatHistory = conversations[activeChatId]?.messages || [];
-    const userPromptParts = [{ text: prompt }];
     
-    // File Handling
+    // UI me dikhane ke liye nahi, bas API ko bhejne ke liye 'finalPrompt' use karenge
+    const userPromptParts = [{ text: finalPrompt }];
+    
     if (fileData) {
         userPromptParts.push({
             inlineData: {
@@ -1406,21 +1385,27 @@ async function addMessageToUI(sender, message, animate = false) {
         });
     }
 
-    // Prepare Payload
     const apiHistory = [ ...currentChatHistory, { role: "user", parts: userPromptParts } ];
     const payload = { contents: apiHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
     
     // API Call
-    const response = await fetch('https://raviai-1h96.onrender.com/api/generate', { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(payload) 
-    });
-    
-    if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
-    const result = await response.json();
-    if (result.text) return result.text;
-    throw new Error("Invalid API response structure.");
+    try {
+        const response = await fetch('https://raviai-1h96.onrender.com/api/generate', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify(payload) 
+        });
+        
+        if (!response.ok) throw new Error(`API Status: ${response.status}`);
+        const result = await response.json();
+        
+        if (result.text) return result.text;
+        throw new Error("Invalid API response.");
+        
+    } catch (error) {
+        console.error(error);
+        return "Maaf kijiye, server connect nahi ho raha. Kuch der baad try karein. 😓";
+    }
 }
         
         async function generateImage(prompt) {
