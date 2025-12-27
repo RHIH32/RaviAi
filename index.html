@@ -148,15 +148,61 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col main-content overflow-hidden">
             <!-- Header -->
-            <header class="header backdrop-blur-sm p-4 pt-8 flex items-center justify-between z-10 border-b">
-                <div class="flex items-center">
-                    <button id="menu-button" class="hidden mr-4"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
-                    <img src="logooo-removebg-preview.png" alt="IndusGPT Logo" class="h-10 w-10 rounded-full bg-white/10 p-1 object-cover">
-                    <h1 class="animated-text text-xl font-bold ml-2">IndusGPT</h1>
+           <header class="header backdrop-blur-sm p-4 pt-8 flex items-center justify-between z-10 border-b relative">
+    <div class="flex items-center">
+        <button id="menu-button" class="hidden mr-4"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
+        <img src="logooo-removebg-preview.png" alt="IndusGPT Logo" class="h-10 w-10 rounded-full bg-white/10 p-1 object-cover">
+        <h1 class="animated-text text-xl font-bold ml-2">IndusGPT</h1>
+    </div>
+
+    <div class="relative">
+        <button id="header-profile-btn" class="focus:outline-none ring-2 ring-transparent hover:ring-indigo-500 rounded-full transition-all">
+            <img id="header-profile-img" src="https://ui-avatars.com/api/?name=User&background=random" alt="Profile" class="h-10 w-10 rounded-full object-cover border border-gray-600">
+        </button>
+
+        <div id="header-profile-dropdown" class="hidden absolute right-0 mt-3 w-72 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl shadow-2xl z-50 overflow-hidden transform origin-top-right transition-all">
+            
+            <div class="p-6 text-center border-b border-[var(--border-color)] bg-[var(--bg-tertiary)]">
+                <div class="relative inline-block">
+                    <img id="dropdown-profile-img" src="https://ui-avatars.com/api/?name=User&background=random" class="h-20 w-20 rounded-full object-cover border-4 border-[var(--bg-secondary)] shadow-lg mx-auto">
+                    <label for="profile-upload-input" class="absolute bottom-0 right-0 bg-blue-600 text-white p-1.5 rounded-full cursor-pointer hover:bg-blue-700 shadow-md transition-colors" title="Change Photo">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    </label>
+                    <input type="file" id="profile-upload-input" class="hidden" accept="image/*">
                 </div>
-                <div class="flex items-center space-x-4">
+                <h3 id="dropdown-name" class="mt-3 text-lg font-bold text-[var(--text-primary)]">Guest User</h3>
+                <p class="text-xs text-green-400 font-medium">Online</p>
+            </div>
+
+            <div class="p-4 space-y-3">
+                <div class="flex items-center p-2 rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors">
+                    <div class="bg-indigo-500/20 p-2 rounded-full mr-3 text-indigo-400">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-[var(--text-secondary)]">Email</p>
+                        <p id="dropdown-email" class="text-sm font-medium text-[var(--text-primary)] truncate max-w-[180px]">guest@example.com</p>
+                    </div>
                 </div>
-            </header>
+
+                <div class="flex items-center p-2 rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors">
+                    <div class="bg-purple-500/20 p-2 rounded-full mr-3 text-purple-400">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-[var(--text-secondary)]">Phone</p>
+                        <p id="dropdown-phone" class="text-sm font-medium text-[var(--text-primary)]">Not Added</p>
+                    </div>
+                </div>
+
+                <button class="w-full mt-2 flex items-center justify-center p-2 border border-[var(--border-color)] rounded-xl hover:bg-[var(--bg-tertiary)] transition-all text-[var(--text-primary)] text-sm font-medium">
+                    <svg class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    Settings
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
 
             <main id="chat-container" class="flex-1 p-4 space-y-4 overflow-y-auto"></main>
 
@@ -469,6 +515,99 @@ window.showLanguagePackGuide = function() {
             setupIcons();
             setupEventListeners();
       }
+
+
+
+        // --- Profile Elements ---
+const headerProfileBtn = document.getElementById('header-profile-btn');
+const headerProfileDropdown = document.getElementById('header-profile-dropdown');
+const profileUploadInput = document.getElementById('profile-upload-input');
+const headerProfileImg = document.getElementById('header-profile-img');
+const dropdownProfileImg = document.getElementById('dropdown-profile-img');
+const dropdownName = document.getElementById('dropdown-name');
+const dropdownEmail = document.getElementById('dropdown-email');
+const dropdownPhone = document.getElementById('dropdown-phone');
+
+// --- Updated handleLogin Function ---
+// Is function ko apne purane handleLogin se replace karein
+function handleLogin(username, email = 'guest@example.com', photoUrl = null) {
+    currentUser = username;
+    currentUserEmail = email;
+    
+    // LocalStorage mein save karein
+    localStorage.setItem('ravi-ai-user', username);
+    localStorage.setItem('ravi-ai-email', email);
+    
+    // Profile Update Logic
+    updateProfileUI(username, email, photoUrl);
+    
+    showChatInterface();
+}
+
+// --- Helper Function to Update Profile UI ---
+function updateProfileUI(name, email, photoUrl) {
+    // 1. Name & Email Set karein
+    if(dropdownName) dropdownName.textContent = name;
+    if(dropdownEmail) dropdownEmail.textContent = email;
+    
+    // 2. Phone Number (Random Logic for Demo, Firebase Auth se asli number bhi le sakte hain)
+    // Filhal agar user guest nahi hai to number dikhayein
+    if (name !== 'Guest') {
+        const storedPhone = localStorage.getItem('ravi-ai-phone') || '+91 98765 43210';
+        if(dropdownPhone) dropdownPhone.textContent = storedPhone;
+    } else {
+        if(dropdownPhone) dropdownPhone.textContent = "Not Added";
+    }
+
+    // 3. Photo Logic (Priority: LocalUpload > FirebaseURL > Default)
+    const localPhoto = localStorage.getItem('ravi-ai-profile-pic');
+    const finalPhoto = localPhoto || photoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6366f1&color=fff`;
+    
+    if(headerProfileImg) headerProfileImg.src = finalPhoto;
+    if(dropdownProfileImg) dropdownProfileImg.src = finalPhoto;
+}
+
+// --- Event Listeners for Profile ---
+// Yeh setupEventListeners function ke andar add karein
+
+// 1. Dropdown Toggle
+headerProfileBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    headerProfileDropdown.classList.toggle('hidden');
+});
+
+// 2. Click Outside to Close
+document.addEventListener('click', (e) => {
+    if (!headerProfileDropdown.classList.contains('hidden') && 
+        !headerProfileDropdown.contains(e.target) && 
+        !headerProfileBtn.contains(e.target)) {
+        headerProfileDropdown.classList.add('hidden');
+    }
+});
+
+// 3. Photo Upload & Save Logic
+profileUploadInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const base64Image = event.target.result;
+            // UI Update
+            headerProfileImg.src = base64Image;
+            dropdownProfileImg.src = base64Image;
+            // Save to Storage
+            localStorage.setItem('ravi-ai-profile-pic', base64Image);
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// 4. Initial Load Check (Initialize function ke andar call karein)
+const savedUser = localStorage.getItem('ravi-ai-user');
+const savedEmail = localStorage.getItem('ravi-ai-email');
+if(savedUser) {
+    updateProfileUI(savedUser, savedEmail);
+}
         // --- setupIcons ---
         function setupIcons() {
             micButton.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>`;
