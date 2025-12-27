@@ -65,18 +65,41 @@
 }
 
 /* --- Code Block Styling --- */
+/* --- Code Block Styling Updated --- */
 pre {
-    background-color: #1e1e1e !important; /* Sirf Code ka background rahega */
-    border: none !important; /* Border HATA diya */
+    background-color: #1e1e1e !important;
+    border: none !important;
     border-radius: 8px;
-    padding: 15px;
+    padding: 35px 15px 15px 15px; /* Top padding badhayi taki button ke liye jagah mile */
     overflow-x: auto;
     margin: 15px 0;
     color: #e0e0e0;
     width: 100%;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3); /* Thoda sa shadow taaki code utha hua lage */
+    position: relative; /* ZAROORI: Button ko set karne ke liye */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
 
+/* Code Copy Button Styling */
+.code-copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: #a1a1aa;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.code-copy-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
 code {
     font-family: 'Courier New', Courier, monospace;
     font-size: 14px;
@@ -1206,18 +1229,16 @@ async function typeWriter(element, markdownText) {
 }
 
 // ✅ UPDATED addMessageToUI (Full Width Code Fix)
+// ✅ UPDATED addMessageToUI (With Code Copy Button)
 async function addMessageToUI(sender, message, animate = false) {
     const wrapper = document.createElement('div');
-    // User right mein, AI left mein (lekin full width)
     wrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} w-full mb-4`; 
     
     const bubble = document.createElement('div');
 
     if (sender === 'user') {
-        // User ka bubble waisa hi rahega
         bubble.className = 'message-bubble p-3 rounded-2xl user-bubble text-white';
     } else {
-        // AI ka bubble ab FULL WIDTH lega
         bubble.className = 'message-bubble py-4 px-4 w-full text-[var(--text-primary)] ai-bubble';
     }
     
@@ -1233,7 +1254,6 @@ async function addMessageToUI(sender, message, animate = false) {
     } 
     else if (sender === 'model') {
         const contentDiv = document.createElement('div');
-        // Prose class hatayi taki width limit na ho
         contentDiv.className = "leading-relaxed text-base w-full overflow-hidden"; 
         bubble.appendChild(contentDiv);
 
@@ -1246,19 +1266,44 @@ async function addMessageToUI(sender, message, animate = false) {
             });
         }
 
-        // --- BUTTONS (Copy + Speak) ---
+        // --- 🟢 NEW: Add Copy Button INSIDE Code Blocks ---
+        contentDiv.querySelectorAll('pre').forEach(pre => {
+            // Agar button pehle se nahi hai
+            if (!pre.querySelector('.code-copy-btn')) {
+                const btn = document.createElement('button');
+                btn.className = 'code-copy-btn';
+                // Copy Icon
+                btn.innerHTML = `<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
+                
+                btn.onclick = () => {
+                    const code = pre.querySelector('code').innerText;
+                    navigator.clipboard.writeText(code);
+                    
+                    // Icon change to Checkmark temporarily
+                    btn.innerHTML = `<svg class="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`;
+                    setTimeout(() => {
+                        btn.innerHTML = `<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
+                    }, 2000);
+                };
+                
+                pre.appendChild(btn);
+            }
+        });
+
+        // --- BUTTONS (Global Copy + Speak for text) ---
+        // Code blocks ke liye alag button hai, isliye isse sirf text ke liye rakhte hain
         if (!message.includes('```')) {
              const actionDiv = document.createElement('div');
-             actionDiv.className = "flex items-center mt-3 space-x-3 border-t border-gray-700/30 pt-2";
+             actionDiv.className = "flex items-center mt-2 space-x-3 pt-1";
 
-             // Speaker Button
+             // Speaker
              const speakButton = document.createElement('button');
              speakButton.className = 'text-gray-400 hover:text-blue-400 transition-colors p-1 rounded-full hover:bg-gray-800/30';
              speakButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
              speakButton.onclick = () => toggleSpeech(message, speakButton);
              actionDiv.appendChild(speakButton);
 
-             // Copy Button
+             // Global Copy
              const copyButton = document.createElement('button');
              copyButton.className = 'text-gray-400 hover:text-green-400 transition-colors p-1 rounded-full hover:bg-gray-800/30'; 
              copyButton.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`;
