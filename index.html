@@ -136,11 +136,7 @@
                 <h3 class="text-sm font-semibold px-2 mb-2 sidebar-subtext">Recent Chats</h3>
                 <div id="chat-history-list" class="flex-1 overflow-y-auto space-y-2"></div>
                 <div class="border-t my-2 border-color"></div>
-                <div id="profile-section" class="p-2 rounded-lg profile-bg">
-                    <h3 class="text-sm font-semibold mb-1 sidebar-subtext">Profile</h3>
-                    <p id="profile-name" class="text-sm truncate sidebar-text"></p>
-                    <p id="profile-email" class="text-xs truncate sidebar-subtext"></p>
-                </div>
+                
                 <!-- Privacy and Terms Links -->
                 <div class="flex items-center justify-between mt-4 flex-shrink-0">
                     <button id="theme-toggle-button" class="p-2 rounded-full sidebar-button"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg></button>
@@ -371,8 +367,6 @@ Your subscription payments are handled by our secure third-party payment partner
         const newChatButton = document.getElementById('new-chat-button');
         const chatHistoryList = document.getElementById('chat-history-list');
         const themeToggleButton = document.getElementById('theme-toggle-button');
-        const profileName = document.getElementById('profile-name');
-        const profileEmail = document.getElementById('profile-email');
         const fileInput = document.getElementById('file-input');
         const filePreviewContainer = document.getElementById('file-preview-container');
         const filePreviewName = document.getElementById('file-preview-name');
@@ -490,8 +484,6 @@ window.showLanguagePackGuide = function() {
         }
 
         function showChatInterface() {
-           if(profileName) profileName.textContent = currentUser;
-           if(profileEmail) profileEmail.textContent = currentUserEmail;
             loginScreen.classList.add('hidden');
             appContainer.classList.remove('hidden');
             appContainer.classList.add('flex');
