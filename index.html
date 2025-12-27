@@ -900,68 +900,56 @@ function loadVoices() {
     console.log("Voices loaded. Hindi voice:", hindiVoice ? hindiVoice.name : "None");
 }
 
+// --- NEW HELPER: Text Cleaning for Better Voice ---
+function cleanTextForTTS(text) {
+    return text
+        // 1. Code Blocks ko 'skip' karein (Pura code padhne se bachein)
+        .replace(/```[\s\S]*?```/g, ' Yahan code diya gaya hai. ')
+        
+        // 2. Bold/Italic formatting hatayein (**text** -> text)
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1')
+        
+        // 3. URLs/Links hatayein
+        .replace(/https?:\/\/\S+/g, 'link')
+        
+        // 4. Markdown Symbols hatayein (#, >, `) lekin Punctuation (. , ? !) rakhein
+        .replace(/[#_`>]/g, '')
+        
+        // 5. Numbered Lists ko pause ke liye adjust karein (Example: "1." -> "Point 1.")
+        // Yeh optional hai, agar simple rakhna hai to bas regex se clean karein
+        
+        // 6. Extra spaces aur lines ko single space karein
+        .replace(/\s+/g, ' ').trim();
+}
+
+// --- UPDATED SPEAK FUNCTION ---
 function speak(text) {
-    // 1. Pehle agar kuch bol raha hai to chup karao
-    if (synth) {
-        synth.cancel();
-    }
-    
-    // Agar Android hai to Android ka stop function call karo (agar available ho)
-    if (window.Android && typeof window.Android.stopSpeak === 'function') {
-        window.Android.stopSpeak();
-    }
+    if (synth) synth.cancel(); // Purana bolna band karein
+    if (window.Android && typeof window.Android.stopSpeak === 'function') window.Android.stopSpeak();
 
     if (!text || isMuted) return;
 
-    // Text cleaning (Markdown/Symbols hatana)
-    let cleanText = text
-        .replace(/([^\w\s\u0900-\u097F])/g, '') // Special chars hatana
-        .replace(/\*\*(.*?)\*\*/g, '$1')        // Bold hatana
-        .replace(/\*(.*?)\*/g, '$1')            // Italic hatana
-        .replace(/[#*_`]/g, '');                // Markdown symbols hatana
+    // Naya Cleaner Use Karein (Isme Punctuation bachegi, to voice pause legi)
+    let cleanText = cleanTextForTTS(text);
 
-    // 2. Naya Text Bolo
     if (window.Android && typeof window.Android.speak === 'function') {
         window.Android.speak(cleanText);
     } else if (synth) {
         const utterance = new SpeechSynthesisUtterance(cleanText);
         if (hindiVoice) utterance.voice = hindiVoice;
+        
+        // --- Professional Settings ---
+        utterance.rate = 0.9;  // Thoda dhire (Clear aur Professional lagta hai)
+        utterance.pitch = 1.0; // Normal pitch (Friendly)
+        
         speechSynthesis.speak(utterance);
     }
 }
 
-
-
-        // ✅ NEW: Play/Stop Toggle Logic
-function toggleSpeech(text, btnElement) {
-    
-    // Icons Define karein
-    const speakerIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
-    const stopIcon = `<svg class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg>`;
-
-    // 1. Agar wahi button dobara dabaya gaya (STOP karna hai)
-    if (currentPlayingBtn === btnElement) {
-        stopAudio();
-        btnElement.innerHTML = speakerIcon; // Wapas speaker bana do
-        currentPlayingBtn = null;
-        return;
-    }
-
-    // 2. Agar koi aur button pehle se baj raha hai, to use band karo
-    if (currentPlayingBtn) {
-        stopAudio();
-        currentPlayingBtn.innerHTML = speakerIcon; // Purane wale ko reset karo
-    }
-
-    // 3. Naya audio shuru karo
-    startAudio(text);
-    btnElement.innerHTML = stopIcon; // Button ko STOP icon bana do
-    currentPlayingBtn = btnElement;  // Is button ko current set karo
-}
-
-// Audio start karne ka logic
+// --- UPDATED START AUDIO (Toggle Button ke liye) ---
 function startAudio(text) {
-    let cleanText = text.replace(/([^\w\s\u0900-\u097F])/g, '').replace(/\*\*(.*?)\*\*/g, '$1').replace(/[#*_`]/g, '');
+    let cleanText = cleanTextForTTS(text);
     
     if (window.Android && typeof window.Android.speak === 'function') {
         window.Android.speak(cleanText);
@@ -969,7 +957,10 @@ function startAudio(text) {
         const utterance = new SpeechSynthesisUtterance(cleanText);
         if (hindiVoice) utterance.voice = hindiVoice;
         
-        // Jab bolna khatam ho jaye, to icon wapas reset karo
+        // --- Professional Settings ---
+        utterance.rate = 0.9; // Speed thodi kam (Professional feel ke liye)
+        
+        // Jab bolna khatam ho, icon wapas badal dein
         utterance.onend = () => {
             if (currentPlayingBtn) {
                 currentPlayingBtn.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
@@ -980,6 +971,27 @@ function startAudio(text) {
     }
 }
 
+// --- TOGGLE SPEECH FUNCTION (No Change needed here, but ensure it calls startAudio) ---
+function toggleSpeech(text, btnElement) {
+    const speakerIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
+    const stopIcon = `<svg class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg>`;
+
+    if (currentPlayingBtn === btnElement) {
+        stopAudio();
+        btnElement.innerHTML = speakerIcon;
+        currentPlayingBtn = null;
+        return;
+    }
+
+    if (currentPlayingBtn) {
+        stopAudio();
+        currentPlayingBtn.innerHTML = speakerIcon;
+    }
+
+    startAudio(text);
+    btnElement.innerHTML = stopIcon;
+    currentPlayingBtn = btnElement;
+}
 
 // Audio stop karne ka logic
 function stopAudio() {
