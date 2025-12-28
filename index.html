@@ -1455,26 +1455,19 @@ async function addMessageToUI(sender, message, animate = false) {
             throw new Error("Invalid API response structure.");
         }
 
-        async function generateImage(prompt) {
-            const enhancedPrompt = `${prompt}, 8k, photorealistic, highly detailed, professional photography, sharp focus, cinematic lighting`;
-            const payload = { prompt: enhancedPrompt };
-            const response = await fetch('https://raviai-1h96.onrender.com/api/generate-image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error(`Image generation failed with status ${response.status}`);
-            const result = await response.json();
-            if (result.base64Image) return result.base64Image;
-            throw new Error("Invalid image response structure.");
-        }
-        
-        
-        async function generateImage(prompt) {
-            const enhancedPrompt = `${prompt}, 8k, photorealistic, highly detailed, professional photography, sharp focus, cinematic lighting`;
-            const payload = { prompt: enhancedPrompt };
-            const response = await fetch('https://raviai-1h96.onrender.com/api/generate-image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error(`Image generation failed with status ${response.status}`);
-            const result = await response.json();
-            if (result.base64Image) return result.base64Image;
-            throw new Error("Invalid image response structure.");
-        }
+       // ✅ UPDATED generateImage (No Auto-Enhancement)
+    async function generateImage(prompt) {
+    // Humne zabardasti ke keywords hata diye hain.
+    // Ab jo user likhega, wahi model ke paas jayega.
+    const enhancedPrompt = prompt;
+
+    const payload = { prompt: enhancedPrompt };
+    const response = await fetch('https://raviai-1h96.onrender.com/api/generate-image', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    if (!response.ok) throw new Error(`Image generation failed with status ${response.status}`);
+    const result = await response.json();
+    if (result.base64Image) return result.base64Image;
+    throw new Error("Invalid image response structure.");
+}
         
         function readFileAsBase64(file) {
             return new Promise((resolve, reject) => {
@@ -1647,19 +1640,23 @@ chatForm.addEventListener('submit', async (e) => {
     if (!userMessage && !selectedFile) return;
 
     synth?.cancel(); // Purana bolna band karo
-
+   
     // --- STEP 1: KEYWORD CHECK (Gemini ko Bypass karne ke liye) ---
-    // In shabdon se hum pakad lenge ki user photo maang raha hai
-    const imageKeywords = [
-        "image", "photo", "tasveer", "picture", "drawing", "sketch", "banao", "create", "generate", "draw"
-    ];
-    
-    // Check karein ki kya user ne "Toggle" on kiya hai YA keyword match ho raha hai
-    // Logic: Agar message me "photo" aur "banao" dono aa jaye, ya "create image" aa jaye
-    const isImageRequest = createImageToggle.checked || (
-        (userMessage.toLowerCase().includes("photo") || userMessage.toLowerCase().includes("image") || userMessage.toLowerCase().includes("tasveer")) &&
-        (userMessage.toLowerCase().includes("banao") || userMessage.toLowerCase().includes("create") || userMessage.toLowerCase().includes("generate") || userMessage.toLowerCase().includes("dikhao"))
-    );
+const lowerCaseMessage = userMessage.toLowerCase();
+
+// 1. Strong Start keywords (Agar sentence इनसे शुरू हो)
+const startsWithImageCommand = lowerCaseMessage.startsWith("draw") ||
+                               lowerCaseMessage.startsWith("create a") ||
+                               lowerCaseMessage.startsWith("generate a");
+
+// 2. Hindi specific combination (Noun + Verb combination)
+// Jaise "photo banao", "tasveer dikhao"
+const hasHindiCombination = (lowerCaseMessage.includes("photo") || lowerCaseMessage.includes("tasveer") || lowerCaseMessage.includes("image") || lowerCaseMessage.includes("sketch")) &&
+                            (lowerCaseMessage.includes("banao") || lowerCaseMessage.includes("create") || lowerCaseMessage.includes("generate") || lowerCaseMessage.includes("dikhao") || lowerCaseMessage.includes("chahiye"));
+
+
+// Final Check: Toggle ON hai, YA Strong Start hai, YA Hindi Combination hai
+const isImageRequest = createImageToggle.checked || startsWithImageCommand || hasHindiCombination;
 
     // --- STEP 2: IMAGE GENERATION (Direct Call - No Gemini) ---
     if (isImageRequest) {
