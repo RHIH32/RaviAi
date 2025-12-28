@@ -1433,6 +1433,10 @@ async function addMessageToUI(sender, message, animate = false) {
             \`\`\`javascript
             console.log("Hello, World!");
             \`\`\``;
+
+                // Check karein ki Deep Research Toggle ON hai ya nahi
+            const deepResearchToggle = document.getElementById('deep-research-toggle');
+            const isDeepResearch = deepResearchToggle ? deepResearchToggle.checked : false;
             
             const currentChatHistory = conversations[activeChatId]?.messages || [];
             const userPromptParts = [{ text: prompt }];
@@ -1445,14 +1449,19 @@ async function addMessageToUI(sender, message, animate = false) {
                 });
             }
 
-            const apiHistory = [ ...currentChatHistory, { role: "user", parts: userPromptParts } ];
-            const payload = { contents: apiHistory, systemInstruction: { parts: [{ text: systemPrompt }] } };
-            const response = await fetch('https://raviai-1h96.onrender.com/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error(`API request failed with status ${response.status}`);
-            const result = await response.json();
-            if (result.text) return result.text;
-            throw new Error("Invalid API response structure.");
-        }
+        const apiHistory = [ ...currentChatHistory, { role: "user", parts: userPromptParts } ];
+     // Payload me 'isDeepResearch' bhejein
+        const payload = { 
+        contents: apiHistory, 
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        isDeepResearch: isDeepResearch // <--- New Param
+    };
+
+    const response = await fetch('https://raviai-1h96.onrender.com/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    if (!response.ok) throw new Error(`API error`);
+    const result = await response.json();
+    return result.text;
+}
 
        // ✅ UPDATED generateImage (No Auto-Enhancement)
     async function generateImage(prompt) {
