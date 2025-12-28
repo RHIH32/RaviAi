@@ -502,7 +502,6 @@ Your subscription payments are handled by our secure third-party payment partner
         const sendButton = document.getElementById('send-button');
         const typingIndicator = document.getElementById('typing-indicator');
         const micButton = document.getElementById('mic-button');
-        const muteButton = document.getElementById('mute-button');
         const sidebar = document.getElementById('sidebar');
         const menuButton = document.getElementById('menu-button');
         const collapseSidebarButton = document.getElementById('collapse-sidebar-button');
@@ -718,7 +717,6 @@ if(savedUser) {
             micButton.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>`;
             sendButton.innerHTML = `<svg class="h-6 w-6 transform rotate-90" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>`;
             optionsMenuButton.innerHTML = `<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6" /></svg>`;
-            updateMuteButtonIcon();
         }
         
         // --- UI Switching & State ---
@@ -1014,11 +1012,7 @@ function stopAudio() {
     }
 }
 
-function updateMuteButtonIcon() {
-    if (muteButton) {
-        muteButton.innerHTML = isMuted ? speakerOffIcon : speakerOnIcon;
-    }
-}
+
 
 if (isSpeechSupported) {
     console.log("Speech Synthesis is supported.");
