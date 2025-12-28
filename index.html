@@ -900,7 +900,7 @@ function loadVoices() {
     console.log("Voices loaded. Hindi voice:", hindiVoice ? hindiVoice.name : "None");
 }
 
-// --- NEW HELPER: Text Cleaning for Better Voice ---
+// --- NEW HELPER: Text Cleaning for Better Voice (Smart) ---
 function cleanTextForTTS(text) {
     return text
         // 1. Code Blocks ko skip karein (Pura code padhne se bachein)
@@ -932,31 +932,35 @@ function cleanTextForTTS(text) {
         .replace(/\s+/g, ' ').trim();
 }
 
-// --- UPDATED SPEAK FUNCTION ---
+// --- UPDATED SPEAK FUNCTION (Professional Tone) ---
 function speak(text) {
-    if (synth) synth.cancel(); // Purana bolna band karein
+    // Purana bolna cancel karein
+    if (synth) synth.cancel(); 
     if (window.Android && typeof window.Android.stopSpeak === 'function') window.Android.stopSpeak();
 
     if (!text || isMuted) return;
 
-    // Naya Cleaner Use Karein (Isme Punctuation bachegi, to voice pause legi)
+    // Text ko clean karein taaki symbols na bole
     let cleanText = cleanTextForTTS(text);
 
     if (window.Android && typeof window.Android.speak === 'function') {
         window.Android.speak(cleanText);
     } else if (synth) {
         const utterance = new SpeechSynthesisUtterance(cleanText);
+        
+        // Hindi voice set karein (Agar available ho)
         if (hindiVoice) utterance.voice = hindiVoice;
         
-        // --- Professional Settings ---
-        utterance.rate = 0.9;  // Thoda dhire (Clear aur Professional lagta hai)
-        utterance.pitch = 1.0; // Normal pitch (Friendly)
-        
+        // --- SETTINGS FOR FRIENDLY VOICE ---
+        utterance.rate = 0.95;  // Thoda sa dhire (Natural lagta hai)
+        utterance.pitch = 1.0;  // Normal Pitch
+        utterance.volume = 1.0; // Full Volume
+
         speechSynthesis.speak(utterance);
     }
 }
 
-// --- UPDATED START AUDIO (Toggle Button ke liye) ---
+// --- START AUDIO FUNCTION (Toggle Button ke liye bhi same logic) ---
 function startAudio(text) {
     let cleanText = cleanTextForTTS(text);
     
@@ -965,13 +969,12 @@ function startAudio(text) {
     } else if (synth) {
         const utterance = new SpeechSynthesisUtterance(cleanText);
         if (hindiVoice) utterance.voice = hindiVoice;
-        
-        // --- Professional Settings ---
-        utterance.rate = 0.9; // Speed thodi kam (Professional feel ke liye)
-        
+        utterance.rate = 0.95; 
+
         // Jab bolna khatam ho, icon wapas badal dein
         utterance.onend = () => {
             if (currentPlayingBtn) {
+                // Speaker Icon Wapas
                 currentPlayingBtn.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
                 currentPlayingBtn = null;
             }
@@ -979,7 +982,6 @@ function startAudio(text) {
         speechSynthesis.speak(utterance);
     }
 }
-
 // --- TOGGLE SPEECH FUNCTION (No Change needed here, but ensure it calls startAudio) ---
 function toggleSpeech(text, btnElement) {
     const speakerIcon = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
