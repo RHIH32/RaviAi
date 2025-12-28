@@ -170,7 +170,7 @@ code {
 /* Bold text ko highlight karein */
 .message-bubble strong {
     font-weight: 700 !important;
-    color: #ffffff !important; /* Bold text white chamkega */
+    color: inherit !important; /* Bold text white chamkega */
 }
     </style>
 </head>
@@ -1025,7 +1025,6 @@ if (isSpeechSupported) {
     // NAYA CHECK: Agar app normal browser mein hai (Android App nahi hai),
     // tabhi buttons ko hide karne ka socho.
     if (!window.Android) {
-        if (muteButton) muteButton.style.display = 'none';
         if (micButton) micButton.style.display = 'none';
     }
     // Agar yeh Android App hai, to mute button ko dikhne do, kyunki
