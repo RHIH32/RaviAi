@@ -41,73 +41,102 @@ if (GEMINI_API_KEYS.length === 0) {
     process.exit(1);
 }
 
-// === ✅ UPDATED /api/generate ENDPOINT (Quota Saving Logic Added) ===
+// === ✅ SMART /api/generate (Auto Search + Auto Image) ===
 app.post('/api/generate', async (req, res) => {
     try {
-        const { contents, systemInstruction } = req.body;
+        const { contents, systemInstruction, isDeepResearch } = req.body;
+        
         if (!contents) {
             return res.status(400).json({ error: 'Request body must contain "contents".' });
         }
 
-        // --- 🛑 QUOTA SAVER LOGIC START ---
-        // Hum check karenge ki kya user image maang raha hai.
-        // Agar haan, to hum Gemini ko call NAHI karenge aur khud JSON bana kar bhej denge.
+        // User ka latest message nikalo
+        const lastMessagePart = contents[contents.length - 1]?.parts[0];
+        let userText = "";
         
-        try {
-            // User ka latest message nikalo
-            const lastMessagePart = contents[contents.length - 1]?.parts[0];
-            
-            // Sirf tab check karo agar message text hai (File nahi hai)
-            if (lastMessagePart && lastMessagePart.text) {
-                const userText = lastMessagePart.text.toLowerCase();
+        if (lastMessagePart && lastMessagePart.text) {
+            userText = lastMessagePart.text.toLowerCase();
+        }
 
-                // Keywords jo image request batate hain
+        // --- 1. IMAGE GENERATION CHECK (Quota Saver) ---
+        try {
+            if (userText) {
                 const isImageRequest = 
                     (userText.includes("image") || userText.includes("photo") || userText.includes("tasveer") || userText.includes("picture") || userText.includes("drawing") || userText.includes("sketch")) &&
                     (userText.includes("create") || userText.includes("generate") || userText.includes("make") || userText.includes("draw") || userText.includes("banao") || userText.includes("dikhao"));
 
                 if (isImageRequest) {
-                    console.log("Image request detected! Skipping Gemini to SAVE QUOTA. 🟢");
-                    
-                    // Hum waisa hi JSON return karenge jaisa Gemini karta hai
-                    // Taki Frontend ka code (handleAIResponse) ise samajh sake aur image generate kar de.
+                    console.log("🎨 Image request detected! Skipping Gemini.");
                     const fakeGeminiResponse = JSON.stringify({
                         action: "generate_image",
-                        prompt: lastMessagePart.text, // User ka asli text
+                        prompt: lastMessagePart.text,
                         response: "Haan zaroor! Main aapke liye ye tasveer bana raha hoon... 🎨"
                     });
-
                     return res.json({ text: fakeGeminiResponse });
                 }
             }
-        } catch (checkError) {
-            console.error("Error checking for image keywords:", checkError);
-            // Agar check me error aaye to normal chalne do, koi dikkat nahi
+        } catch (checkError) { console.error(checkError); }
+
+        // --- 2. SMART SEARCH DETECTION (Auto Internet) ---
+        // Agar user ne Toggle ON kiya hai, TOH search karega hi.
+        // LEKIN agar Toggle OFF hai, tab bhi hum check karenge ki kya search zaroori hai?
+        
+        let enableGoogleSearch = isDeepResearch; // Default: Jo user ne frontend se bheja
+
+        if (!enableGoogleSearch && userText) {
+            // In shabdon se pata chalega ki user ko TAZA jaankari chahiye
+            const searchTriggers = [
+                "news", "khabar", "samachar",    // News
+                "weather", "mausam", "temperature", // Weather
+                "score", "match", "cricket", "live", // Sports
+                "price", "rate", "bhav", "kemat", "share market", // Finance
+                "latest", "current", "abhi", "aaj", "today", "now", // Time-based
+                "kaun hai", "who is", "kya hai", "what is", // General queries (Optional, can remove if too sensitive)
+                "search", "dhundo", "google" // Direct command
+            ];
+
+            // Check karein agar koi keyword match hota hai
+            if (searchTriggers.some(keyword => userText.includes(keyword))) {
+                console.log("🌍 Auto-Search Triggered: User asked for live info.");
+                enableGoogleSearch = true;
+            }
         }
-        // --- 🛑 QUOTA SAVER LOGIC END ---
 
-
-        // Agar Image nahi hai, to Gemini ko call karo (Normal Chat)
+        // --- 3. CALL GEMINI API ---
         const currentApiKey = getNextApiKey();
         
-        // Model Updated to 2.0 Flash (Fast & Efficient)
-       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${currentApiKey}`;
-        const payload = { contents, ...(systemInstruction && { systemInstruction }) };
+        // Google Search Tool Configuration
+        let tools = [];
+        if (enableGoogleSearch) {
+            tools = [{ googleSearch: {} }];
+        }
+
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${currentApiKey}`;        
+        const payload = { 
+            contents, 
+            ...(systemInstruction && { systemInstruction }),
+            ...(enableGoogleSearch && { tools: tools }) // Tool tabhi add hoga jab zaroorat ho
+        };
         
         const response = await axios.post(apiUrl, payload);
-        const textResponse = response.data.candidates[0].content.parts[0].text;
         
+        const candidate = response.data.candidates[0];
+        let textResponse = "";
+
+        if (candidate.content && candidate.content.parts) {
+            textResponse = candidate.content.parts.map(part => part.text || "").join("");
+        }
+        
+        // Search Results ka citation (reference) agar mile to use ignore kar sakte hain ya format kar sakte hain
+        // Gemini automatically answer me integrate kar deta hai.
+
         res.json({ text: textResponse });
 
     } catch (error) {
         console.error('Error in /api/generate:', error.response ? error.response.data : error.message);
-        if (error.code === 'auth/id-token-expired') {
-            return res.status(401).send({ error: "Session expire ho gaya, कृपया dobara login karein." });
-        }
         res.status(500).json({ error: 'Failed to get response from AI model.' });
     }
 });
-
 
 // === API: IMAGE GENERATION (Pollinations.ai - Free & No Key) ===
 app.post('/api/generate-image', async (req, res) => {
@@ -150,4 +179,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
+
 
