@@ -3,17 +3,15 @@ const axios = require('axios');
 const cors = require('cors');
 require('dotenv').config();
 
-// --- NAYA: Firebase Admin SDK Setup ---
+// --- Firebase Admin SDK Setup ---
 const admin = require('firebase-admin');
-// ZAROORI: Apne Firebase project se 'serviceAccountKey.json' file download karke
-// is file ke saath rakhein.
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 const db = admin.firestore();
-const DAILY_LIMIT = 20; // Aap apni free limit yahan set kar sakte hain
+const DAILY_LIMIT = 20;
 // ------------------------------------
 
 const app = express();
@@ -21,7 +19,6 @@ const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
-// Limit 50mb kar di taaki photo/pdf send ho sake
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(__dirname));
@@ -44,38 +41,61 @@ if (GEMINI_API_KEYS.length === 0) {
     process.exit(1);
 }
 
-// === SAHI WALA /api/generate ENDPOINT (SIRF EK BAAR) ===
+// === ✅ UPDATED /api/generate ENDPOINT (Quota Saving Logic Added) ===
 app.post('/api/generate', async (req, res) => {
-    // Abhi ke liye hum limit check ko band rakhenge, aap baad mein chalu kar sakte hain
-    /*
-    const idToken = req.headers.authorization?.split('Bearer ')[1];
-    if (!idToken) {
-        return res.status(401).send({ error: "Authentication token nahi mila." });
-    }
-    */
-    
     try {
-        /*
-        const decodedToken = await admin.auth().verifyIdToken(idToken);
-        const uid = decodedToken.uid;
-        // Firestore limit check logic yahan aayegi...
-        */
-
         const { contents, systemInstruction } = req.body;
         if (!contents) {
             return res.status(400).json({ error: 'Request body must contain "contents".' });
         }
+
+        // --- 🛑 QUOTA SAVER LOGIC START ---
+        // Hum check karenge ki kya user image maang raha hai.
+        // Agar haan, to hum Gemini ko call NAHI karenge aur khud JSON bana kar bhej denge.
         
+        try {
+            // User ka latest message nikalo
+            const lastMessagePart = contents[contents.length - 1]?.parts[0];
+            
+            // Sirf tab check karo agar message text hai (File nahi hai)
+            if (lastMessagePart && lastMessagePart.text) {
+                const userText = lastMessagePart.text.toLowerCase();
+
+                // Keywords jo image request batate hain
+                const isImageRequest = 
+                    (userText.includes("image") || userText.includes("photo") || userText.includes("tasveer") || userText.includes("picture") || userText.includes("drawing") || userText.includes("sketch")) &&
+                    (userText.includes("create") || userText.includes("generate") || userText.includes("make") || userText.includes("draw") || userText.includes("banao") || userText.includes("dikhao"));
+
+                if (isImageRequest) {
+                    console.log("Image request detected! Skipping Gemini to SAVE QUOTA. 🟢");
+                    
+                    // Hum waisa hi JSON return karenge jaisa Gemini karta hai
+                    // Taki Frontend ka code (handleAIResponse) ise samajh sake aur image generate kar de.
+                    const fakeGeminiResponse = JSON.stringify({
+                        action: "generate_image",
+                        prompt: lastMessagePart.text, // User ka asli text
+                        response: "Haan zaroor! Main aapke liye ye tasveer bana raha hoon... 🎨"
+                    });
+
+                    return res.json({ text: fakeGeminiResponse });
+                }
+            }
+        } catch (checkError) {
+            console.error("Error checking for image keywords:", checkError);
+            // Agar check me error aaye to normal chalne do, koi dikkat nahi
+        }
+        // --- 🛑 QUOTA SAVER LOGIC END ---
+
+
+        // Agar Image nahi hai, to Gemini ko call karo (Normal Chat)
         const currentApiKey = getNextApiKey();
-        // Option 1: Stable Version (Sabse Safe)
-      // Naya / Sahi Code (High Limit wala):
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${currentApiKey}`;
+        
+        // Model Updated to 2.0 Flash (Fast & Efficient)
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${currentApiKey}`;
         const payload = { contents, ...(systemInstruction && { systemInstruction }) };
         
         const response = await axios.post(apiUrl, payload);
         const textResponse = response.data.candidates[0].content.parts[0].text;
-        
-        // Firestore limit update logic yahan aayegi...
         
         res.json({ text: textResponse });
 
@@ -99,25 +119,24 @@ app.post('/api/generate-image', async (req, res) => {
 
         console.log("Generating image for:", prompt);
 
-        // 1. Pollinations AI ka URL banayein (Seed add karte hain taki har baar alag image bane)
+        // 1. Pollinations AI ka URL
         const seed = Math.floor(Math.random() * 10000);
-        const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed}&width=512&height=512&nologo=true`;
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?seed=${seed}&width=1024&height=1024&nologo=true&model=flux`; // Model flux kar diya better quality ke liye
 
-        // 2. Image ko download karein (Binary format mein)
+        // 2. Image ko download karein
         const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
 
-        // 3. Image ko Base64 mein convert karein (Kyuki apka frontend Base64 mangta hai)
+        // 3. Image ko Base64 mein convert karein
         const base64Image = Buffer.from(response.data, 'binary').toString('base64');
 
-       // 4. Frontend ko bhej dein (URL zaroor bhejein history ke liye)
-    res.json({ 
-    base64Image: base64Image,
-    imageUrl: imageUrl 
-});
+        // 4. Frontend ko bhej dein
+        res.json({ 
+            base64Image: base64Image,
+            imageUrl: imageUrl 
+        });
 
     } catch (error) {
         console.error("Image Gen Error:", error.message);
-        // Agar fail ho jaye, to user ko error dikhayein
         res.status(500).json({ error: "Image generation failed. Try again." });
     }
 });
@@ -131,12 +150,3 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Ravi AI server is running at http://localhost:${port}`);
 });
-
-
-
-
-
-
-
-
-
