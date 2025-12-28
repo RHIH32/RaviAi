@@ -900,67 +900,63 @@ function loadVoices() {
     console.log("Voices loaded. Hindi voice:", hindiVoice ? hindiVoice.name : "None");
 }
 
-// --- NEW HELPER: Text Cleaning for Better Voice (Smart) ---
+// --- NEW HELPER: Text Cleaning for Better Voice (Smart & No Emojis) ---
 function cleanTextForTTS(text) {
     return text
-        // 1. Code Blocks ko skip karein (Pura code padhne se bachein)
+        // 1. Sabse Pehle Emojis Hatayein (Unicode Range for Emojis)
+        // Yeh line saare emojis (😀, 🚀, 🌟, 🇮🇳 etc.) ko delete kar degi
+        .replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '')
+
+        // 2. Code Blocks ko skip karein
         .replace(/```[\s\S]*?```/g, ' Yahan code diya gaya hai. ')
         
-        // 2. URLs/Links hatayein
+        // 3. URLs/Links hatayein
         .replace(/https?:\/\/\S+/g, 'link')
         
-        // 3. Bold/Italic ke stars (**) hatayein, taaki "Star Star" na bole
+        // 4. Formatting Symbols hatayein (Bold, Italic, Underscore)
         .replace(/\*\*/g, '') 
         .replace(/\*/g, '')   
         .replace(/__/g, '')   
 
-        // 4. Bullet Points (* ya -) jo line ke shuru mein ho, unhe hata dein
-        // Isse wo "Dash" ya "Star" nahi bolega, seedha point padhega
+        // 5. Bullet Points (* ya -) jo line ke shuru mein ho, unhe hata dein
         .replace(/^[\*\-]\s+/gm, '') 
 
-        // 5. Numbered Lists (1. 2.) ka DOT (.) hata kar COMMA (,) lagayein
-        // Isse wo "One Dot" nahi bolega, balki "One [pause]" bolega.
+        // 6. Numbered Lists (1. 2.) ka DOT (.) hata kar COMMA (,) lagayein (Pause ke liye)
         .replace(/^\s*(\d+)\.\s+/gm, '$1, ') 
 
-        // 6. Colons (:) ko bhi comma banayein taaki natural pause mile
+        // 7. Colons (:) ko comma banayein
         .replace(/:/g, ', ')
 
-        // 7. Hash (#) headings hatayein
+        // 8. Hash (#) headings hatayein
         .replace(/#/g, '')
 
-        // 8. Extra spaces clean karein
+        // 9. Extra spaces clean karein
         .replace(/\s+/g, ' ').trim();
 }
-
-// --- UPDATED SPEAK FUNCTION (Professional Tone) ---
+// --- UPDATED SPEAK FUNCTION ---
 function speak(text) {
-    // Purana bolna cancel karein
-    if (synth) synth.cancel(); 
+    if (synth) synth.cancel(); // Purana bolna band karein
     if (window.Android && typeof window.Android.stopSpeak === 'function') window.Android.stopSpeak();
 
     if (!text || isMuted) return;
 
-    // Text ko clean karein taaki symbols na bole
+    // Naya Cleaner Use Karein (Isme Punctuation bachegi, to voice pause legi)
     let cleanText = cleanTextForTTS(text);
 
     if (window.Android && typeof window.Android.speak === 'function') {
         window.Android.speak(cleanText);
     } else if (synth) {
         const utterance = new SpeechSynthesisUtterance(cleanText);
-        
-        // Hindi voice set karein (Agar available ho)
         if (hindiVoice) utterance.voice = hindiVoice;
         
-        // --- SETTINGS FOR FRIENDLY VOICE ---
-        utterance.rate = 0.95;  // Thoda sa dhire (Natural lagta hai)
-        utterance.pitch = 1.0;  // Normal Pitch
-        utterance.volume = 1.0; // Full Volume
-
+        // --- Professional Settings ---
+        utterance.rate = 0.9;  // Thoda dhire (Clear aur Professional lagta hai)
+        utterance.pitch = 1.0; // Normal pitch (Friendly)
+        
         speechSynthesis.speak(utterance);
     }
 }
-
-// --- START AUDIO FUNCTION (Toggle Button ke liye bhi same logic) ---
+// --- UPDATED START AUDIO (Toggle Button ke liye) ---
 function startAudio(text) {
     let cleanText = cleanTextForTTS(text);
     
@@ -969,12 +965,13 @@ function startAudio(text) {
     } else if (synth) {
         const utterance = new SpeechSynthesisUtterance(cleanText);
         if (hindiVoice) utterance.voice = hindiVoice;
-        utterance.rate = 0.95; 
-
+        
+        // --- Professional Settings ---
+        utterance.rate = 0.9; // Speed thodi kam (Professional feel ke liye)
+        
         // Jab bolna khatam ho, icon wapas badal dein
         utterance.onend = () => {
             if (currentPlayingBtn) {
-                // Speaker Icon Wapas
                 currentPlayingBtn.innerHTML = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>`;
                 currentPlayingBtn = null;
             }
