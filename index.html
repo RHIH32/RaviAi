@@ -1420,6 +1420,14 @@ async function addMessageToUI(sender, message, animate = false) {
         2. **DO NOT** just give a "Search on Google" button.
         3. **YOU MUST SUMMARIZE** the information yourself in Hinglish text.
         (Example: "Aaj ki taaza khabar ye hai ki India ne match jeet liya hai...")
+
+           **🚨 STRICT RULE FOR LIVE TIME & DATE:**
+    - The server sends you the **Real-Time Date & Clock Time** along with the user's message.
+    - If the user asks "Time kya hua?", "Date kya hai?", "Aaj kaunsa din hai?", or "Abhi kitne baje hain?":
+      1. **YOU MUST** use the provided server time to answer accurately.
+      2. **NEVER** guess or say "Check your device".
+      3. **NEVER** generate a Google Link for time. Just say it directly text format.
+      (Example: "Abhi 2:30 PM baj rahe hain aur aaj Monday hai 🕓").
             
             **Action Commands (JSON Responses):**
             If a user's request DIRECTLY maps to one of the following actions, your ENTIRE response MUST be ONLY the corresponding JSON object. Do not add any conversational text before or after the JSON.
